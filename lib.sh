@@ -71,6 +71,12 @@ alias la='ls -la'
 
 alias f=find
 
+alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
+alias ecpnoacl=_editto
+alias ecp='_editto --acl'
+alias editto=ecp
+
+alias ecpnoacl=
 function _fdrm() {
 	local nameflag="$1"
 	local what="$2"
@@ -144,10 +150,10 @@ function ffiles() {
 	done
 
 }
-
-function ufdirs() {
-	for d in "$@"; do chflags -R nouchg,noschg "$d"; done
-}
+alias lock='chflags uchg,schg'
+alias lockr='lock -R'
+alias unlock='chflags -R nouchg,noschg'
+alias ufdirs=unlock
 
 # index
 
