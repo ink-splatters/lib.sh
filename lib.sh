@@ -1,4 +1,4 @@
-VERSION=1.0
+LIBSH_VERSION=20230103
 cat <<EOF
 			lib.sh v$VERSION
 Initializing...
@@ -12,9 +12,16 @@ function _problem() { echo '**' there is a problem with: $@; }
 macchina 2>/dev/null || _problem macchina
 mullvad status 2>/dev/null || _problem mullvad status
 
-alias uuid0='uuidgen | sed -E "s/[^-]/0/g" | tr -d "\n"'
+# uuid generation
+alias uuid=uuidgen
+alias ugen=uuid
+alias ug=ugen
+alias u0='echo 00000000-0000-0000-0000-000000000000 | tr -d "\n"'
 
-alias about='macchina'
+# random 64-byte hex value
+alias r64='printf "%s%s" $(ugen)$(ugen) | tr "[[:upper:]]" "[[:lower:]]" | tr -d "-" | grep -oE ".{64}"'
+
+about='macchina'
 
 alias m=mullvad
 alias ms='echo Mullvad status: ; m status'
@@ -48,15 +55,17 @@ alias lcd='lc disable'
 alias lcbs='lc bootstrap'
 alias lck='lc kill'
 alias lcks='lc kickstart -k'
-alias pbc='pbcopy'
-alias ppp='pbpaste'
-alias xml1='plutil -convert xml1'
-alias bin1='plutil -convert binary1'
+alias c=pbcopy
+alias p=pbpaste
+alias ptrim="p | tr -d '\n'"
+alias ptr=ptrim
 
 # plists
 
-alias p=/usr/libexec/PlistBuddy
-alias pp='p -c print'
+alias pb=/usr/libexec/PlistBuddy
+alias pp='pb -c print'
+alias xml1='plutil -convert xml1'
+alias bin1='plutil -convert binary1'
 
 # functools
 alias x=xargs
@@ -215,13 +224,13 @@ alias kd='kitty +kitten diff'
 
 alias mk=mkdir
 alias mkp='mk -p'
-alias t=touch
 alias _fd=fd
 alias fd='_fd -iuuu'
 alias _rg=rg
 alias rg='_rg -uuu'
 alias rgi='_rg -iuuu'
 
+# TODO: mind that c is for pbcopy
 # c() {
 # 	if [[ $# -gt 1 ]] ; then echo error ; return ; fi
 #	uutils-coreutils "$1"
@@ -247,32 +256,33 @@ alias q='nix-env -q'
 alias snap='tmutil localsnapshot /'
 alias unsnap='tmutil deletelocalsnapshots / ; tmutil deletelocalsnapshots /Volumes/Shared'
 
-# diskutil / asr
+# diskutil general
 
 alias d='diskutil'
 alias l='diskutil list'
 alias dm='d mount'
 alias dum='d umount'
+alias dud='d umountDisk'
 alias dr='d rename'
+
+# apfs
 
 alias a='d apfs'
 alias au='a unlock'
 alias al='a lock'
 alias alu='a listUsers'
+
 function ausr() { a listUsers "$1" | grep -Eo '[0-9A-F-]{36}' | head -1; }
 
 alias alvg='a listVolumeGroups'
 alias adelvg='a deleteVolumeGroup'
-
 alias als='a listSnapshots'
-
 alias aav='a addVolume'
 alias adel='a deleteVolume'
 
 function aev() { a encryptVolume "$1" -user disk; }
 function adv() { a decryptVolume "$1" -user $(ausr "$1"); }
 
-function aev() { a encryptVolume "$1" -user disk; }
 function aav() {
 	if [[ $# -lt 2 ]]; then
 		echo not enough args
@@ -281,37 +291,36 @@ function aav() {
 	a addVolume "$1" APFS "$2"
 }
 
-function acloneex() {
-	local s="$1"
-	local t="$2"
-	local snap="$3"
-	shift 3
+# asr to become synonim of 'asr restore'
+function _asrwrap() {
+	local in="$1"
 
-	if [ "$snap" != "" ]; then
-		snap=(--toSnapshot $snap)
+	if [[ ! "$in" =~ ^/dev ]]; then
+		in="'$in'"
 	fi
 
-	asr restore -s "$s" -t "$t" ${snap[*]} $@
+	printf "%s" "$in"
 }
 
-function aclonesnap() {
-	local s="$1"
-	local t="$2"
+function _asrargs() {
+
+	local stargs=(-s $(_asrwrap "$1") -t $(_asrwrap "$2"))
 	shift 2
 
-	acloneex "$s" "$t" $@
+	echo "${stargs[*]}" $@
+
 }
 
-function aclone() {
-	local s="$1"
-	local t="$2"
-	shift 2
-	local snap=$(als "$s" | grep -Eo '[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}')
+function asr() {
+	if [ $# -lt 2 ]; then
+		echo ERROR: not enough arguments
+		return 1
+	fi
 
-	acloneex "$s" "$t" $snap $@
+	echo /usr/sbin/asr restore $(_asrargs $@)
 }
 
-# scm (git)
+# git
 
 alias g=git
 alias gb='g branch'
@@ -326,6 +335,9 @@ alias gf='g fetch -vp'
 alias gl='g log'
 alias gl1='gl -1'
 alias gd='git difftool --no-symlinks --dir-diff'
+
+# TODO: ✂ - - - - - - - - - - - - - - - - - - -
+
 echo -- "${BASH_SOURCE[0]}"
 function _init() {
 	local self="${BASH_SOURCE[0]}"
