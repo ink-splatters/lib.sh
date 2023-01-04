@@ -16,9 +16,10 @@ mullvad status 2>/dev/null || _problem mullvad status
 alias uuid=uuidgen
 alias ugen=uuid
 alias ug=ugen
-alias u0='echo 00000000-0000-0000-0000-000000000000 | tr -d "\n"'
+alias u0='printf "%s"  00000000-0000-0000-0000-000000000000' 
 
 # random 64-byte hex value
+# TODO: generalize
 alias r64='printf "%s%s" $(ugen)$(ugen) | tr "[[:upper:]]" "[[:lower:]]" | tr -d "-" | grep -oE ".{64}"'
 
 about='macchina'
