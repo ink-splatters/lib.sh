@@ -401,6 +401,19 @@ alias gl='g log'
 alias gl1='gl -1'
 alias gd='git difftool --no-symlinks --dir-diff'
 
+# hdiutil
+
+alias _h=hdiutil
+alias _ha='h attach'
+alias _hnv='_ha -noverify'
+alias _hnvo='_hnv -owners on'
+alias hm=_hnvo
+alias ha='hm -nomount'
+alias has='ha -shadow'
+alias hms='hm -shadow'
+alias hd='_h detach'
+alias hi='_h info'
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 function _init() {
