@@ -1,6 +1,6 @@
-LIBSH_VERSION=20230103
+LIBSH_VERSION=20230115
 cat <<EOF
-			lib.sh v$VERSION
+			lib.sh v$LIBSH_VERSION
 Initializing...
 
 EOF
@@ -9,28 +9,87 @@ EOF
 
 function _problem() { echo '**' there is a problem with: $@; }
 
-macchina 2>/dev/null || _problem macchina
-mullvad status 2>/dev/null || _problem mullvad status
-
 # uuid generation
 alias uuid=uuidgen
 alias ugen=uuid
 alias ug=ugen
 alias u0='printf "%s"  00000000-0000-0000-0000-000000000000'
 
-# random 64-byte hex value
-# TODO: generalize
-alias r64='printf "%s%s" $(ugen)$(ugen) | tr "[[:upper:]]" "[[:lower:]]" | tr -d "-" | grep -oE ".{64}"'
+# generation using /dev/random
+
+function urand() {
+	if [[ $# == 0 ]]; then
+		cat <<EOF
+the util takes <count> bytes from /dev/urandom and outputs lower-case hex values
+
+usage: urand <count> [-f] [-n]
+
+<count>		byte count
+-f, --force	if count > 64, the flag is required
+-n, --newline	if specified, '\n' is added after the output
+
+example: to get 256 bit nonce use: $(urand 32)
+
+EOF
+		return 1
+	fi
+
+	local f=0
+	local n=0
+
+	local count=$1
+	shift
+	((count == 0)) &&
+		echo "ERROR: invalid value: $count" &&
+		return 1
+
+	while [[ $1 != "" ]]; do
+		case $1 in
+		-f | --force)
+			f=1
+			;;
+
+		-n | --newline)
+			n=1
+			;;
+
+		esac
+		shift
+	done
+
+	((count > 64)) && ((f != 1)) &&
+		echo 'for count > 64 use -f' &&
+		return 1
+
+	dd if=/dev/urandom bs=1 count=$count 2>/dev/null | xxd -p | tr -d '\n'
+
+	((n == 1)) && echo
+}
+
+alias ur=urand
+function urn() {
+	ur $@ -n
+}
+
+# pair of short nonces
+function urpair() {
+	ur 16 | grep -Eo '.{16}'
+}
 
 alias about='macchina'
 alias br='broot'
 
-alias m=mullvad
-alias ms='echo Mullvad status: ; m status'
-alias mc='m connect'
-alias md='m disconnect'
-alias mr='m reconnect'
-alias mvpn='m always-require-vpn set'
+alias v='ivpn'
+alias vh='v -h'
+alias vhh='v -h -full'
+alias vf='v firewall'
+alias von='vf -on'
+alias voff='vf -off'
+alias vfe='vf -exceptions'
+alias vs='ivpn status'
+alias vc='ivpn connect'
+alias vcl='vc -last'
+alias vd='ivpn disconnect'
 
 # editing / viewing
 
@@ -41,13 +100,14 @@ if [[ "$EDITOR" == "" ]]; then
 	export EDITOR=vim
 fi
 alias vi="$EDITOR"
-alias v=vi
 alias fs="source ~/.zshrc"
 alias fle="vim $HOME/zshrc.lib"
 alias batlog='bat --paging=never -l log'
+alias e=echo
 
 # themes
-alias themes="kitty +kitten themes"
+# TODO: list wezterm themes?
+# alias themes="kitty +kitten themes"
 
 # launchctl
 
@@ -69,8 +129,13 @@ alias pp='pb -c print'
 alias xml1='plutil -convert xml1'
 alias bin1='plutil -convert binary1'
 
-# functools
+# functools kinda stuff (love it)
 alias x=xargs
+alias xo='x -n1'
+
+# uppercase
+alias upper='tr "[[:lower:]]" "[[:upper:]]"'
+alias uc=upper
 
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
@@ -205,7 +270,8 @@ function tree {
 	broot -c :pt "$@"
 }
 alias s=sudo
-alias k9='kill -9'
+alias si='sudo -i'
+alias k='kill -9'
 
 function _maybe() {
 	commdand -v $@ >/dev/null 2>&1 && $@
@@ -222,7 +288,8 @@ if [ -n "${commands[fzf - share]}" ]; then
 	source "$(fzf-share)/completion.zsh"
 fi
 
-alias kd='kitty +kitten diff'
+# no anymore myaw in da houze
+# alias kd='kitty +kitten diff'
 
 alias mk=mkdir
 alias mkp='mk -p'
@@ -238,11 +305,7 @@ alias rgi='_rg -iuuu'
 #	uutils-coreutils "$1"
 # }
 
-alias n='sudo nextdns'
-alias na='n activate'
-alias nd='n deactivate'
-alias ns='n status'
-alias nr='n restart'
+alias ns='networksetup'
 alias nl='nslookup'
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
@@ -340,9 +403,11 @@ alias gd='git difftool --no-symlinks --dir-diff'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
-echo -- "${BASH_SOURCE[0]}"
 function _init() {
-	local self="${BASH_SOURCE[0]}"
+
+	local exp='self="${BASH_SOURCE[0]:-${(%):-%x}}"'
+	eval $(echo $exp)
+
 	if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then self="$(pwd)/$self"; fi
 
 	echo -- self: $self
@@ -374,17 +439,29 @@ function _init() {
 		local bspath=/etc/profile
 		local bkpath='N/A'
 
+		local tmpfile=$(mktemp)
 		if [ -f $bspath ]; then
 			bkpath=$bspath.orig
-			cp -a $bspath $bkpath
+			if [ ! -f $bkpath ]; then
+				cp -a $bspath $bkpath
+			else
+				echo -- not overwriting backed up original profile: $bkpath
+			fi
 		fi
 
-		cat <<EOF >>$bspath
-# lib.sh: footer written on $(date '+%+')
-__LIBSH_INITIALIZED=1 source $self
+		cat $tmpfile >$bspath
+		cat <<EOF >$bspath
+# lib.sh footer written on $(date '+%+')
+__LIBSH_INITIALIZED=1 source "$self"
+
+alias fsl="source '$self'"
+alias flel="vi '$self'"
+alias fs="source /etc/profile"
+alias fle="vi /etc/profile"
+
 export PATH="$PATH"
 echo -- PATH: "$PATH"
-# lib.sh: footer written
+# end of lib.sh footer
 EOF
 
 		cat <<EOF
