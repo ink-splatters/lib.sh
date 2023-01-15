@@ -404,7 +404,7 @@ alias gd='git difftool --no-symlinks --dir-diff'
 # hdiutil
 
 alias _h=hdiutil
-alias _ha='h attach'
+alias _ha='_h attach'
 alias _hnv='_ha -noverify'
 alias _hnvo='_hnv -owners on'
 alias hm=_hnvo
