@@ -101,7 +101,7 @@ if [[ "$EDITOR" == "" ]]; then
 fi
 alias vi="$EDITOR"
 alias fs="source ~/.zshrc"
-alias fle="vim $HOME/zshrc.lib"
+alias fle="vim $HOME/.zshrc"
 alias batlog='bat --paging=never -l log'
 alias e=echo
 
