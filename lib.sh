@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230115
+LIBSH_VERSION=20230128
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -135,7 +135,7 @@ alias xo='x -n1'
 
 # uppercase
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
-alias uc=upper
+alias up=upper
 
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
@@ -240,7 +240,6 @@ function mdon() { mdutil -i on "$1" -E; }
 alias mdaoff='mdoff -a'
 
 # wireless && networking
-export PATH="$PATH:/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources"
 alias airportd=/usr/libexec/airportd
 alias ap='airport'
 alias apd='airportd'
@@ -318,8 +317,21 @@ alias q='nix-env -q'
 
 #TM snapshots
 
-alias snap='tmutil localsnapshot /'
-alias unsnap='tmutil deletelocalsnapshots / ; tmutil deletelocalsnapshots /Volumes/Shared'
+alias t=tmutil
+alias snap='tmutil localsnapshot'
+alias ts=snap
+alias _tus='tmutil deletelocalsnapshots'
+function unsnap() {
+
+	# _tus /
+	# for v in /Volumes/* ; do _tus "$v" ; done
+
+	mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
+	echo Unmounted volumes were unaffected.
+
+}
+alias usnap=unsnap
+alias tus=unsnap
 
 # diskutil general
 
@@ -356,35 +368,6 @@ function aav() {
 	a addVolume "$1" APFS "$2"
 }
 
-# asr to become synonim of 'asr restore'
-function _asrwrap() {
-	local in="$1"
-
-	if [[ ! "$in" =~ ^/dev ]]; then
-		in="'$in'"
-	fi
-
-	printf "%s" "$in"
-}
-
-function _asrargs() {
-
-	local stargs=(-s $(_asrwrap "$1") -t $(_asrwrap "$2"))
-	shift 2
-
-	echo "${stargs[*]}" $@
-
-}
-
-function asr() {
-	if [ $# -lt 2 ]; then
-		echo ERROR: not enough arguments
-		return 1
-	fi
-
-	echo /usr/sbin/asr restore $(_asrargs $@)
-}
-
 # git
 
 alias g=git
@@ -403,8 +386,8 @@ alias gd='git difftool --no-symlinks --dir-diff'
 
 # hdiutil
 
-alias _h=hdiutil
-alias _ha='_h attach'
+alias h=hdiutil
+alias _ha='h attach'
 alias _hnv='_ha -noverify'
 alias _hnvo='_hnv -owners on'
 alias hm=_hnvo
