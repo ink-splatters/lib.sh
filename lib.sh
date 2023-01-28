@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230128_1
+LIBSH_VERSION=20230128_dev
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -76,6 +76,41 @@ function randn() {
 
 alias randp='rand 16 | grep -Eo ".{16}"' # pair of short nonces
 alias randup='randp | up'
+
+function randmac() {
+
+        if (($# > 1)); then
+                cat <<'EOF'
+Temporary changes network interface mac address. This does not survice a reboot.
+
+usage: randmac [<interface>]
+
+[<interface>]   optionally specified interace for the mac address to be set on
+EOF
+                return 1
+        fi
+
+        local interface=en0
+
+        if [ "$1" != "" ]; then
+                interface="$1"
+        fi
+
+        /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -z
+        local mac=$(ur 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g')
+
+        echo -- "generated value: $mac; attempting to set..."
+        set -x
+        ifconfig $interface ether "$mac"
+        set +x
+        if (($? == 0)); then
+                echo -- set mac address: $(ifconfig $interface ether | x | sed -E 's/^.+ether (.+)$/\1/g')
+        else
+                echo WARN: might not have worked, look at the config:
+                ifconfig $interface ether
+        fi
+}
+
 # misc
 
 alias about='macchina'
