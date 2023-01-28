@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230128
+LIBSH_VERSION=20230128_1
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -15,20 +15,24 @@ alias ugen=uuid
 alias ug=ugen
 alias u0='printf "%s"  00000000-0000-0000-0000-000000000000'
 
+# uppercase
+alias upper='tr "[[:lower:]]" "[[:upper:]]"'
+alias up=upper
+
 # generation using /dev/random
 
-function urand() {
+function rand() {
 	if [[ $# == 0 ]]; then
 		cat <<EOF
-the util takes <count> bytes from /dev/urandom and outputs lower-case hex values
+the util takes <count> bytes from /dev/random and outputs lower-case hex values
 
-usage: urand <count> [-f] [-n]
+usage: rand <count> [-f] [-n]
 
 <count>		byte count
 -f, --force	if count > 64, the flag is required
 -n, --newline	if specified, '\n' is added after the output
 
-example: to get 256 bit nonce use: $(urand 32)
+example: to get 256 bit nonce use: $(rand 32)
 
 EOF
 		return 1
@@ -61,20 +65,18 @@ EOF
 		echo 'for count > 64 use -f' &&
 		return 1
 
-	dd if=/dev/urandom bs=1 count=$count 2>/dev/null | xxd -p | tr -d '\n'
+	dd if=/dev/random bs=1 count=$count 2>/dev/null | xxd -p | tr -d '\n'
 
 	((n == 1)) && echo
 }
 
-alias ur=urand
-function urn() {
-	ur $@ -n
+function randn() {
+	rand $@ -n
 }
 
-# pair of short nonces
-function urpair() {
-	ur 16 | grep -Eo '.{16}'
-}
+alias randp='rand 16 | grep -Eo ".{16}"' # pair of short nonces
+alias randup='randp | up'
+# misc
 
 alias about='macchina'
 alias br='broot'
@@ -131,11 +133,7 @@ alias bin1='plutil -convert binary1'
 
 # functools kinda stuff (love it)
 alias x=xargs
-alias xo='x -n1'
-
-# uppercase
-alias upper='tr "[[:lower:]]" "[[:upper:]]"'
-alias up=upper
+alias x1='x -n1'
 
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
