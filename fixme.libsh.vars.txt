@@ -1,0 +1,8 @@
+LIBSH_VG=F0DB199C-D7FF-46A1-AF40-F200D4DC97C6
+LIBSH_SYSTEM_PATH=/Volumes/Macintosh HD
+LIBSH_SYSTEM_DEV=/dev/disk3s1
+LIBSH_PROFILE_PATH=/etc/profile
+LIBSH_PROFILE_BACKUP_PATH=/etc/profile.orig
+LIBSH_PATH=/Volumes/Data/Users/ez/dev/lib.sh/lib.sh
+LIBSH_DATA_PATH=/Volumes/Data
+LIBSH_DATA_DEV=/dev/disk3s5

@@ -1,0 +1,23 @@
+# lib.sh footer written on Fri  3 Feb 2023 00:43:47 UTC
+__LIBSH_INITIALIZED=1 source "/Volumes/Data/Users/ez/dev/lib.sh/lib.sh"
+
+export LIBSH_DATA_PATH="/Volumes/Data"
+export LIBSH_DATA_DEV="/dev/disk3s5"
+export LIBSH_SYSTEM_PATH="/Volumes/Macintosh HD"
+export LIBSH_SYSTEM_DEV="/dev/disk3s1"
+export LIBSH_VG="F0DB199C-D7FF-46A1-AF40-F200D4DC97C6"
+export LIBSH_PROFILE_PATH="/etc/profile"
+export LIBSH_PROFILE_BACKUP_PATH="/etc/profile.orig"
+export LIBSH_PATH="/Volumes/Data/Users/ez/dev/lib.sh/lib.sh"
+
+alias fsl="source /Volumes/Data/Users/ez/dev/lib.sh/lib.sh"
+alias flel="vi /Volumes/Data/Users/ez/dev/lib.sh/lib.sh"
+alias fs="source /etc/profile"
+alias fle="vi /etc/profile"
+
+export PATH="/Volumes/Data/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Volumes/Macintosh HD/usr/bin:/Volumes/Macintosh HD/usr/libexec:/Volumes/Macintosh HD/usr/sbin:/Volumes/Macintosh HD/sbin:/Volumes/Macintosh HD/bin"
+echo -- PATH: "/Volumes/Data/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Volumes/Macintosh HD/usr/bin:/Volumes/Macintosh HD/usr/libexec:/Volumes/Macintosh HD/usr/sbin:/Volumes/Macintosh HD/sbin:/Volumes/Macintosh HD/bin"
+
+
+
+# end of lib.sh footer
