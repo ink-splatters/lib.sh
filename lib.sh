@@ -392,6 +392,7 @@ function ausr() { a listUsers "$1" | grep -Eo '[0-9A-F-]{36}' | head -1; }
 alias alvg='a listVolumeGroups'
 alias adelvg='a deleteVolumeGroup'
 alias als='a listSnapshots'
+alias adels='a deleteSnapshot'
 alias aav='a addVolume'
 alias adel='a deleteVolume'
 
