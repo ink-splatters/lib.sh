@@ -564,4 +564,11 @@ EOF
 if [[ $__LIBSH_INITIALIZED != 1 ]]; then
 	_init
 	echo -- updated \$PATH: "$PATH"
+	if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
+		echo
+		echo Network Status:
+		echo -n '\tVPN: '
+		ms
+		echo "\tDNS: $(networksetup -getdnsservers 'Wi-Fi')"
+	fi
 fi
