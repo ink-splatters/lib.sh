@@ -206,11 +206,11 @@ alias la='ls -la'
 alias f=find
 
 alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
-alias ecpnoacl=_editto
 alias ecp='_editto --acl'
+alias ecpnoacl='_editto --noacl'
 alias editto=ecp
+alias edittonoacl=ecpnoacl
 
-alias ecpnoacl=
 function _fdrm() {
 	local nameflag="$1"
 	local what="$2"
@@ -396,7 +396,33 @@ alias dm='d mount'
 alias dum='d umount'
 alias dud='d umountDisk'
 alias dr='d rename'
+alias muw='mount -uw'
 
+function ms() {
+	if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
+		cat <<EOF
+mount apfs snapshot
+
+usage: ms <snapshot name> <device node> <mount point> [ ... mount options ]
+EOF
+
+		return 1
+	fi
+
+	local s=$1
+	local d=$2
+	local m="$3"
+	shift 3
+
+	local mopt=(-s $s $@)
+
+	if [ ! -d "$m" ]; then
+		mkdir -p "$m"
+		echo "-- mount point: $m created ( didn't exist )"
+	fi
+
+	mount_apfs ${mopt[*]} "$@" $d "$m"
+}
 # apfs
 
 alias a='d apfs'
