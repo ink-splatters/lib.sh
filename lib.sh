@@ -9,6 +9,26 @@ EOF
 
 function _problem() { echo '**' there is a problem with: $@; }
 
+#macchina 2>/dev/null || _problem macchina
+
+# networking
+alias n='sudo nextdns'
+alias na='n activate'
+alias nd='n deactivate'
+alias ns='n status'
+alias nr='n restart'
+alias nl='nslookup'
+
+alias m=mullvad
+alias ms='mullvad status 2>/dev/null || _problem mullvad status'
+alias mc='m connect'
+alias md='m disconnect'
+alias mr='m reconnect'
+alias mvpn='m always-require-vpn set'
+
+alias net='networksetup'
+alias ng=ngrep
+
 # uuid generation
 alias uuid=uuidgen
 alias ugen=uuid
@@ -341,9 +361,6 @@ alias rgi='_rg -iuuu'
 # 	if [[ $# -gt 1 ]] ; then echo error ; return ; fi
 #	uutils-coreutils "$1"
 # }
-
-alias ns='networksetup'
-alias nl='nslookup'
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
