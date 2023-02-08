@@ -567,8 +567,8 @@ if [[ $__LIBSH_INITIALIZED != 1 ]]; then
 	if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
 		echo
 		echo Network Status:
-		echo -n '\tVPN: '
+		echo -e '\tVPN: '
 		ms
-		echo "\tDNS: $(networksetup -getdnsservers 'Wi-Fi')"
+		echo -e "\tDNS: $(networksetup -getdnsservers 'Wi-Fi')"
 	fi
 fi
