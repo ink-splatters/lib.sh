@@ -7,27 +7,7 @@ EOF
 
 # status
 
-function _problem() { echo '**' there is a problem with: $@; }
-
-#macchina 2>/dev/null || _problem macchina
-
-# networking
-alias n='sudo nextdns'
-alias na='n activate'
-alias nd='n deactivate'
-alias ns='n status'
-alias nr='n restart'
-alias nl='nslookup'
-
-alias m=mullvad
-alias ms='mullvad status 2>/dev/null || _problem mullvad status'
-alias mc='m connect'
-alias md='m disconnect'
-alias mr='m reconnect'
-alias mvpn='m always-require-vpn set'
-
-alias net='networksetup'
-alias ng=ngrep
+function _problem() { echo '**' there was a problem running: $@; }
 
 # uuid generation
 alias uuid=uuidgen
@@ -97,6 +77,30 @@ function randn() {
 alias randp='rand 16 | grep -Eo ".{16}"' # pair of short nonces
 alias randup='randp | up'
 
+# networking
+
+alias n='sudo nextdns'
+alias na='n activate'
+alias nd='n deactivate'
+alias ni='n install'
+alias nl='nslookup'
+alias nr='n restart'
+alias ns='n status'
+alias nu='n uninstall'
+alias ncw='n config wizard'
+
+function m() {
+	mullvad $@ || _problem mullvad $@
+}
+
+alias mc='m connect ; m status'
+alias md='m disconnect ; m status'
+alias mr='echo Reconnecting... ; m reconnect ; m status'
+alias mvpn='m always-require-vpn set'
+
+alias net='networksetup'
+alias ng=ngrep
+
 function mac() {
 
 	local interface=en0
@@ -136,22 +140,67 @@ EOF
 	(($? == 0)) && mac && echo done.
 }
 
-# misc
+# status / system info
 
-alias about='macchina'
+#alias about='macchina'
+
+alias ms='m status'
+
+# mullvad status with increasing verbosity
+
+# TODO: get local network status
+
+function _status_dns() {
+	printf "\t"
+	m dns get | grep Custom
+}
+
+function _status_always_req() {
+
+	printf "\t"
+	m always-require-vpn get
+
+}
+function _mss() {
+
+	echo
+	printf "Mullvad status:\n\t"
+	ms
+}
+
+function mss() {
+	_mss
+	_status_dns
+	_status_always_req
+}
+
+function msss() {
+	_mss
+	_status_always_req
+
+	local dns="$(m dns get)"
+	printf "\tDNS:\n"
+
+	echo "$dns" | sed 's/ DNS//g' | sed 's/^/\t\t/g'
+
+	printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
+}
+
+function nets() {
+
+	local keys=(IP Mask Gateway Ether DNS)
+	local values=($(net -getinfo 'Wi-Fi' | grep -E '^(IP |Sub|Router|^Wi-Fi)' | tr -d ' \t' | sed -E 's/^[^:]+://g'))
+	values+=($(net -getdnsservers 'Wi-Fi'))
+
+	echo
+	echo Network status:
+	for ((i = 1; i <= ${#keys[@]}; i++)); do
+		printf "\t"
+		echo "${keys[i]}: ${values[i]}"
+	done
+}
+
 alias br='broot'
-
-alias v='ivpn'
-alias vh='v -h'
-alias vhh='v -h -full'
-alias vf='v firewall'
-alias von='vf -on'
-alias voff='vf -off'
-alias vfe='vf -exceptions'
-alias vs='ivpn status'
-alias vc='ivpn connect'
-alias vcl='vc -last'
-alias vd='ivpn disconnect'
 
 # editing / viewing
 
@@ -398,6 +447,8 @@ alias dud='d umountDisk'
 alias dr='d rename'
 alias muw='mount -uw'
 
+# apfs
+
 function ms() {
 	if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
 		cat <<EOF
@@ -423,7 +474,6 @@ EOF
 
 	mount_apfs ${mopt[*]} "$@" $d "$m"
 }
-# apfs
 
 alias a='d apfs'
 alias au='a unlock'
@@ -565,10 +615,6 @@ if [[ $__LIBSH_INITIALIZED != 1 ]]; then
 	_init
 	echo -- updated \$PATH: "$PATH"
 	if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
-		echo
-		echo Network Status:
-		echo -e '\tVPN: '
 		ms
-		echo -e "\tDNS: $(networksetup -getdnsservers 'Wi-Fi')"
 	fi
 fi
