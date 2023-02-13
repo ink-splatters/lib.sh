@@ -90,7 +90,7 @@ alias nu='n uninstall'
 alias ncw='n config wizard'
 
 function m() {
-	mullvad $@ || _problem mullvad $@
+	mullvad $@
 }
 
 alias mc='m connect ; m status'
@@ -449,7 +449,7 @@ alias muw='mount -uw'
 
 # apfs
 
-function ms() {
+function msnap() {
 	if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
 		cat <<EOF
 mount apfs snapshot
