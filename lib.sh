@@ -526,8 +526,8 @@ alias hm=_hnvo
 alias ha='hm -nomount'
 alias has='ha -shadow'
 alias hms='hm -shadow'
-alias hd='_h detach'
-alias hi='_h info'
+alias hd='h detach'
+alias hi='h info'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
