@@ -428,7 +428,7 @@ alias _tus='tmutil deletelocalsnapshots'
 function unsnap() {
 
 	# _tus /
-	# for v in /Volumes/* ; do _tus "$v" ; done
+	# for v in /Volumes/* /nix ; do _tus "$v" ; done
 
 	mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
 	echo Unmounted volumes were unaffected.
