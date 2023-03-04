@@ -96,7 +96,7 @@ function m() {
 alias mc='m connect ; m status'
 alias md='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
-alias mvpn='m always-require-vpn set'
+alias mvpn='m lockdown-mode set'
 
 alias net='networksetup'
 alias ng=ngrep
@@ -158,7 +158,7 @@ function _status_dns() {
 function _status_always_req() {
 
 	printf "\t"
-	m always-require-vpn get
+	m lockdown-mode get
 
 }
 function _mss() {
