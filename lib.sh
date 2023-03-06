@@ -504,7 +504,8 @@ function aav() {
 
 alias g=git
 alias gb='g branch'
-alias gba='gb a'
+alias gba='gb -a'
+alias gbd='gb -D'
 alias gs='g status'
 alias gc='g commit'
 alias gca='gc -a'
