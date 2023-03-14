@@ -93,7 +93,7 @@ function m() {
 	mullvad $@
 }
 
-alias mc='m connect ; m status'
+alias mcc='m connect ; m status'
 alias md='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
 alias mvpn='m lockdown-mode set'
