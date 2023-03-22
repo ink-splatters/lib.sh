@@ -74,7 +74,7 @@ function randn() {
 	rand $@ -n
 }
 
-alias randp='rand 16 | grep -Eo ".{16}"' # pair of short nonces
+alias randp='rand 8 | grep -Eo ".{8}"' # pair of short nonces
 alias randup='randp | up'
 
 # networking
