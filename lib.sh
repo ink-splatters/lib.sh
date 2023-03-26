@@ -311,9 +311,34 @@ function xsv() {
 	_x -rsv $attr "$@"
 }
 
-# flags
+# fs lockers
 
-alias cfu='chflags -R uchg,schg'
+# Despite not to be inferred from names exactly, all the routines lock file system objects from
+# further changes by both System and User.
+
+# There are destructive and non-destructive versions of the routines.
+
+# WARNING
+# They serve temporary, opinionated measure against macOS annoyances, depriving it from configs
+# and Data believed to disturb User Privacy. They may or may not help, potentially being capable to make things worse,
+# in the worst case scenario - kill the system, cause extremely wierd issues hard to debug
+# because of unexpected and unpredictable modifications to OS state.
+# Unwise use may kill your system. It's possible that resource utilization would go crazy by those
+# daemons deprived of their precious things, grinning, moaning and craving for their getting back.
+#
+# If you are still not scared enough: it's like opening combustion engine' gas distribution mechanism,
+# pouring some good pack of IKEA screws, (which are ALWAYS left after you assemble your another piece, aren't thy).
+# Don't hesitate to throw any useless thing found in the garage on it, as much as space allows.
+# When it becomes evident that no room has left, do fix up the new gasket and the lid on the top of it,
+# as per your engine service manual. It's time to start it up!
+# --
+# I mean wa w... ww.wait! NO! Don't do it!!!!1111 Wait!!
+
+# 1. destructive
+
+# before locking, erases directories'  contents and lock those from further changes by both system or user.
+# "softer" versions are still destructive!
+
 function fdirs() {
 	for d in "$@"; do
 		chflags -R nouchg,noschg "$d" 2>/dev/null
@@ -323,19 +348,44 @@ function fdirs() {
 	done
 
 }
-
-function ffiles() {
+# "softer" version
+# same but preserve original folders and its ownership, permissions, unrelated BSD flags and  xattrs
+function sfdirs() {
 	for d in "$@"; do
 		chflags -R nouchg,noschg "$d" 2>/dev/null
-		rm -rf "$d"
-		touch "$d"
+		mkdir -p "$d"
+		cleandirs 1>/dev/null "$d"
 		chflags uchg,schg "$d"
 	done
-
 }
+alias sfd=sfdirs
+
+function ffiles() {
+	for f in "$@"; do
+		chflags nouchg,noschg "$f" 2>/dev/null
+		rm -f "$f"
+		touch "$f"
+		chflags uchg,schg "$f"
+	done
+}
+# "softer" version
+# same but preserve original files and its ownership, permissions, unrelated BSD flags and  xattrs
+function sffiles() {
+	for f in "$@"; do
+		chflags nouchg,noschg "$f" 2>/dev/null
+		truncate -s 0 "$f"
+		chflags uchg,schg "$f"
+	done
+}
+
+alias sff=sffiles
+
+# 2. non-destructive
+
 alias lock='chflags uchg,schg'
-alias lockr='lock -R'
-alias unlock='chflags -R nouchg,noschg'
+alias unlock='chflags nouchg,noschg'
+# recursive version
+alias unlockr='chflags -R nouchg,noschg'
 alias ufdirs=unlock
 
 # index
