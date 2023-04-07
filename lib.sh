@@ -201,6 +201,8 @@ function nets() {
 }
 
 alias br='broot'
+alias umamba=micromamba
+alias um=umamba
 
 # editing / viewing
 
@@ -353,7 +355,9 @@ function fdirs() {
 function sfdirs() {
 	for d in "$@"; do
 		chflags -R nouchg,noschg "$d" 2>/dev/null
-		mkdir -p "$d"
+
+		if [ ! -d "$d" ]; then mkdir "$d"; fi
+
 		cleandirs 1>/dev/null "$d"
 		chflags uchg,schg "$d"
 	done
