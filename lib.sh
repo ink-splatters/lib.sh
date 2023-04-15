@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230128_dev
+LIBSH_VERSION=20230415_dev
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -203,6 +203,8 @@ function nets() {
 alias br='broot'
 alias umamba=micromamba
 alias um=umamba
+alias ma=umamba
+alias maa='ma activate'
 
 # editing / viewing
 
@@ -213,8 +215,6 @@ if [[ "$EDITOR" == "" ]]; then
 	export EDITOR=vim
 fi
 alias vi="$EDITOR"
-alias fs="source ~/.zshrc"
-alias fle="vim $HOME/.zshrc"
 alias batlog='bat --paging=never -l log'
 alias e=echo
 
@@ -255,6 +255,24 @@ alias laa='ls -laO@e'
 alias la='ls -la'
 
 alias f=find
+
+# find helpers:
+# - support 1 search term (for now) in 1 or more locations
+# - search term gets globbed from both sides, by default
+# - case insensitive versions are postfixed with i
+# - globbing is tunable with prefix: no prefix, l, r, n[no globbing]
+
+# function f() { local what="$1" ; shift ; echo find $@ -name "'*${what}*'"; }
+# function fi() { local what="$1" ; shift ; find $@ -iname "'*${what}*'"; }
+
+# function lf() { local what="$1" ; shift ; find $@ -name "'*${what}'" ; }
+# function lfi() { local what="$1" ; shift ; find $@ -iname "'*${what}'" ; }
+
+# function rf() { local what="$1" ; shift ; find $@ -name "${what}*'"; }
+# function rfi() { local what="$1" ; shift ; find $@ -iname "${what}*'"; }
+
+# function nf() { local what="$1" ; shift ; find $@ -name "${what}'" ; }
+# function nfi() { local what="$1" ; shift ; find $@ -iname "${what}" ; }
 
 alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
 alias ecp='_editto --acl'
