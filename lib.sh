@@ -427,7 +427,44 @@ alias woff='sudo /usr/libexec/airportd setpower off'
 alias wup='sudo ifconfig en0 up'
 alias wdown='sudo ifconfig en0 down'
 alias wassoc='sudo /usr/libexec/airportd assoc --ssid'
-alias rewifi='echo down up | x -I@ sh -c "echo -- @ ; sudo ifconfig en0 @ ; sleep 1"'
+
+# draft
+function rewifi() {
+	set +e
+	set -x
+
+	mvpn off
+	md
+	nd
+	nu
+	sleep 1
+
+	sudo route -n flush
+	sudo dscacheutil -flushcache
+	sudo killall -m HUP mDNSResponder
+
+	sudo ifconfig en0 down
+	sleep 1
+
+	sudo ifconfig en0 up
+	sleep 1
+
+	na
+	ni
+	mc
+	sleep 1
+	mc
+	nr
+	sleep 1
+
+	mvpn on
+
+	set +x
+	set -e
+
+	echo Done
+
+}
 
 function wchan() {
 	if [ $1 != "" ]; then
@@ -588,6 +625,8 @@ alias gf='g fetch -vp'
 alias gl='g log'
 alias gl1='gl -1'
 alias gd='git difftool --no-symlinks --dir-diff'
+alias gi='gitui'
+alias gu='gitui'
 
 # hdiutil
 
