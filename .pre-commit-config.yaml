@@ -1,0 +1,26 @@
+---
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v2.3.0
+      hooks:
+          - id: check-yaml
+          - id: end-of-file-fixer
+          - id: trailing-whitespace
+    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+      rev: 0.2.1
+      hooks:
+          - id: yamlfmt
+    - repo: https://github.com/jumanjihouse/pre-commit-hooks
+      rev: 3.0.0
+      hooks:
+          - id: shfmt
+    - repo: local
+      hooks:
+          - id: patchversion
+            name: LIBSH_VERSION
+            entry: .pre-commit-patch-version
+            language: script
+            types:
+                - bash
+            pass_filenames: false
+            always_run: true

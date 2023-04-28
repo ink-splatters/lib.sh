@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230428_2396af2
+LIBSH_VERSION=20230428_61de81f
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -714,13 +714,13 @@ Summary:
 	Bootstrapped to: $bspath
 		Wrote:	$bspath
 		Backup: $bkpath
-			
+
 	Self:	$self
 
 	Volume Group:	$vg
 		System:	$svdev
 		Data:	$dvdev
-	 
+
 EOF
 		echo -- initialized!
 	fi
