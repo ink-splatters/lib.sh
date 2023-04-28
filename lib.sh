@@ -481,6 +481,10 @@ alias wi='airport -I'
 alias winfo=wi
 alias ngrep0='sudo ngrep -d en0'
 
+alias pg='pgrep -i'
+alias t=btop
+alias bw=bandwhich
+
 function tree {
 	broot -c :pt "$@"
 }
@@ -530,7 +534,7 @@ alias q='nix-env -q'
 
 #TM snapshots
 
-alias t=tmutil
+alias tm=tmutil
 alias snap='tmutil localsnapshot'
 alias ts=snap
 alias _tus='tmutil deletelocalsnapshots'
