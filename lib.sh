@@ -482,6 +482,12 @@ alias winfo=wi
 alias ngrep0='sudo ngrep -d en0'
 
 alias pg='pgrep -i'
+
+# grep and kill what was grepped
+function pk() {
+	pgrep -i "$1" | x kill -9
+}
+
 alias t=btop
 alias bw=bandwhich
 
