@@ -651,6 +651,9 @@ alias hms='hm -shadow'
 alias hd='h detach'
 alias hi='h info'
 
+alias sac=sysadminctl
+
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 function _init() {
