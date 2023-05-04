@@ -217,6 +217,7 @@ fi
 alias vi="$EDITOR"
 alias batlog='bat --paging=never -l log'
 alias e=echo
+alias mq=glow # a-la jq/yq, etc
 
 # themes
 # TODO: list wezterm themes?
