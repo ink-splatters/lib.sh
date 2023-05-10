@@ -5,9 +5,35 @@ Initializing...
 
 EOF
 
-# status
+# helpers
 
-function _problem() { echo '**' there was a problem running: $@; }
+_problem() { echo '**' there was a problem running: $@; }
+_maybe() { command -v $@ >/dev/null 2>&1 && $@; }
+
+_alias() {
+	local name="$1"
+	shift
+	args=($@)
+	alias $name="${args[*]}"
+}
+_salias() {
+	local name="$1"
+	shift
+	args=($@)
+	alias $name="sudo ${args[*]}"
+} # sudo
+
+#sudo
+
+alias s=sudo
+alias si='sudo -i'
+
+# functools kinda stuff (love it)
+alias x=xargs
+alias x1='x -n1'
+
+alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; #usr#libexec#PlistBuddy -c print @'"
+alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
 
 # uuid generation
 alias uuid=uuidgen
@@ -19,9 +45,12 @@ alias u0='printf "%s"  00000000-0000-0000-0000-000000000000'
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
 alias up=upper
 
+# status / system info
+#alias about='macchina'
+
 # generation using /dev/random
 
-function rand() {
+rand() {
 	if [[ $# == 0 ]]; then
 		cat <<EOF
 the util takes <count> bytes from /dev/random and outputs lower-case hex values
@@ -70,16 +99,39 @@ EOF
 	((n == 1)) && echo
 }
 
-function randn() {
+randn() {
 	rand $@ -n
 }
 
 alias randp='rand 8 | grep -Eo ".{8}"' # pair of short nonces
 alias randup='randp | up'
 
+# system resources
+alias pg='pgrep -i'
+
+_salias k kill
+_salias kall killall
+
+alias k9='k -9'
+
+pk() { pg "$1" | x k9; }
+
+alias t=btop
+alias bw=bandwhich
+
+tree() {
+	broot -c :pt "$@"
+}
+
+# opendirectory
+_salias ds dsconfigad
+_salias dsc dscacheutil
+_salias sysac sysadminctl
+
 # networking
 
-alias n='sudo nextdns'
+_salias n nextdns
+
 alias na='n activate'
 alias nd='n deactivate'
 alias ni='n install'
@@ -88,20 +140,82 @@ alias nr='n restart'
 alias ns='n status'
 alias nu='n uninstall'
 alias ncw='n config wizard'
-
-function m() {
-	mullvad $@
-}
+alias m=mullvad
 
 alias mc='m connect ; m status'
 alias md='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
 alias mvpn='m lockdown-mode set'
 
-alias net='networksetup'
-alias ng=ngrep
+# wireless && networking
+_salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
+_salias apd /usr/libexec/airportd
+_salias ifc ifconfig
 
-function mac() {
+alias won="apd setpower on"
+alias woff="apd setpower off"
+alias wup="ifc en0 up"
+alias wdown="ifc en0 down"
+alias wassoc="apd assoc --ssid"
+
+_salias rt route
+
+# draft
+rewifi() {
+	set +e
+	set -x
+
+	mvpn off
+	md
+	nd
+	nu
+	sleep 1
+
+	rt -n flush
+	dsc -flushcache
+	kall -m HUP mDNSResponder
+
+	ifc down
+	sleep 1
+
+	ifc en0 up
+	sleep 1
+
+	na
+	ni
+	mc
+	sleep 1
+	mc
+	nr
+	sleep 1
+
+	mvpn on
+
+	set +x
+	set -e
+
+	echo Done
+}
+
+wchan() {
+	if [ $1 != "" ]; then
+		wdown
+		echo -setting channel to: $1
+		ap -c=$1
+		sleep 1
+	else
+		ap -c
+	fi
+}
+alias wscan='ap -s'
+alias wi='ap -I'
+alias winfo=wi
+_salias ng ngrep
+alias ng0='ng -d en0'
+
+alias netsetup=networksetup
+
+mac() {
 
 	local interface=en0
 
@@ -109,11 +223,11 @@ function mac() {
 		interface="$1"
 	fi
 
-	ifconfig $interface | grep ether | grep -Eo ' [0-9a-f:]+' | tr -d ' \t'
+	ifc $interface | grep ether | grep -Eo ' [0-9a-f:]+' | tr -d ' \t'
 
 }
 
-function randmac() {
+randmac() {
 
 	if (($# > 1)); then
 		cat <<'EOF'
@@ -132,17 +246,13 @@ EOF
 		interface="$1"
 	fi
 
-	/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -z
+	ap -z
 	local mac=$(rand 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g')
 
 	echo -- "generated value: $mac; attempting to set..."
-	ifconfig $interface ether "$mac"
+	ifc $interface ether "$mac"
 	(($? == 0)) && mac && echo done.
 }
-
-# status / system info
-
-#alias about='macchina'
 
 alias ms='m status'
 
@@ -150,31 +260,31 @@ alias ms='m status'
 
 # TODO: get local network status
 
-function _status_dns() {
+_status_dns() {
 	printf "\t"
 	m dns get | grep Custom
 }
 
-function _status_always_req() {
+_status_always_req() {
 
 	printf "\t"
 	m lockdown-mode get
 
 }
-function _mss() {
+_mss() {
 
 	echo
 	printf "Mullvad status:\n\t"
 	ms
 }
 
-function mss() {
+mss() {
 	_mss
 	_status_dns
 	_status_always_req
 }
 
-function msss() {
+msss() {
 	_mss
 	_status_always_req
 
@@ -186,7 +296,7 @@ function msss() {
 	printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
 }
 
-function nets() {
+nets() {
 
 	local keys=(IP Mask Gateway Ether DNS)
 	local values=($(net -getinfo 'Wi-Fi' | grep -E '^(IP |Sub|Router|^Wi-Fi)' | tr -d ' \t' | sed -E 's/^[^:]+://g'))
@@ -217,7 +327,6 @@ fi
 alias vi="$EDITOR"
 alias batlog='bat --paging=never -l log'
 alias e=echo
-alias mq=glow # a-la jq/yq, etc
 
 # themes
 # TODO: list wezterm themes?
@@ -240,15 +349,10 @@ alias ptr=ptrim
 
 alias pb=/usr/libexec/PlistBuddy
 alias pp='pb -c print'
-alias xml1='plutil -convert xml1'
-alias bin1='plutil -convert binary1'
-
-# functools kinda stuff (love it)
-alias x=xargs
-alias x1='x -n1'
-
-alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
-alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
+alias pl=plutil
+alias plc='pl -convvert'
+alias xml1='plc xml1'
+alias bin1='plc binary1'
 
 # file system / ls + clean/rm utils
 
@@ -257,23 +361,24 @@ alias la='ls -la'
 
 alias f=find
 
+# TODO: fix broken
 # find helpers:
 # - support 1 search term (for now) in 1 or more locations
 # - search term gets globbed from both sides, by default
 # - case insensitive versions are postfixed with i
 # - globbing is tunable with prefix: no prefix, l, r, n[no globbing]
 
-# function f() { local what="$1" ; shift ; echo find $@ -name "'*${what}*'"; }
-# function fi() { local what="$1" ; shift ; find $@ -iname "'*${what}*'"; }
+# f() { local what="$1" ; shift ; echo find $@ -name "'*${what}*'"; }
+# fi() { local what="$1" ; shift ; find $@ -iname "'*${what}*'"; }
 
-# function lf() { local what="$1" ; shift ; find $@ -name "'*${what}'" ; }
-# function lfi() { local what="$1" ; shift ; find $@ -iname "'*${what}'" ; }
+# lf() { local what="$1" ; shift ; find $@ -name "'*${what}'" ; }
+# lfi() { local what="$1" ; shift ; find $@ -iname "'*${what}'" ; }
 
-# function rf() { local what="$1" ; shift ; find $@ -name "${what}*'"; }
-# function rfi() { local what="$1" ; shift ; find $@ -iname "${what}*'"; }
+# rf() { local what="$1" ; shift ; find $@ -name "${what}*'"; }
+# rfi() { local what="$1" ; shift ; find $@ -iname "${what}*'"; }
 
-# function nf() { local what="$1" ; shift ; find $@ -name "${what}'" ; }
-# function nfi() { local what="$1" ; shift ; find $@ -iname "${what}" ; }
+# nf() { local what="$1" ; shift ; find $@ -name "${what}'" ; }
+# nfi() { local what="$1" ; shift ; find $@ -iname "${what}" ; }
 
 alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
 alias ecp='_editto --acl'
@@ -281,7 +386,7 @@ alias ecpnoacl='_editto --noacl'
 alias editto=ecp
 alias edittonoacl=ecpnoacl
 
-function _fdrm() {
+_fdrm() {
 	local nameflag="$1"
 	local what="$2"
 	shift 2
@@ -290,19 +395,19 @@ function _fdrm() {
 
 }
 
-function fdrm() {
+fdrm() {
 	local what="$1"
 	shift
 	_fdrm -name "$what" "$@"
 }
 
-function fdirm() {
+fdirm() {
 	local what="$1"
 	shift
 	_fdrm -iname "$what" "$@"
 }
 
-function cleandirs() {
+cleandirs() {
 	for d in "$@"; do rm -rf "$d"/* "$d"/.*; done
 
 }
@@ -311,7 +416,7 @@ alias cld=cleandirs
 
 alias xd='xattr -rd'
 alias xsd='xattr -rsd'
-function _x() {
+_x() {
 
 	local args="$1"
 	local attr="$2"
@@ -320,13 +425,13 @@ function _x() {
 	xattr $args $attr "$@" | grep -Eo ' com.+' | sort -u
 }
 
-function xv() {
+xv() {
 	local attr="$1"
 	shift
 	_x -rv $attr "$@"
 }
 
-function xsv() {
+xsv() {
 	local attr="$1"
 	shift
 	_x -rsv $attr "$@"
@@ -339,28 +444,12 @@ function xsv() {
 
 # There are destructive and non-destructive versions of the routines.
 
-# WARNING
-# They serve temporary, opinionated measure against macOS annoyances, depriving it from configs
-# and Data believed to disturb User Privacy. They may or may not help, potentially being capable to make things worse,
-# in the worst case scenario - kill the system, cause extremely wierd issues hard to debug
-# because of unexpected and unpredictable modifications to OS state.
-# Unwise use may kill your system. It's possible that resource utilization would go crazy by those
-# daemons deprived of their precious things, grinning, moaning and craving for their getting back.
-#
-# If you are still not scared enough: it's like opening combustion engine' gas distribution mechanism,
-# pouring some good pack of IKEA screws, (which are ALWAYS left after you assemble your another piece, aren't thy).
-# Don't hesitate to throw any useless thing found in the garage on it, as much as space allows.
-# When it becomes evident that no room has left, do fix up the new gasket and the lid on the top of it,
-# as per your engine service manual. It's time to start it up!
-# --
-# I mean wa w... ww.wait! NO! Don't do it!!!!1111 Wait!!
-
 # 1. destructive
 
 # before locking, erases directories'  contents and lock those from further changes by both system or user.
 # "softer" versions are still destructive!
 
-function fdirs() {
+fdirs() {
 	for d in "$@"; do
 		chflags -R nouchg,noschg "$d" 2>/dev/null
 		rm -rf "$d"
@@ -369,9 +458,9 @@ function fdirs() {
 	done
 
 }
-# "softer" version
+# - "softer" version
 # same but preserve original folders and its ownership, permissions, unrelated BSD flags and  xattrs
-function sfdirs() {
+sfdirs() {
 	for d in "$@"; do
 		chflags -R nouchg,noschg "$d" 2>/dev/null
 
@@ -383,7 +472,7 @@ function sfdirs() {
 }
 alias sfd=sfdirs
 
-function ffiles() {
+ffiles() {
 	for f in "$@"; do
 		chflags nouchg,noschg "$f" 2>/dev/null
 		rm -f "$f"
@@ -391,9 +480,9 @@ function ffiles() {
 		chflags uchg,schg "$f"
 	done
 }
-# "softer" version
+# - "softer" version
 # same but preserve original files and its ownership, permissions, unrelated BSD flags and  xattrs
-function sffiles() {
+sffiles() {
 	for f in "$@"; do
 		chflags nouchg,noschg "$f" 2>/dev/null
 		truncate -s 0 "$f"
@@ -416,94 +505,10 @@ alias ufdirs=unlock
 alias mdx='mdutil -X'
 alias mdoff='mdutil -i off -d'
 
-function mdon() { mdutil -i on "$1" -E; }
-alias mdaoff='mdoff -a'
+mdon() { mdutil -i on "$1" -E; }
+alias mdoffa='mdoff -a'
 
-# wireless && networking
-alias airportd=/usr/libexec/airportd
-alias ap='airport'
-alias apd='airportd'
-alias won='sudo /usr/libexec/airportd setpower on'
-alias woff='sudo /usr/libexec/airportd setpower off'
-alias wup='sudo ifconfig en0 up'
-alias wdown='sudo ifconfig en0 down'
-alias wassoc='sudo /usr/libexec/airportd assoc --ssid'
-
-# draft
-function rewifi() {
-	set +e
-	set -x
-
-	mvpn off
-	md
-	nd
-	nu
-	sleep 1
-
-	sudo route -n flush
-	sudo dscacheutil -flushcache
-	sudo killall -m HUP mDNSResponder
-
-	sudo ifconfig en0 down
-	sleep 1
-
-	sudo ifconfig en0 up
-	sleep 1
-
-	na
-	ni
-	mc
-	sleep 1
-	mc
-	nr
-	sleep 1
-
-	mvpn on
-
-	set +x
-	set -e
-
-	echo Done
-
-}
-
-function wchan() {
-	if [ $1 != "" ]; then
-		wdown
-		echo -setting channel to: $1
-		sudo airport -c=$1
-		sleep 1
-	else
-		airport -c
-	fi
-}
-function wscan() { sudo airport -s "$1"; }
-alias wi='airport -I'
-alias winfo=wi
-alias ngrep0='sudo ngrep -d en0'
-
-alias pg='pgrep -i'
-
-# grep and kill what was grepped
-function pk() {
-	pgrep -i "$1" | x kill -9
-}
-
-alias t=btop
-alias bw=bandwhich
-
-function tree {
-	broot -c :pt "$@"
-}
-alias s=sudo
-alias si='sudo -i'
-alias k='kill -9'
-
-function _maybe() {
-	commdand -v $@ >/dev/null 2>&1 && $@
-}
-
-function mdcat() {
+mdcat() {
 	glow "$@"
 
 	echo "this is not actual mdcat"
@@ -533,7 +538,7 @@ alias rgi='_rg -iuuu'
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
-function _i() { echo "$@" | xpkgs | xargs nix-env -iA; }
+_i() { echo "$@" | xpkgs | xargs nix-env -iA; }
 alias i=_i
 
 alias u='nix-env -e'
@@ -545,7 +550,7 @@ alias tm=tmutil
 alias snap='tmutil localsnapshot'
 alias ts=snap
 alias _tus='tmutil deletelocalsnapshots'
-function unsnap() {
+unsnap() {
 
 	# _tus /
 	# for v in /Volumes/* /nix ; do _tus "$v" ; done
@@ -568,8 +573,8 @@ alias dr='d rename'
 alias muw='mount -uw'
 
 # apfs
-
-function msnap() {
+_salias apfs.util /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
+msnap() {
 	if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
 		cat <<EOF
 mount apfs snapshot
@@ -600,7 +605,7 @@ alias au='a unlock'
 alias al='a lock'
 alias alu='a listUsers'
 
-function ausr() { a listUsers "$1" | grep -Eo '[0-9A-F-]{36}' | head -1; }
+ausr() { a listUsers "$1" | grep -Eo '[0-9A-F-]{36}' | head -1; }
 
 alias alvg='a listVolumeGroups'
 alias adelvg='a deleteVolumeGroup'
@@ -609,8 +614,8 @@ alias adels='a deleteSnapshot'
 alias aav='a addVolume'
 alias adel='a deleteVolume'
 
-function aev() { a encryptVolume "$1" -user disk; }
-function adv() { a decryptVolume "$1" -user $(ausr "$1"); }
+aev() { a encryptVolume "$1" -user disk; }
+adv() { a decryptVolume "$1" -user $(ausr "$1"); }
 
 function aav() {
 	if [[ $# -lt 2 ]]; then
@@ -652,12 +657,9 @@ alias hms='hm -shadow'
 alias hd='h detach'
 alias hi='h info'
 
-alias sac=sysadminctl
-
-
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
-function _init() {
+_init() {
 
 	local exp='self="${BASH_SOURCE[0]:-${(%):-%x}}"'
 	eval $(echo $exp)
