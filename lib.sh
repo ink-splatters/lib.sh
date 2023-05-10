@@ -45,6 +45,9 @@ alias u0='printf "%s"  00000000-0000-0000-0000-000000000000'
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
 alias up=upper
 
+# better xxd: https://github.com/felixge/go-xxd
+alias xd=go-xxd
+
 # status / system info
 #alias about='macchina'
 
@@ -414,7 +417,7 @@ cleandirs() {
 alias cld=cleandirs
 # attrs
 
-alias xd='xattr -rd'
+alias xad='xattr -d'
 alias xsd='xattr -rsd'
 _x() {
 
