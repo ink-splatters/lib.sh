@@ -32,7 +32,7 @@ alias si='sudo -i'
 alias x=xargs
 alias x1='x -n1'
 
-alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; #usr#libexec#PlistBuddy -c print @'"
+alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
 
 # uuid generation
