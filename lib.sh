@@ -117,7 +117,7 @@ _salias kall killall
 
 alias k9='k -9'
 
-pk() { pg "$1" | x k9; }
+pk() { pg "$1" | x kill -9; }
 
 alias t=btop
 alias bw=bandwhich
@@ -353,7 +353,7 @@ alias ptr=ptrim
 alias pb=/usr/libexec/PlistBuddy
 alias pp='pb -c print'
 alias pl=plutil
-alias plc='pl -convvert'
+alias plc='pl -convert'
 alias xml1='plc xml1'
 alias bin1='plc binary1'
 
