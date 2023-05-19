@@ -49,7 +49,7 @@ alias up=upper
 alias xd=go-xxd
 
 # status / system info
-#alias about='macchina'
+alias about='macchina'
 
 # generation using /dev/random
 
@@ -109,7 +109,7 @@ randn() {
 alias randp='rand 8 | grep -Eo ".{8}"' # pair of short nonces
 alias randup='randp | up'
 
-# system resources
+# system // resources
 alias pg='pgrep -i'
 
 _salias k kill
@@ -125,6 +125,8 @@ alias bw=bandwhich
 tree() {
 	broot -c :pt "$@"
 }
+
+_salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
 
 # opendirectory
 _salias ds dsconfigad
@@ -150,7 +152,6 @@ alias md='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
 alias mvpn='m lockdown-mode set'
 
-# wireless && networking
 _salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
 _salias apd /usr/libexec/airportd
 _salias ifc ifconfig
@@ -659,6 +660,9 @@ alias has='ha -shadow'
 alias hms='hm -shadow'
 alias hd='h detach'
 alias hi='h info'
+
+# nerdctl
+alias ne='colima nerdctl'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
