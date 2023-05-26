@@ -122,16 +122,13 @@ pk() { pg "$1" | x kill -9; }
 alias t=btop
 alias bw=bandwhich
 
-tree() {
-	broot -c :pt "$@"
-}
-
-_salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
+_salias sc sysctl
+alias sw='sc -w'
 
 # opendirectory
 _salias ds dsconfigad
 _salias dsc dscacheutil
-_salias sysac sysadminctl
+_salias sctl sysadminctl
 
 # networking
 
@@ -360,6 +357,12 @@ alias bin1='plc binary1'
 
 # file system / ls + clean/rm utils
 
+tree() {
+	broot -c :pt "$@"
+}
+
+_salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
+
 alias laa='ls -laO@e'
 alias la='ls -la'
 
@@ -523,7 +526,7 @@ if [ -n "${commands[fzf - share]}" ]; then
 	source "$(fzf-share)/completion.zsh"
 fi
 
-# no anymore myaw in da houze
+# no myaw in da houze
 # alias kd='kitty +kitten diff'
 
 alias mk=mkdir
@@ -627,6 +630,30 @@ function aav() {
 		return
 	fi
 	a addVolume "$1" APFS "$2"
+}
+
+restore() {
+	local _sudo=
+
+	if (($EUID != 0)); then
+		_sudo=sudo
+	fi
+
+	local src="$1"
+	local tgt="$2"
+	shift 2
+
+	$_sudo asr restore -s "$src" -t "$tgt" -noprompt -noverify $@
+}
+
+srestore() {
+	local snap="$1"
+	local src="$2"
+	local tgt="$3"
+
+	shift 3
+
+	clone "$src" "$tgt" --toSnapshot "$snap" $@
 }
 
 # git
