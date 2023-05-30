@@ -311,11 +311,12 @@ nets() {
 	done
 }
 
-alias br='broot'
-alias umamba=micromamba
-alias um=umamba
-alias ma=umamba
-alias maa='ma activate'
+alias br=broot
+
+# python
+alias um=micromamba
+alias uma='um activate'
+alias uenv='um env'
 
 # editing / viewing
 
@@ -421,6 +422,7 @@ cleandirs() {
 alias cld=cleandirs
 # attrs
 
+alias xa='xattr'
 alias xad='xattr -d'
 alias xsd='xattr -rsd'
 _x() {
@@ -443,6 +445,10 @@ xsv() {
 	shift
 	_x -rsv $attr "$@"
 }
+
+# as it shadows legitimate app:
+
+alias csv=/nix/var/nix/profiles/default/bin/xsv
 
 # fs lockers
 
@@ -674,6 +680,10 @@ alias gl1='gl -1'
 alias gd='git difftool --no-symlinks --dir-diff'
 alias gi='gitui'
 alias gu='gitui'
+
+# rust
+alias ru=rustup
+alias car=cargo
 
 # hdiutil
 
