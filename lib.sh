@@ -125,6 +125,8 @@ alias bw=bandwhich
 _salias sc sysctl
 alias sw='sc -w'
 
+_salias santa santactl
+
 # opendirectory
 _salias ds dsconfigad
 _salias dsc dscacheutil
