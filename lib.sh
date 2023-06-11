@@ -586,7 +586,8 @@ alias dum='d umount'
 alias dud='d umountDisk'
 alias dr='d rename'
 alias muw='mount -uw'
-
+alias eo='d enableOwnership'
+ 
 # apfs
 _salias apfs.util /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
 msnap() {
