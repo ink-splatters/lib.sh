@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230428_61de81f
+LIBSH_VERSION=20230618_ad38af1
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
