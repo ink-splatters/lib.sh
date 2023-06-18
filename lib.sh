@@ -541,8 +541,6 @@ fi
 
 alias mk=mkdir
 alias mkp='mk -p'
-alias _fd=fd
-alias fd='_fd -iuuu'
 alias _rg=rg
 alias rg='_rg -uuu'
 alias rgi='_rg -iuuu'
