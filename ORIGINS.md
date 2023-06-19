@@ -8,7 +8,7 @@ of struggling to preserve some sanity.
 
 ### Hope not found
 
-```shell
+```
 bash: rsync: command not found
 
 bash-3.2 #
@@ -20,7 +20,7 @@ For the luckiest ones, who just need to switch `SIP` on/off or enable 3rd-party 
 
 ### The Fall
 
-```shell
+```
 bash-3.2 # top
 bash: top: command not found # of course there is no top, neither is there a bottom
 
@@ -35,7 +35,7 @@ care less about it.
 
 ### Perverted stance on security
 
-```shell
+```
 bash-3.2 # gpt add
 gpt: add: operation not permitted: add
 ```

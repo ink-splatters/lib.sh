@@ -20,9 +20,9 @@ As `flel` is alias for editing `lib.sh` code itself, there are those two I use
 along with it, to edit / reload `.zshrc`
 
 ```shell
-% cd ~
-% git clone https://github.com/ink-splatters/lib.sh
-% cat <<'EOF' >> ~/.zshrc
+cd ~
+git clone https://github.com/ink-splatters/lib.sh
+cat <<'EOF' >> ~/.zshrc
 
 source "$HOME"/lib.sh/lib.sh
 
@@ -34,7 +34,7 @@ EOF
 ##### Root shell
 
 ```shell
-# cat <<'EOF' >> /var/root/.profile
+cat <<'EOF' >> /var/root/.profile
 source /Users/<username>/lib.sh/lib.sh
 
 alias fle='vi ~/.profile'
@@ -44,7 +44,7 @@ EOF
 
 #### RecoveryOS
 
-```shell
+```
 -bash-3.2# diskutil mount /Volumes/Data # or `diskutil apfs unlock Data` if applicabl
 -bash-3.2# source /Volumes/Data/Users/<username>/lib.sh/lib.sh
 ```
@@ -70,3 +70,9 @@ workflows, I leave my right to decline your PR without a reason. Thus, open an i
 ##### pre-commit
 
 `pre-commit` is used for formatting purposes, as well as for bumping `lib.sh` version. Contributors are expected to run it before submitting a PR.
+
+Before running, it should be initialized by executing the following in the project dir:
+
+```shell
+pre-commit install --install-hooks
+```
