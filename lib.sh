@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230619_ea10a6d
+LIBSH_VERSION=20230629_c9cfb22
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -315,6 +315,11 @@ nets() {
 
 alias br=broot
 
+alias pkg=pkgutil
+alias pkgs='pkg --pkgs'
+_salias pkgf pkgutil --forget
+alias pkgd=pkgf
+
 # python
 alias um=micromamba
 alias uma='um activate'
@@ -586,7 +591,7 @@ alias dum='d umount'
 alias dud='d umountDisk'
 alias dr='d rename'
 alias muw='mount -uw'
-alias eo='d enableOwnership'
+_salias eo diskutil enableOwnership
 
 # apfs
 _salias apfs.util /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
