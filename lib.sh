@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230630_c50223e
+LIBSH_VERSION=20230630_4a3a116
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -154,6 +154,8 @@ alias mvpn='m lockdown-mode set'
 _salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
 _salias apd /usr/libexec/airportd
 _salias ifc ifconfig
+
+_salias utm /Applications/UTM.app/Contents/MacOS/utmctl
 
 alias won="apd setpower on"
 alias woff="apd setpower off"
