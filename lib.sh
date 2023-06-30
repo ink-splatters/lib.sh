@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230629_c9cfb22
+LIBSH_VERSION=20230630_c50223e
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -319,6 +319,7 @@ alias pkg=pkgutil
 alias pkgs='pkg --pkgs'
 _salias pkgf pkgutil --forget
 alias pkgd=pkgf
+alias upkg=pkgf
 
 # python
 alias um=micromamba
