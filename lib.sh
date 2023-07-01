@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230630_4a3a116
+LIBSH_VERSION=20230701_d4f2df0
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -570,20 +570,51 @@ alias q='nix-env -q'
 #TM snapshots
 
 alias tm=tmutil
-alias snap='tmutil localsnapshot'
-alias ts=snap
-alias _tus='tmutil deletelocalsnapshots'
-unsnap() {
+alias ts='tmutil localsnapshot'
+alias _tu='tmutil deletelocalsnapshots'
 
-	# _tus /
-	# for v in /Volumes/* /nix ; do _tus "$v" ; done
+function tu() {
 
+	vols=($(ls /Volumes) /nix)
+	pics=/Users/ic/Pictures
+
+	if [ -d $pics ]; then vols+=($pics); fi
+
+	for v in "${vols[@]}"; do _tus "$v"; done
+
+	# TODO: handle spaces
 	mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
 	echo Unmounted volumes were unaffected.
 
 }
-alias usnap=unsnap
-alias tus=unsnap
+
+# General APFS snapshots
+
+# https://github.com/ahl/apfs
+alias snap=snapUtil
+
+# list APFS snapshots
+alias snapl='snap -l'
+
+# create APFS snapshot
+alias snapc='snap -c'
+
+# rename APFS snapshot
+alias snapr='snap -n'
+
+# Delete APFS snapshot, alternative to adels
+alias snapd='snap -d'
+alias adels2=snapd
+
+# mount APFS snapshot (alternative to mount_apfs -s )
+alias snapm='snap -s'
+alias msnap2='snap -s'
+
+# APFS snapshot info
+alias snapi='snap -o'
+
+# Revert to APFS snapshot
+alias tosnap='snap -r'
 
 # diskutil general
 
