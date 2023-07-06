@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230706_90d2089
+LIBSH_VERSION=20230706_725a6e1
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -711,7 +711,9 @@ alias g=git
 #  working copy
 alias gs='g status'
 alias gco='g checkout'
+
 alias ga='g add'
+alias garenorm='ga --renormalize'
 alias grm='g rm'
 alias grmr='grm -r'
 alias grmrf='g rm -rf'
@@ -735,7 +737,12 @@ alias gg='g grep'
 #  lfs
 alias gl='g lfs'
 alias glt='gl track'
-alias glt='gl untrack'
+
+function glu() {
+	gl untrack "$@"
+	garenorm .
+}
+
 alias glc='gl clone'
 
 #   lfs fetch
