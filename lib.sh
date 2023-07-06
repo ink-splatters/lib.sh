@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230706_208c967
+LIBSH_VERSION=20230706_90d2089
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -735,6 +735,7 @@ alias gg='g grep'
 #  lfs
 alias gl='g lfs'
 alias glt='gl track'
+alias glt='gl untrack'
 alias glc='gl clone'
 
 #   lfs fetch
@@ -760,7 +761,7 @@ EOF
 }
 
 alias gll='gl lock'
-alias glu='gl unlock'
+alias glul='gl unlock'
 
 #   lfs prune
 alias _glprune='gl prune'
