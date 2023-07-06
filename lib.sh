@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230706_36dd7fc
+LIBSH_VERSION=20230706_9e0a40b
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -729,6 +729,41 @@ alias gcae='g commit --allow-empty'
 alias gp='g pull'
 alias gpr='gp --rebase'
 
+# grep
+alias gg='g grep'
+
+#  lfs
+alias gl='glfs track'
+alias glt='gl track'
+
+# see https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
+gltlockable() {
+
+	glt "$1" --lockable
+	cat <<EOF
+IMPORTANT: ensure the desired pattern is in .gitattributes first:
+
+echo "$1" filter=lfs diff=lfs merge=lfs -text lockable >> .gitattributes
+gltl "$1"
+EOF
+
+}
+
+alias gll='gl lock'
+alias glu='gl unlock'
+
+alias glf='gl fetch'
+alias glfrecent='glf --recent'
+alias glfall='glf --all'
+
+# safety belt if 'git config --global lfs.pruneverifyremotealways true' not set
+alias glprune='gl prune --verify-remote'
+
+# see https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
+alias glfind='git log --all -p -S'
+
+alias gfl=glf # marry it to gf a.k.a. git fetch
+
 #  git pull lfs
 #   needs configuration of git plfs as per: https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs:
 #   git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
@@ -737,10 +772,27 @@ alias gplfs='g plfs'
 alias gpl=gplfs
 alias gri='gr -i'
 alias gf='g fetch -vp'
-alias gl='g log'
+
+# logs
+#   note: gl prefix is shared with git lfs aliases
+alias glog='g log'
 alias gl1='gl -1'
 alias glf='gl -4'
 alias gle='gl -8'
+
+# patches and diffs
+
+alias gd='g diff'
+alias gda='gd apply --whitespace=fix'
+alias gdastat='gda --stat --apply' # --apply by some reason means 'dry run'
+alias gdstat=gdastat
+
+alias gdiff='git difftool --no-symlinks --dir-diff' # TODO: check, was it intented to use it with gitui?
+alias gldiff='glog --all -p'
+
+#  git lfs related, see: https://www.atlassian.com/git/tutorials/git-lfs#fetching-history
+#   -S should follow git lfs sha-256 oid
+alias gldiffs='glog --all -p -S'
 
 #  pushes
 #   best used with push.autoSetupRemote = true
@@ -758,8 +810,7 @@ gresu() {
 	gre set-url $1 "$2"
 }
 
-#  diffs
-alias gd='git difftool --no-symlinks --dir-diff'
+#  gitui
 alias gui='gitui'
 
 # rust
