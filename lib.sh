@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230706_725a6e1
+LIBSH_VERSION=20230706_9ab5eae
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -742,7 +742,7 @@ function glu() {
 	gl untrack "$@"
 	garenorm .
 }
-
+alias glut=glu
 alias glc='gl clone'
 
 #   lfs fetch
