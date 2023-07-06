@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230706_9e0a40b
+LIBSH_VERSION=20230706_208c967
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -733,14 +733,24 @@ alias gpr='gp --rebase'
 alias gg='g grep'
 
 #  lfs
-alias gl='glfs track'
+alias gl='g lfs'
 alias glt='gl track'
+alias glc='gl clone'
 
-# see https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
+#   lfs fetch
+alias glf='gl fetch'
+alias gfl=glf # marry it to gf a.k.a. git fetch
+
+#    lfs fetch recent / all
+alias glfrecent='glf --recent'
+alias glfall='glf --all'
+
+#   locks
+#   see https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
 gltlockable() {
 
-	glt "$1" --lockable
-	cat <<EOF
+	glt "$1" --lockable &&
+		cat <<EOF
 IMPORTANT: ensure the desired pattern is in .gitattributes first:
 
 echo "$1" filter=lfs diff=lfs merge=lfs -text lockable >> .gitattributes
@@ -752,33 +762,42 @@ EOF
 alias gll='gl lock'
 alias glu='gl unlock'
 
-alias glf='gl fetch'
-alias glfrecent='glf --recent'
-alias glfall='glf --all'
+#   lfs prune
+alias _glprune='gl prune'
 
-# safety belt if 'git config --global lfs.pruneverifyremotealways true' not set
-alias glprune='gl prune --verify-remote'
+#     safety belt if 'git config --global lfs.pruneverifyremotealways true' not set
+alias glprune='_glprune --verify-remote'
 
-# see https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
-alias glfind='git log --all -p -S'
+#  faster `git pull` for lfs
+#   needs configuration of git plfs as per: https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
+function gplfs() {
+	g plfs || cat <<'EOF'
+--
+BOOM! lib.sh here. Ain't got a clue? Make sure alias.plfs is configured, otherwise run:
 
-alias gfl=glf # marry it to gf a.k.a. git fetch
+git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
+EOF
 
-#  git pull lfs
-#   needs configuration of git plfs as per: https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs:
-#   git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
+}
 
-alias gplfs='g plfs'
-alias gpl=gplfs
+alias glp=gplfs
+alias gpl=glp # marry it to gp a.k.a. git pull
+
+alias gr='g rebase'
 alias gri='gr -i'
 alias gf='g fetch -vp'
 
 # logs
 #   note: gl prefix is shared with git lfs aliases
 alias glog='g log'
-alias gl1='gl -1'
-alias glf='gl -4'
-alias gle='gl -8'
+alias glo=glog
+alias gl1='glog -1'
+alias gl2='glog -2'
+alias gl3='glog -3'
+alias gl4='glog -4'
+alias glf='gl4'
+alias gl8='glog -8'
+alias gle='gl8'
 
 # patches and diffs
 
