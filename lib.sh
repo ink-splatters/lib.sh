@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230701_ea7830a
+LIBSH_VERSION=20230706_36dd7fc
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -707,21 +707,60 @@ srestore() {
 # git
 
 alias g=git
+
+#  working copy
+alias gs='g status'
+alias gco='g checkout'
+alias ga='g add'
+alias grm='g rm'
+alias grmr='grm -r'
+alias grmrf='g rm -rf'
+
+#  branches  "CRUD"
 alias gb='g branch'
 alias gba='gb -a'
 alias gbd='gb -D'
-alias gs='g status'
-alias gc='g commit'
-alias gca='gc -a'
-alias gco='g checkout'
-alias gpr='g pull --rebase'
-alias gri='g rebase -i'
+alias gbc='gco -b'
+
+alias gc='g commit -a'
+alias gcae='g commit --allow-empty'
+
+#  merge / rebase
+alias gp='g pull'
+alias gpr='gp --rebase'
+
+#  git pull lfs
+#   needs configuration of git plfs as per: https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs:
+#   git config --global alias.plfs "\!git -c filter.lfs.smudge= -c filter.lfs.required=false pull && git lfs pull"
+
+alias gplfs='g plfs'
+alias gpl=gplfs
+alias gri='gr -i'
 alias gf='g fetch -vp'
 alias gl='g log'
 alias gl1='gl -1'
+alias glf='gl -4'
+alias gle='gl -8'
+
+#  pushes
+#   best used with push.autoSetupRemote = true
+alias gpu='g push'
+
+#  remotes
+alias gre='g remote'
+alias grea='gre add'
+alias grerm='gre remove'
+alias gremv='gre rename'
+alias gregu='gre get-url'
+gresu() {
+	local origin=$1
+	local url="$2"
+	gre set-url $1 "$2"
+}
+
+#  diffs
 alias gd='git difftool --no-symlinks --dir-diff'
-alias gi='gitui'
-alias gu='gitui'
+alias gui='gitui'
 
 # rust
 alias ru=rustup
