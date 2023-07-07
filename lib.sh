@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230706_9ab5eae
+LIBSH_VERSION=20230707_be4df90
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -715,8 +715,12 @@ alias gco='g checkout'
 alias ga='g add'
 alias garenorm='ga --renormalize'
 alias grm='g rm'
+alias grmc='grm --cached'
 alias grmr='grm -r'
-alias grmrf='g rm -rf'
+alias grmrf='grm -rf'
+
+alias grmcr='grmc -r'
+alias grmcrf='grmc -rf'
 
 #  branches  "CRUD"
 alias gb='g branch'
@@ -736,9 +740,14 @@ alias gg='g grep'
 
 #  lfs
 alias gl='g lfs'
+
+#   lfs install
+alias glinst='gl install'
+alias gluninst='gl uninstall'
+
 alias glt='gl track'
 
-function glu() {
+glu() {
 	gl untrack "$@"
 	garenorm .
 }
@@ -831,11 +840,16 @@ alias grea='gre add'
 alias grerm='gre remove'
 alias gremv='gre rename'
 alias gregu='gre get-url'
+alias greg=gregu
 gresu() {
 	local origin=$1
 	local url="$2"
 	gre set-url $1 "$2"
 }
+
+# restore
+alias gres='g restore'
+alias gress='gres --staged'
 
 #  gitui
 alias gui='gitui'
