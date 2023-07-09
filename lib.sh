@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230707_be4df90
+LIBSH_VERSION=20230709_0ef1c51
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -580,7 +580,7 @@ function tu() {
 
 	if [ -d $pics ]; then vols+=($pics); fi
 
-	for v in "${vols[@]}"; do _tus "$v"; done
+	for v in "${vols[@]}"; do _tu "$v"; done
 
 	# TODO: handle spaces
 	mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
