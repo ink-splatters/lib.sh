@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230709_0ef1c51
+LIBSH_VERSION=20230710_7bc71b4
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -717,7 +717,7 @@ alias garenorm='ga --renormalize'
 alias grm='g rm'
 alias grmc='grm --cached'
 alias grmr='grm -r'
-alias grmrf='grm -rf'
+alias grmf='grm -rf'
 
 alias grmcr='grmc -r'
 alias grmcrf='grmc -rf'
