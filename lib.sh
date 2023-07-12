@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230710_7bc71b4
+LIBSH_VERSION=20230712_c8113bf
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -812,9 +812,7 @@ alias gl1='glog -1'
 alias gl2='glog -2'
 alias gl3='glog -3'
 alias gl4='glog -4'
-alias glf='gl4'
 alias gl8='glog -8'
-alias gle='gl8'
 
 # patches and diffs
 
