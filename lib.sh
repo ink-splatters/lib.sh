@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230723_899e02d
+LIBSH_VERSION=20230723_22cacc4
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -711,6 +711,7 @@ alias g=git
 #  working copy
 alias gs='g status'
 alias gco='g checkout'
+alias gcr='gco -b'
 
 alias ga='g add'
 alias garenorm='ga --renormalize'
@@ -727,6 +728,25 @@ alias gb='g branch'
 alias gba='gb -a'
 alias gbd='gb -D'
 alias gbc='gco -b'
+
+# tags
+
+alias _gt='g tag'
+alias gtag=_gt
+
+alias gtl='_gt -l'
+
+gt() {
+	gtl
+	cat <<'EOF'
+Use `gtag` to create a new tag
+EOF
+}
+
+alias gtpush='g push --tags'
+alias gtd='_gt -d'
+
+# commits
 
 alias gc='g commit -a'
 alias gcae='g commit --allow-empty'
@@ -830,7 +850,22 @@ alias gldiffs='glog --all -p -S'
 
 #  pushes
 #   best used with push.autoSetupRemote = true
-alias gpu='g push'
+alias gpush='g push'
+
+gpushd() {
+	if [[ $# -lt 1 ]]; then
+		cat <<'EOF'
+Usage: gpushd <branch|tag> [origin]
+EOF
+		return 1
+	fi
+
+	local origin="$2"
+	if [ "$origin" != "" ]; then shift; else origin=origin; fi
+
+	gpush $origin --delete $1
+}
+alias gpusht=gtpush
 
 #  remotes
 alias gre='g remote'
