@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230712_c8113bf
+LIBSH_VERSION=20230723_899e02d
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -870,7 +870,7 @@ alias hd='h detach'
 alias hi='h info'
 
 # nerdctl
-alias ne='colima nerdctl'
+alias nctl='colima nerdctl'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
