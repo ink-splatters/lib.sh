@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230723_22cacc4
+LIBSH_VERSION=20230806_70a35ed
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -50,6 +50,7 @@ alias xd=go-xxd
 
 # status / system info
 alias about='macchina'
+alias info=about
 
 # generation using /dev/random
 
