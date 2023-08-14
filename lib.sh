@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230806_70a35ed
+LIBSH_VERSION=20230814_44365fb
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -367,7 +367,10 @@ alias plc='pl -convert'
 alias xml1='plc xml1'
 alias bin1='plc binary1'
 
-# file system / ls + clean/rm utils
+# file system
+
+alias rr='rsync -avhHS --delete --existing --ignore-existing'
+alias rd='rsync -d --delete --existing --ignore-existing'
 
 tree() {
 	broot -c :pt "$@"
