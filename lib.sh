@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230815_97b4ee3
+LIBSH_VERSION=20230816_01b82ac
 cat <<EOF
 			lib.sh v$LIBSH_VERSION
 Initializing...
@@ -369,6 +369,7 @@ alias bin1='plc binary1'
 
 # file system
 
+alias r='rsync -avhHS --delete'
 alias rr='rsync -avhHS --delete --existing --ignore-existing'
 alias rd='rsync -d --delete --existing --ignore-existing'
 
