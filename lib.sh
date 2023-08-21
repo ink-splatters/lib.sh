@@ -1,6 +1,5 @@
-LIBSH_VERSION=20230816_01b82ac
-cat <<EOF
-			lib.sh v$LIBSH_VERSION
+LIBSH_VERSION=20230821_72ae16b
+lib.sh v$LIBSH_VERSION
 Initializing...
 
 EOF
@@ -945,9 +944,6 @@ _init() {
 		local previouspath="/usr/bin:/bin:/usr/sbin:/sbin"
 		export PATH="$data/usr/local/bin:$previouspath$(echo usr/bin:usr/libexec:usr/sbin:sbin:bin | sed -E 's@^|:@:'"$system\/"'@g')"
 
-		# patch for Sonoma
-		alias rsync="'$system/usr/libexec/rsync/rsync.samba'"
-
 		echo -- preparing the persistence in Recovery OS
 
 		local bspath=/etc/profile
@@ -975,9 +971,6 @@ alias fle="vi /etc/profile"
 
 export PATH="$PATH"
 echo -- PATH: "$PATH"
-
-# patch for Sonoma
-alias rsync="'$system/usr/libexec/rsync/rsync.samba'"
 # end of lib.sh footer
 EOF
 
