@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230821_b7a7a78
+LIBSH_VERSION=20230824_dd7cbdd
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -568,6 +568,10 @@ alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
 _i() { echo "$@" | xpkgs | xargs nix-env -iA; }
 alias i=_i
+
+alias ncd='nix-collect-garbage'
+alias ncdd='ncd -d'
+alias nso='nix store optimise'
 
 alias u='nix-env -e'
 alias q='nix-env -q'
