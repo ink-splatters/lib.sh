@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230824_dd7cbdd
+LIBSH_VERSION=20230902_03616cc
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -382,7 +382,8 @@ _salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/
 alias laa='ls -laO@e'
 alias la='ls -la'
 
-alias f=find
+alias f='fd -u'
+alias ff=find
 
 # TODO: fix broken
 # find helpers:
