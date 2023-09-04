@@ -1,9 +1,13 @@
-LIBSH_VERSION=20230902_24862c4
+LIBSH_VERSION=20230904_8341742
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
 
 EOF
+
+# TODO:
+# - shellcheck
+# - shellharden
 
 # helpers
 
@@ -21,9 +25,9 @@ _salias() {
 	shift
 	args=($@)
 	alias $name="sudo ${args[*]}"
-} # sudo
+}
 
-#sudo
+# sudo
 
 alias s=sudo
 alias si='sudo -i'
