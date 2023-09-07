@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230905_e666323
+LIBSH_VERSION=20230907_5c5f6a9
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -140,7 +140,6 @@ _salias sctl sysadminctl
 # networking
 
 _salias n nextdns
-
 alias na='n activate'
 alias nd='n deactivate'
 alias ni='n install'
@@ -155,6 +154,7 @@ alias mc='m connect ; m status'
 alias md='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
 alias mvpn='m lockdown-mode set'
+alias isnet='nl google.com && ping google.com'
 
 _salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
 _salias apd /usr/libexec/airportd
