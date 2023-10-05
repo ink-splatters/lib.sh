@@ -1,4 +1,4 @@
-LIBSH_VERSION=20230907_5c5f6a9
+LIBSH_VERSION=20231005_94622a9
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -920,6 +920,9 @@ alias hi='h info'
 
 # nerdctl
 alias nctl='colima nerdctl'
+
+# xcode
+alias simctl=/Applications/Xcode.app/Contents/Developer/usr/bin/simctl
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
