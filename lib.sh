@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231005_94622a9
+LIBSH_VERSION=20231008_b8f8a16
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -337,13 +337,15 @@ alias uenv='um env'
 
 alias _vi=/usr/bin/vi
 
-# editing / viewing
 if [[ "$EDITOR" == "" ]]; then
 	export EDITOR=vim
 fi
 alias vi="$EDITOR"
 alias batlog='bat --paging=never -l log'
 alias e=echo
+
+# protonmail
+alias pm='protonmail-bridge'
 
 # themes
 # TODO: list wezterm themes?
