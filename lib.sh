@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231008_b8f8a16
+LIBSH_VERSION=20231017_9711971
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -47,7 +47,6 @@ alias u0='printf "%s"  00000000-0000-0000-0000-000000000000'
 
 # uppercase
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
-alias up=upper
 
 # better xxd: https://github.com/felixge/go-xxd
 alias xd=go-xxd
@@ -146,7 +145,7 @@ alias ni='n install'
 alias nl='nslookup'
 alias nr='n restart'
 alias ns='n status'
-alias nu='n uninstall'
+alias nun='n uninstall'
 alias ncw='n config wizard'
 alias m=mullvad
 
@@ -185,10 +184,6 @@ rewifi() {
 	dsc -flushcache
 	kall -m HUP mDNSResponder
 
-	ifc down
-	sleep 1
-
-	ifc en0 up
 	sleep 1
 
 	na
@@ -571,6 +566,8 @@ alias rgi='_rg -iuuu'
 #	uutils-coreutils "$1"
 # }
 
+# nix
+
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
 _i() { echo "$@" | xpkgs | xargs nix-env -iA; }
@@ -579,6 +576,8 @@ alias i=_i
 alias ncd='nix-collect-garbage'
 alias ncdd='ncd -d'
 alias nso='nix store optimise'
+alias nu='nix-env --upgrade'
+alias ncu='nix-channel --update'
 
 alias u='nix-env -e'
 alias q='nix-env -q'
