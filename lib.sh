@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231019_6ef063b
+LIBSH_VERSION=20231022_0b16d36
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -924,6 +924,9 @@ alias nctl='colima nerdctl'
 
 # xcode
 alias simctl=/Applications/Xcode.app/Contents/Developer/usr/bin/simctl
+
+# gcloud
+alias gcl=gcloud
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
