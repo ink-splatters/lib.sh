@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231022_0b16d36
+LIBSH_VERSION=20231022_29647f5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -867,7 +867,7 @@ alias gldiffs='glog --all -p -S'
 #   best used with push.autoSetupRemote = true
 alias gpush='g push'
 
-gpushd() {
+gpushdel() {
 	if [[ $# -lt 1 ]]; then
 		cat <<'EOF'
 Usage: gpushd <branch|tag> [origin]
