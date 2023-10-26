@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231026_ec7b720
+LIBSH_VERSION=20231026_d7e03c1
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -927,6 +927,21 @@ alias simctl=/Applications/Xcode.app/Contents/Developer/usr/bin/simctl
 
 # gcloud
 alias gcl=gcloud
+
+# cachix
+cpush() {
+	local cache="$1"
+	shift
+	cachix push "$cache" -j$(sysctl hw.ncpu | rg -o '\d') $@
+}
+
+cpushinputs() {
+	nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush $@
+}
+
+cpushrt() {
+	nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush $@
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
