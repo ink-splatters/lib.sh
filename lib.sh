@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231027_1bb429b
+LIBSH_VERSION=20231027_92286e2
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -943,6 +943,21 @@ cpushinputs() {
 cpushrt() {
 	nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush $@
 }
+
+# nomino - superfast renamer - is dangerous to use because of --dry-run (--test)
+# is switched OFF by default which results in potentially dangerous mass renames.
+# the wrapper, besides being a safequard, shows rename map, nicely highlighted with `jq`
+
+unset -f nomino
+alias _nomino="$(which nomino)"
+nomino() {
+	jq < <(_nomino --test $@ -g /dev/fd/1)
+}
+
+alias nom=nomino
+
+# actually call nomino to perform unsafe action
+alias nominate=_nomino
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
