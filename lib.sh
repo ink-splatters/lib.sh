@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231027_92286e2
+LIBSH_VERSION=20231027_8a883b0
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -39,11 +39,14 @@ alias x1='x -n1'
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
 
-# uuid generation
-alias uuid=uuidgen
+# uuid retrieval and generation
 alias ugen=uuid
-alias ug=ugen
-alias u0='printf "%s"  00000000-0000-0000-0000-000000000000'
+alias u0='echo 00000000-0000-0000-0000-000000000000'
+
+duuid() {
+
+	d info $@ | grep Volume\ UUID | grep -Eo '[0-9A-F-]{36}'
+}
 
 # uppercase
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
@@ -958,6 +961,9 @@ alias nom=nomino
 
 # actually call nomino to perform unsafe action
 alias nominate=_nomino
+
+alias td='tr -d'
+alias tn="tr -d '\n'"
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
