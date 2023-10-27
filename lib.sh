@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231026_d7e03c1
+LIBSH_VERSION=20231027_1bb429b
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -154,6 +154,7 @@ alias md='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
 alias mvpn='m lockdown-mode set'
 alias isnet='nl google.com && ping google.com'
+alias pig=isnet
 
 _salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
 _salias apd /usr/libexec/airportd
