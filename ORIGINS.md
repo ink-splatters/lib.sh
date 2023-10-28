@@ -1,10 +1,18 @@
 ## Origins
 
-While used in `macOS` on daily basis by author, it initially emerged as
-improvised survival kit, borne to make miserable, irrecoverable experience of Apple
-`RecoveryOS` less punishing. There is zero proud about it and this tool should probably
-have never existed, thus all the benefits of using it are just supprising side effect
-of struggling to preserve some sanity.
+_`lib.sh`_ intially emerged as sanity - preserving kit, aimed to make the unforgiving, barely recoverable experience of Apple _RecoveryOS_ - less punishing.
+
+Later on it became the author's daily driver.
+
+## Hurt
+
+The Following paragraph is generously sponsored by Trent:
+
+[![NIN - Hurt](http://img.youtube.com/vi/PbHz9p7Z4OU/1.jpg)](http://www.youtube.com/watch?v=PbHz9p7Z4OU "NIN - Hurt")
+
+_Recovery_ has been always half-baked environment. Apple has been continously disabling it, arming against user's mental health. If one needs more than changing Security Policy via menu (1TR needs to be correctly booted!), it's all pain and dispair. It's taken over by bitrot. E.g., at some point in the past, more dylibs were moved to `dyldcache` which broke tons of CLI tools. This has become persistent, only to get even worse with each major release.
+
+Apple hardly could care less, however: Recovery is stub OS, meaning they have a freedom to put absolute nonsense as far as it fulfills the minimum viable requirements.
 
 ### Hope not found
 
@@ -14,42 +22,26 @@ bash: rsync: command not found
 bash-3.2 #
 ```
 
-Apple has been continously arming `RecoveryOS` against operator's mental health.
+Nice move, Apple! It's because `rsync` now lives at `/Volumes/Macintosh HD/usr/libexec/rsync/rsync.samba`, as of _Sonoma_.
 
-For the luckiest ones, who just need to switch `SIP` on/off or enable 3rd-party KEXTs, it may not pose an issue, but otherwise it's advised to prepare for the worst. Or if the reader already got sadly aquainted to it, they may want to stop reading.
 
-### The Fall
+### Deliberate assault
 
-```
-bash-3.2 # top
-bash: top: command not found # of course there is no top, neither is there a bottom
-
-bash-3.2 #
-```
-
-Initially eunuchized, prostrate environment, it has been degrading over time. And while the _top of it_ was left behind long time ago,
-the bottom is also yet to be seen, so this abyssic fall seems neverending.
-
-It's taken over by bitrot. E.g. Apple's moving more dylibs to `dyldcache` just broke tons of tools in Recovery. Well, of course, Apple hardly could
-care less about it.
-
-### Perverted stance on security
+Sometimes, however, it gets worse on purpose. That is: rockstar engineering workforce hired from all over the world is being wasted for pushing the limits of noncense. Indeed, why not enmasculate `gpt`:
 
 ```
 bash-3.2 # gpt add
 gpt: add: operation not permitted: add
 ```
 
-But it's unthinkable that some disimprovements are being made on purpuse. That is, rockstars Apple engineers hired from all over the world, keep on working hard, probing the limit of "breaking things and getting away with it".
+Srsly, Apple, what did it do to you? Or is it perverted approach to security?
 
-So, one of their latest targeted assaults emasculated `gpt` utility, which has lost ability to make any modifications to partition tables.
+Good that [`gdisk`](https://sourceforge.net/projects/gptfdisk) just works fine.
 
-Srsly, Apple, **why**? Especially, given [`gdisk`](https://sourceforge.net/projects/gptfdisk) continues to work like a charm and requires no special entitlements or stuff.
+### tmp1
 
-While the question stays open for a reader, I can't come up with better answer for myself, than
+Finishing my rant with a really funny stuff: some _Monterey_ release frorbade creating a user named `tmp`. In a couple of incremental updates it has been reverted :)
 
-Tim's _because fuck you submissive cash cows, that's why_.
+![image](https://github.com/ink-splatters/lib.sh/assets/2706884/03a29a17-c840-4391-9e7f-d9a2798715bd)
 
-### Script Kiddie's woe
 
-As survival kit, anxiously crafted from bunch of oneliners, it probably may look even more ugly than I anticipate, so don't expect it to be more nice than the beast it was supposed to fight. Generally it needs good refactoring, but I really don't feel like investing into it :)
