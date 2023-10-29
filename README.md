@@ -1,33 +1,34 @@
 ## lib.sh
 
-Opinionated POSIX shell utils and aliases, for Apple operating systems.
+Collection of opinionated POSIX shell utils for Apple operating systems.
 
 ### [Origins](ORIGINS.md)
 
-### Documentation
-
-There is no explicit documentation, but it should not be hard to make sense of it by reading the code.
-
 ### Installing
 
-#### macOS
-
-##### User shell
-
-Just `source` lib.sh from `.zshrc`
-
-As `flel` is alias for editing `lib.sh` code itself, there are those two I use
-along with it, to edit / reload `.zshrc`
+### macOS
 
 ```shell
-cd ~
-git clone https://github.com/ink-splatters/lib.sh
-cat <<'EOF' >> ~/.zshrc
+#/bin/sh
+set -e
 
-source "$HOME"/lib.sh/lib.sh
+LIBSH_ROOT=${LIBSH_ROOT:-"$HOME"/lib.sh}
 
-alias fle='vi ~/.zshrc`
-alias fs='source ~/.zshrc'
+LITERAL=
+if [[ $SHELL =~ zsh(-.+)?$ ]] ; then LITERAL=z ; fi
+PROFILE="$HOME"/.${LITERAL}profile
+
+EDIT_ALIAS=${EDIT_ALIAS:-fle}
+RELOAD_ALIAS=${RELOAD_ALIAS:-rel}
+
+git clone --depth 1 https://github.com/ink-splatters/lib.sh "$LIBSH_ROOT"
+
+cat <<EOF >> "$PROFILE" | tee /dev/fd/1
+
+source '$LIBSH_ROOT'/lib.sh
+
+alias $EDIT_ALIAS='vim "$PROFILE"' # edit
+alias $RELOAD_ALIAS='vim "$PROFILE"' # reload
 EOF
 ```
 
