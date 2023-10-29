@@ -35,6 +35,7 @@ alias si='sudo -i'
 # functools kinda stuff (love it)
 alias x=xargs
 alias x1='x -n1'
+alias x2='xs -n2'
 
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
@@ -50,9 +51,6 @@ duuid() {
 
 # uppercase
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
-
-# better xxd: https://github.com/felixge/go-xxd
-alias xd=go-xxd
 
 # status / system info
 alias about='macchina'
@@ -161,7 +159,9 @@ alias pig=isnet
 
 _salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
 _salias apd /usr/libexec/airportd
-_salias ifc ifconfig
+
+# use always native ifconfig for the purpose of lib.sh!
+_salias ifc /sbin/ifconfig
 
 _salias utm /Applications/UTM.app/Contents/MacOS/utmctl
 
@@ -383,6 +383,7 @@ tree() {
 }
 
 _salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
+alias lsreg=lsregister
 
 alias laa='ls -laO@e'
 alias la='ls -la'
@@ -445,8 +446,8 @@ alias cld=cleandirs
 alias o=open
 
 # attrs
-alias xa='xattr'
-alias xad='xattr -d'
+
+alias xd='xattr -d'
 alias xsd='xattr -rsd'
 _x() {
 
@@ -469,8 +470,12 @@ xsv() {
 	_x -rsv $attr "$@"
 }
 
-# as it shadows legitimate app:
+# TODO:
+# print xattrs using abbreviations, e.g.
+# xsp q # echo com.apple.quarantine
+# xsp q m # echo com.apple.{quarantine,macl}
 
+# as it shadows legitimate app:
 alias csv=/nix/var/nix/profiles/default/bin/xsv
 
 # fs lockers
@@ -510,19 +515,19 @@ alias sfd=sfdirs
 
 ffiles() {
 	for f in "$@"; do
-		chflags nouchg,noschg "$f" 2>/dev/null
+		sudo chflags nouchg,noschg "$f" 2>/dev/null
 		rm -f "$f"
 		touch "$f"
-		chflags uchg,schg "$f"
+		sudo chflags uchg,schg "$f"
 	done
 }
 # - "softer" version
 # same but preserve original files and its ownership, permissions, unrelated BSD flags and  xattrs
 sffiles() {
 	for f in "$@"; do
-		chflags nouchg,noschg "$f" 2>/dev/null
+		sudo chflags nouchg,noschg "$f" 2>/dev/null
 		truncate -s 0 "$f"
-		chflags uchg,schg "$f"
+		sudo chflags uchg,schg "$f"
 	done
 }
 
@@ -530,11 +535,11 @@ alias sff=sffiles
 
 # 2. non-destructive
 
-alias lock='chflags uchg,schg'
-alias unlock='chflags nouchg,noschg'
+alias lock='sudo chflags uchg,schg'
+alias unlock='sudo chflags nouchg,noschg'
+
 # recursive version
-alias unlockr='chflags -R nouchg,noschg'
-alias ufdirs=unlock
+alias unlockr='sudo chflags -R nouchg,noschg'
 
 # index
 
