@@ -24,7 +24,6 @@ bash-3.2 #
 
 Nice move, Apple! It's because `rsync` now lives at `/Volumes/Macintosh HD/usr/libexec/rsync/rsync.samba`, as of _Sonoma_.
 
-
 ### Deliberate assault
 
 Sometimes, however, it gets worse on purpose. That is: rockstar engineering workforce hired from all over the world is being wasted for pushing the limits of noncense. Indeed, why not enmasculate `gpt`:
@@ -43,5 +42,3 @@ Good that [`gdisk`](https://sourceforge.net/projects/gptfdisk) just works fine.
 Finishing my rant with a really funny stuff: some _Monterey_ release frorbade creating a user named `tmp`. In a couple of incremental updates it has been reverted :)
 
 ![image](https://github.com/ink-splatters/lib.sh/assets/2706884/03a29a17-c840-4391-9e7f-d9a2798715bd)
-
-

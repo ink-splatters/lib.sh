@@ -181,7 +181,7 @@ rewifi() {
 	mvpn off
 	md
 	nd
-	nu
+	nun
 	sleep 1
 
 	rt -n flush
@@ -480,6 +480,8 @@ alias csv=/nix/var/nix/profiles/default/bin/xsv
 
 # fs lockers
 
+_salias _chflags /usr/bin/chflags
+
 # Despite not to be inferred from names exactly, all the routines lock file system objects from
 # further changes by both System and User.
 
@@ -492,10 +494,10 @@ alias csv=/nix/var/nix/profiles/default/bin/xsv
 
 fdirs() {
 	for d in "$@"; do
-		chflags -R nouchg,noschg "$d" 2>/dev/null
+		_chflags -R nouchg,noschg "$d" 2>/dev/null
 		rm -rf "$d"
 		mkdir -p "$d"
-		chflags uchg,schg "$d"
+		_chflags uchg,schg "$d"
 	done
 
 }
@@ -503,31 +505,31 @@ fdirs() {
 # same but preserve original folders and its ownership, permissions, unrelated BSD flags and  xattrs
 sfdirs() {
 	for d in "$@"; do
-		chflags -R nouchg,noschg "$d" 2>/dev/null
+		_chflags -R nouchg,noschg "$d" 2>/dev/null
 
 		if [ ! -d "$d" ]; then mkdir "$d"; fi
 
 		cleandirs 1>/dev/null "$d"
-		chflags uchg,schg "$d"
+		_chflags uchg,schg "$d"
 	done
 }
 alias sfd=sfdirs
 
 ffiles() {
 	for f in "$@"; do
-		sudo chflags nouchg,noschg "$f" 2>/dev/null
+		_chflags nouchg,noschg "$f" 2>/dev/null
 		rm -f "$f"
 		touch "$f"
-		sudo chflags uchg,schg "$f"
+		_chflags uchg,schg "$f"
 	done
 }
 # - "softer" version
 # same but preserve original files and its ownership, permissions, unrelated BSD flags and  xattrs
 sffiles() {
 	for f in "$@"; do
-		sudo chflags nouchg,noschg "$f" 2>/dev/null
+		_chflags nouchg,noschg "$f" 2>/dev/null
 		truncate -s 0 "$f"
-		sudo chflags uchg,schg "$f"
+		_chflags uchg,schg "$f"
 	done
 }
 
@@ -535,11 +537,11 @@ alias sff=sffiles
 
 # 2. non-destructive
 
-alias lock='sudo chflags uchg,schg'
-alias unlock='sudo chflags nouchg,noschg'
+alias lock='_chflags uchg,schg'
+alias unlock='_chflags nouchg,noschg'
 
 # recursive version
-alias unlockr='sudo chflags -R nouchg,noschg'
+alias unlockr='_chflags -R nouchg,noschg'
 
 # index
 
@@ -956,16 +958,19 @@ cpushrt() {
 # is switched OFF by default which results in potentially dangerous mass renames.
 # the wrapper, besides being a safequard, shows rename map, nicely highlighted with `jq`
 
+# jq call is POSIX - incompliant
+# hence this nasty wrapping
 unset -f nomino
-alias _nomino="$(which nomino)"
+_nomino="$(which nomino)"
 nomino() {
-	jq < <(_nomino --test $@ -g /dev/fd/1)
+	/usr/bin/env bash -c "jq < <('$_nomino' --test $@ -g /dev/fd/1)"
 }
 
 alias nom=nomino
-
 # actually call nomino to perform unsafe action
-alias nominate=_nomino
+alias nominate="$_nomino"
+
+# tr
 
 alias td='tr -d'
 alias tn="tr -d '\n'"
