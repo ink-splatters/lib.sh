@@ -32,7 +32,21 @@ _salias() {
 alias s=sudo
 alias si='sudo -i'
 
-# functools kinda stuff (love it)
+# tr & clipboard
+
+alias td='tr -d'
+alias tn="tr -d '\n'"
+alias c=pbcopy
+alias p=pbpaste
+
+function cr() {
+	local in
+	read in
+	echo $in
+
+}
+
+# xattrs and related
 alias x=xargs
 alias x1='x -n1'
 alias x2='xs -n2'
@@ -41,13 +55,9 @@ alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
 
 # uuid retrieval and generation
-alias ugen=uuid
-alias u0='echo 00000000-0000-0000-0000-000000000000'
-
-duuid() {
-
-	d info $@ | grep Volume\ UUID | grep -Eo '[0-9A-F-]{36}'
-}
+alias uuid=uuidgen
+alias ugen="uuid | tn"
+alias u0='printf "%s" 00000000-0000-0000-0000-000000000000'
 
 # uppercase
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
@@ -102,7 +112,7 @@ EOF
 		echo 'for count > 64 use -f' &&
 		return 1
 
-	dd if=/dev/random bs=1 count=$count 2>/dev/null | xxd -p | tr -d '\n'
+	dd if=/dev/random bs=1 count=$count 2>/dev/null | xxd -p | tn
 
 	((n == 1)) && echo
 }
@@ -358,10 +368,6 @@ alias lcd='lc disable'
 alias lcbs='lc bootstrap'
 alias lck='lc kill'
 alias lcks='lc kickstart -k'
-alias c=pbcopy
-alias p=pbpaste
-alias ptrim="p | tr -d '\n'"
-alias ptr=ptrim
 
 # plists
 
@@ -448,6 +454,7 @@ alias o=open
 # attrs
 
 alias xd='xattr -d'
+alias xdp='xattr -d purgeable-drecs-fixed'
 alias xsd='xattr -rsd'
 _x() {
 
@@ -646,7 +653,12 @@ alias tosnap='snap -r'
 
 alias d='diskutil'
 alias l='diskutil list'
+alias di='d info'
 alias dm='d mount'
+dmm() {
+	dm -mountPoint "$1" "$2"
+}
+
 alias dum='d umount'
 alias dud='d umountDisk'
 alias dr='d rename'
@@ -683,6 +695,10 @@ EOF
 
 alias a='d apfs'
 alias au='a unlock'
+function aunom() {
+
+	au "$1" -nomount
+}
 alias al='a lock'
 alias alu='a listUsers'
 
@@ -728,6 +744,15 @@ srestore() {
 	shift 3
 
 	clone "$src" "$tgt" --toSnapshot "$snap" $@
+}
+
+function duuid() {
+
+	d info $1 | grep Volume\ UUID | grep -Eo '[0-9A-F-]{36}' | tn
+}
+
+function dname() {
+	d info $1 | grep Volume\ Name | sed -E 's/^.*Volume Name:[ \t]+//g' | tn
 }
 
 # git
@@ -969,11 +994,6 @@ nomino() {
 alias nom=nomino
 # actually call nomino to perform unsafe action
 alias nominate="$_nomino"
-
-# tr
-
-alias td='tr -d'
-alias tn="tr -d '\n'"
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
