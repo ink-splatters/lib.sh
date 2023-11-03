@@ -585,6 +585,7 @@ alias rgi='_rg -iuuu'
 
 # nix
 alias xx=nix
+alias ix=nix
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
