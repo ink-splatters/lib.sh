@@ -41,9 +41,8 @@ alias p=pbpaste
 
 function cr() {
 	local in
-	read in
-	echo $in
-
+	cat $in
+	echo
 }
 
 # xattrs and related
@@ -968,7 +967,7 @@ alias gcl=gcloud
 cpush() {
 	local cache="$1"
 	shift
-	cachix push "$cache" -j$(sysctl hw.ncpu | rg -o '\d') $@
+	cachix push "$cache" -j$(sysctl hw.ncpu | grep -o '\d') $@
 }
 
 cpushinputs() {
