@@ -1044,7 +1044,10 @@ _init() {
 			fi
 		fi
 
+		# TODO: WTF?!
 		cat $tmpfile >$bspath
+
+		_sudo='$@'
 		cat <<EOF >$bspath
 # lib.sh footer written on $(date '+%+')
 __LIBSH_INITIALIZED=1 source "$self"
@@ -1056,8 +1059,13 @@ alias fle="vi /etc/profile"
 
 export PATH="$PATH"
 echo -- PATH: "$PATH"
+
+sudo() {
+	$_sudo
+}
 # end of lib.sh footer
 EOF
+		source $bspath
 
 		cat <<EOF
 
