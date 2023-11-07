@@ -1063,6 +1063,13 @@ echo -- PATH: "$PATH"
 sudo() {
 	$_sudo
 }
+
+# patch for Sonoma
+_rsync="$system/usr/libexec/rsync/rsync.samba"
+if [ -f "$_rsync" ]; then
+	alias rsync="'$_rsync'"
+fi
+
 # end of lib.sh footer
 EOF
 		source $bspath
