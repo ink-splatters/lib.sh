@@ -337,6 +337,7 @@ alias pkgd=pkgf
 alias upkg=pkgf
 
 # python
+alias mm=mamba
 alias um=micromamba
 alias uma='um activate'
 alias uenv='um env'
