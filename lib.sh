@@ -134,7 +134,7 @@ alias k9='k -9'
 pk() { pg "$1" | x kill -9; }
 
 alias t=btop
-alias bw=bandwhich
+_salias bw bandwhich
 
 _salias sc sysctl
 alias sw='sc -w'
@@ -154,7 +154,7 @@ alias nd='n deactivate'
 alias ni='n install'
 alias nl='nslookup'
 alias nr='n restart'
-alias ns='n status'
+alias nstat='n status'
 alias nun='n uninstall'
 alias ncw='n config wizard'
 alias m=mullvad
@@ -231,7 +231,7 @@ alias winfo=wi
 _salias ng ngrep
 alias ng0='ng -d en0'
 
-alias netsetup=networksetup
+_salias ns networksetup
 
 mac() {
 
