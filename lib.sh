@@ -62,8 +62,10 @@ alias u0='printf "%s" 00000000-0000-0000-0000-000000000000'
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
 
 # status / system info
-alias about='macchina'
-alias info=about
+alias mf=macchina
+alias bf=bunnyfetch
+alias sysinfo=mf # big info
+alias sinfo=bf   # small info
 
 # generation using /dev/random
 
