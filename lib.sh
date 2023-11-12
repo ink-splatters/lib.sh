@@ -999,7 +999,10 @@ alias nom=nomino
 # actually call nomino to perform unsafe action
 alias nominate="$_nomino"
 
+# cattpuccin
+# ctp is cli binary
 alias ctpal='inkcat macchiato,mocha,frappe,latte'
+alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
