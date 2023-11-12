@@ -997,8 +997,7 @@ alias nom=nomino
 # actually call nomino to perform unsafe action
 alias nominate="$_nomino"
 
-alias catpuccin='inkcat macchiato,mocha,frappe,latte'
-alias cpc=catpuccin
+alias ctpal='inkcat macchiato,mocha,frappe,latte'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
