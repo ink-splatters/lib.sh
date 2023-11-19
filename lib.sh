@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231119_49033ef
+LIBSH_VERSION=20231119_827bc81
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -362,7 +362,7 @@ alias pm='protonmail-bridge'
 
 # themes
 # TODO: list wezterm themes?
-# alias themes="kitty +kitten themes"
+alias themes="kitty +kitten themes"
 
 # launchctl
 
