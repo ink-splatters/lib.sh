@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231027_8a883b0
+LIBSH_VERSION=20231119_49033ef
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -341,7 +341,9 @@ alias upkg=pkgf
 # python
 alias mm=mamba
 alias um=micromamba
+alias uml='um env list'
 alias uma='um activate'
+alias umd='um deactivate'
 alias uenv='um env'
 
 # editing / viewing
@@ -395,6 +397,8 @@ alias lsreg=lsregister
 
 alias laa='ls -laO@e'
 alias la='ls -la'
+alias eaa='eza -la@'
+alias ea='eza -la'
 
 alias f='fd -u'
 alias ff=find
