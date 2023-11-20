@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231119_827bc81
+LIBSH_VERSION=20231120_362dc0a
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -943,6 +943,9 @@ gresu() {
 alias gres='g restore'
 alias gress='gres --staged'
 
+# reset
+alias grhh='g reset --hard HEAD'
+
 #  gitui
 alias gui='gitui'
 
@@ -1002,6 +1005,15 @@ nomino() {
 alias nom=nomino
 # actually call nomino to perform unsafe action
 alias nominate="$_nomino"
+
+# jq-view
+function j() {
+
+	local fn="$1"
+	shift
+	cat "$fn" | jq $@
+
+}
 
 # cattpuccin
 # ctp is cli binary
