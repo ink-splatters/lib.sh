@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231120_362dc0a
+LIBSH_VERSION=20231120_3fd4d79
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1071,7 +1071,11 @@ _init() {
 		# TODO: WTF?!
 		cat $tmpfile >$bspath
 
+		# there is no sudo in RecoveryOS
 		_sudo='$@'
+
+		# rsync path on Sonoma
+		_rsync="$system/usr/libexec/rsync/rsync.samba"
 		cat <<EOF >$bspath
 # lib.sh footer written on $(date '+%+')
 __LIBSH_INITIALIZED=1 source "$self"
@@ -1088,8 +1092,8 @@ sudo() {
 	$_sudo
 }
 
-# patch for Sonoma
-_rsync="$system/usr/libexec/rsync/rsync.samba"
+# on Sonoma we must create rsync alias
+# pointing to unusual location
 if [ -f "$_rsync" ]; then
 	alias rsync="'$_rsync'"
 fi
