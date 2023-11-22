@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231120_3fd4d79
+LIBSH_VERSION=20231122_52be1c9
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -593,6 +593,21 @@ alias rgi='_rg -iuuu'
 # nix
 alias xx=nix
 alias ix=nix
+alias flake='nix flake'
+function drv() {
+
+	local _1="$1"
+	shift
+
+	local cmd=(nix derivation $_1 $@)
+
+	if [[ $_1 == "show" ]]; then
+		${cmd[*]} | jq
+	else
+		${cmd[*]}
+	fi
+
+}
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
