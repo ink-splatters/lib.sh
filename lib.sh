@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231204_59e4829
+LIBSH_VERSION=20231206_f4b9f80
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -363,6 +363,7 @@ alias pm='protonmail-bridge'
 # themes
 alias themes="kitty +kitten themes"
 alias theme=themes # semtantic sugar in order to do like: `theme '3024 Day'`
+alias th=theme
 
 # launchctl
 
