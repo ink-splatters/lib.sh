@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231206_f4b9f80
+LIBSH_VERSION=20231207_b9d3ced
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -15,16 +15,16 @@ _problem() { echo '**' there was a problem running: $@; }
 _maybe() { command -v $@ >/dev/null 2>&1 && $@; }
 
 _alias() {
-	local name="$1"
-	shift
-	args=($@)
-	alias $name="${args[*]}"
+    local name="$1"
+    shift
+    args=($@)
+    alias $name="${args[*]}"
 }
 _salias() {
-	local name="$1"
-	shift
-	args=($@)
-	alias $name="sudo ${args[*]}"
+    local name="$1"
+    shift
+    args=($@)
+    alias $name="sudo ${args[*]}"
 }
 
 # sudo
@@ -40,9 +40,9 @@ alias c=pbcopy
 alias p=pbpaste
 
 function cr() {
-	local in
-	cat $in
-	echo
+    local in
+    cat $in
+    echo
 }
 
 # xattrs and related
@@ -70,8 +70,8 @@ alias sinfo=bf   # small info
 # generation using /dev/random
 
 rand() {
-	if [[ $# == 0 ]]; then
-		cat <<EOF
+    if [[ $# == 0 ]]; then
+        cat <<EOF
 the util takes <count> bytes from /dev/random and outputs lower-case hex values
 
 usage: rand <count> [-f] [-n]
@@ -83,43 +83,43 @@ usage: rand <count> [-f] [-n]
 example: to get 256 bit nonce use: $(rand 32)
 
 EOF
-		return 1
-	fi
+        return 1
+    fi
 
-	local f=0
-	local n=0
+    local f=0
+    local n=0
 
-	local count=$1
-	shift
-	((count == 0)) &&
-		echo "ERROR: invalid value: $count" &&
-		return 1
+    local count=$1
+    shift
+    ((count == 0)) \
+        && echo "ERROR: invalid value: $count" \
+        && return 1
 
-	while [[ $1 != "" ]]; do
-		case $1 in
-		-f | --force)
-			f=1
-			;;
+    while [[ $1 != "" ]]; do
+        case $1 in
+            -f | --force)
+                f=1
+                ;;
 
-		-n | --newline)
-			n=1
-			;;
+            -n | --newline)
+                n=1
+                ;;
 
-		esac
-		shift
-	done
+        esac
+        shift
+    done
 
-	((count > 64)) && ((f != 1)) &&
-		echo 'for count > 64 use -f' &&
-		return 1
+    ((count > 64)) && ((f != 1)) \
+        && echo 'for count > 64 use -f' \
+        && return 1
 
-	dd if=/dev/random bs=1 count=$count 2>/dev/null | xxd -p | tn
+    dd if=/dev/random bs=1 count=$count 2>/dev/null | xxd -p | tn
 
-	((n == 1)) && echo
+    ((n == 1)) && echo
 }
 
 randn() {
-	rand $@ -n
+    rand $@ -n
 }
 
 alias randp='rand 8 | grep -Eo ".{8}"' # pair of short nonces
@@ -186,46 +186,46 @@ _salias rt route
 
 # draft
 rewifi() {
-	set +e
-	set -x
+    set +e
+    set -x
 
-	mvpn off
-	md
-	nd
-	nun
-	sleep 1
+    mvpn off
+    md
+    nd
+    nun
+    sleep 1
 
-	rt -n flush
-	dsc -flushcache
-	kall -m HUP mDNSResponder
+    rt -n flush
+    dsc -flushcache
+    kall -m HUP mDNSResponder
 
-	sleep 1
+    sleep 1
 
-	na
-	ni
-	mc
-	sleep 1
-	mc
-	nr
-	sleep 1
+    na
+    ni
+    mc
+    sleep 1
+    mc
+    nr
+    sleep 1
 
-	mvpn on
+    mvpn on
 
-	set +x
-	set -e
+    set +x
+    set -e
 
-	echo Done
+    echo Done
 }
 
 wchan() {
-	if [ $1 != "" ]; then
-		wdown
-		echo -setting channel to: $1
-		ap -c=$1
-		sleep 1
-	else
-		ap -c
-	fi
+    if [ $1 != "" ]; then
+        wdown
+        echo -setting channel to: $1
+        ap -c=$1
+        sleep 1
+    else
+        ap -c
+    fi
 }
 alias wscan='ap -s'
 alias wi='ap -I'
@@ -237,41 +237,41 @@ _salias ns networksetup
 
 mac() {
 
-	local interface=en0
+    local interface=en0
 
-	if [ "$1" != "" ]; then
-		interface="$1"
-	fi
+    if [ "$1" != "" ]; then
+        interface="$1"
+    fi
 
-	ifc $interface | grep ether | grep -Eo ' [0-9a-f:]+' | tr -d ' \t'
+    ifc $interface | grep ether | grep -Eo ' [0-9a-f:]+' | tr -d ' \t'
 
 }
 
 randmac() {
 
-	if (($# > 1)); then
-		cat <<'EOF'
+    if (($# > 1)); then
+        cat <<'EOF'
 Temporary changes network interface mac address. This does not survice a reboot.
 
 usage: randmac [<interface>]
 
 [<interface>]   optionally specified interace for the mac address to be set on
 EOF
-		return 1
-	fi
+        return 1
+    fi
 
-	local interface=en0
+    local interface=en0
 
-	if [ "$1" != "" ]; then
-		interface="$1"
-	fi
+    if [ "$1" != "" ]; then
+        interface="$1"
+    fi
 
-	ap -z
-	local mac=$(rand 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g')
+    ap -z
+    local mac=$(rand 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g')
 
-	echo -- "generated value: $mac; attempting to set..."
-	ifc $interface ether "$mac"
-	(($? == 0)) && mac && echo done.
+    echo -- "generated value: $mac; attempting to set..."
+    ifc $interface ether "$mac"
+    (($? == 0)) && mac && echo done.
 }
 
 alias ms='m status'
@@ -281,53 +281,53 @@ alias ms='m status'
 # TODO: get local network status
 
 _status_dns() {
-	printf "\t"
-	m dns get | grep Custom
+    printf "\t"
+    m dns get | grep Custom
 }
 
 _status_always_req() {
 
-	printf "\t"
-	m lockdown-mode get
+    printf "\t"
+    m lockdown-mode get
 
 }
 _mss() {
 
-	echo
-	printf "Mullvad status:\n\t"
-	ms
+    echo
+    printf "Mullvad status:\n\t"
+    ms
 }
 
 mss() {
-	_mss
-	_status_dns
-	_status_always_req
+    _mss
+    _status_dns
+    _status_always_req
 }
 
 msss() {
-	_mss
-	_status_always_req
+    _mss
+    _status_always_req
 
-	local dns="$(m dns get)"
-	printf "\tDNS:\n"
+    local dns="$(m dns get)"
+    printf "\tDNS:\n"
 
-	echo "$dns" | sed 's/ DNS//g' | sed 's/^/\t\t/g'
+    echo "$dns" | sed 's/ DNS//g' | sed 's/^/\t\t/g'
 
-	printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
+    printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
 }
 
 nets() {
 
-	local keys=(IP Mask Gateway Ether DNS)
-	local values=($(net -getinfo 'Wi-Fi' | grep -E '^(IP |Sub|Router|^Wi-Fi)' | tr -d ' \t' | sed -E 's/^[^:]+://g'))
-	values+=($(net -getdnsservers 'Wi-Fi'))
+    local keys=(IP Mask Gateway Ether DNS)
+    local values=($(net -getinfo 'Wi-Fi' | grep -E '^(IP |Sub|Router|^Wi-Fi)' | tr -d ' \t' | sed -E 's/^[^:]+://g'))
+    values+=($(net -getdnsservers 'Wi-Fi'))
 
-	echo
-	echo Network status:
-	for ((i = 1; i <= ${#keys[@]}; i++)); do
-		printf "\t"
-		echo "${keys[i]}: ${values[i]}"
-	done
+    echo
+    echo Network status:
+    for ((i = 1; i <= ${#keys[@]}; i++)); do
+        printf "\t"
+        echo "${keys[i]}: ${values[i]}"
+    done
 }
 
 alias br=broot
@@ -351,7 +351,7 @@ alias uenv='um env'
 alias _vi=/usr/bin/vi
 
 if [[ "$EDITOR" == "" ]]; then
-	export EDITOR=vim
+    export EDITOR=vim
 fi
 alias vi="$EDITOR"
 alias batlog='bat --paging=never -l log'
@@ -364,6 +364,20 @@ alias pm='protonmail-bridge'
 alias themes="kitty +kitten themes"
 alias theme=themes # semtantic sugar in order to do like: `theme '3024 Day'`
 alias th=theme
+
+kcolors() {
+    # prints kitty theme using pastel
+    # https://www.grailbox.com/2021/12/displaying-your-kitty-theme-colors/
+
+    local line
+
+    while read line; do
+
+        echo "$line" | grep -o "#[a-f0-9]\{6\}" | pastel color
+    done <"${1:-/dev/stdin}"
+}
+alias kc=kcolors
+alias kcc='kcolors ~/.config/kitty/current-theme.conf'
 
 # launchctl
 
@@ -390,7 +404,7 @@ alias rr='rsync -avhHS --delete --existing --ignore-existing'
 alias rd='rsync -d --delete --existing --ignore-existing'
 
 tree() {
-	broot -c :pt "$@"
+    broot -c :pt "$@"
 }
 
 _salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
@@ -430,28 +444,28 @@ alias editto=ecp
 alias edittonoacl=ecpnoacl
 
 _fdrm() {
-	local nameflag="$1"
-	local what="$2"
-	shift 2
+    local nameflag="$1"
+    local what="$2"
+    shift 2
 
-	find "$@" "$nameflag" "$what" -exec rm -rf {} \;
+    find "$@" "$nameflag" "$what" -exec rm -rf {} \;
 
 }
 
 fdrm() {
-	local what="$1"
-	shift
-	_fdrm -name "$what" "$@"
+    local what="$1"
+    shift
+    _fdrm -name "$what" "$@"
 }
 
 fdirm() {
-	local what="$1"
-	shift
-	_fdrm -iname "$what" "$@"
+    local what="$1"
+    shift
+    _fdrm -iname "$what" "$@"
 }
 
 cleandirs() {
-	for d in "$@"; do rm -rf "$d"/* "$d"/.*; done
+    for d in "$@"; do rm -rf "$d"/* "$d"/.*; done
 
 }
 alias cld=cleandirs
@@ -465,23 +479,23 @@ alias xdp='xattr -d purgeable-drecs-fixed'
 alias xsd='xattr -rsd'
 _x() {
 
-	local args="$1"
-	local attr="$2"
-	shift 2
+    local args="$1"
+    local attr="$2"
+    shift 2
 
-	xattr $args $attr "$@" | grep -Eo ' com.+' | sort -u
+    xattr $args $attr "$@" | grep -Eo ' com.+' | sort -u
 }
 
 xv() {
-	local attr="$1"
-	shift
-	_x -rv $attr "$@"
+    local attr="$1"
+    shift
+    _x -rv $attr "$@"
 }
 
 xsv() {
-	local attr="$1"
-	shift
-	_x -rsv $attr "$@"
+    local attr="$1"
+    shift
+    _x -rsv $attr "$@"
 }
 
 # TODO:
@@ -507,44 +521,44 @@ _salias _chflags /usr/bin/chflags
 # "softer" versions are still destructive!
 
 fdirs() {
-	for d in "$@"; do
-		_chflags -R nouchg,noschg "$d" 2>/dev/null
-		rm -rf "$d"
-		mkdir -p "$d"
-		_chflags uchg,schg "$d"
-	done
+    for d in "$@"; do
+        _chflags -R nouchg,noschg "$d" 2>/dev/null
+        rm -rf "$d"
+        mkdir -p "$d"
+        _chflags uchg,schg "$d"
+    done
 
 }
 # - "softer" version
 # same but preserve original folders and its ownership, permissions, unrelated BSD flags and  xattrs
 sfdirs() {
-	for d in "$@"; do
-		_chflags -R nouchg,noschg "$d" 2>/dev/null
+    for d in "$@"; do
+        _chflags -R nouchg,noschg "$d" 2>/dev/null
 
-		if [ ! -d "$d" ]; then mkdir "$d"; fi
+        if [ ! -d "$d" ]; then mkdir "$d"; fi
 
-		cleandirs 1>/dev/null "$d"
-		_chflags uchg,schg "$d"
-	done
+        cleandirs 1>/dev/null "$d"
+        _chflags uchg,schg "$d"
+    done
 }
 alias sfd=sfdirs
 
 ffiles() {
-	for f in "$@"; do
-		_chflags nouchg,noschg "$f" 2>/dev/null
-		rm -f "$f"
-		touch "$f"
-		_chflags uchg,schg "$f"
-	done
+    for f in "$@"; do
+        _chflags nouchg,noschg "$f" 2>/dev/null
+        rm -f "$f"
+        touch "$f"
+        _chflags uchg,schg "$f"
+    done
 }
 # - "softer" version
 # same but preserve original files and its ownership, permissions, unrelated BSD flags and  xattrs
 sffiles() {
-	for f in "$@"; do
-		_chflags nouchg,noschg "$f" 2>/dev/null
-		truncate -s 0 "$f"
-		_chflags uchg,schg "$f"
-	done
+    for f in "$@"; do
+        _chflags nouchg,noschg "$f" 2>/dev/null
+        truncate -s 0 "$f"
+        _chflags uchg,schg "$f"
+    done
 }
 
 alias sff=sffiles
@@ -566,14 +580,14 @@ mdon() { mdutil -i on "$1" -E; }
 alias mdoffa='mdoff -a'
 
 mdcat() {
-	glow "$@"
+    glow "$@"
 
-	echo "this is not actual mdcat"
+    echo "this is not actual mdcat"
 }
 
 if [ -n "${commands[fzf - share]}" ]; then
-	source "$(fzf-share)/key-bindings.zsh"
-	source "$(fzf-share)/completion.zsh"
+    source "$(fzf-share)/key-bindings.zsh"
+    source "$(fzf-share)/completion.zsh"
 fi
 
 # no myaw in da houze
@@ -597,16 +611,16 @@ alias ix=nix
 alias flake='nix flake'
 function drv() {
 
-	local _1="$1"
-	shift
+    local _1="$1"
+    shift
 
-	local cmd=(nix derivation $_1 $@)
+    local cmd=(nix derivation $_1 $@)
 
-	if [[ $_1 == "show" ]]; then
-		${cmd[*]} | jq
-	else
-		${cmd[*]}
-	fi
+    if [[ $_1 == "show" ]]; then
+        ${cmd[*]} | jq
+    else
+        ${cmd[*]}
+    fi
 
 }
 
@@ -632,16 +646,16 @@ alias _tu='tmutil deletelocalsnapshots'
 
 function tu() {
 
-	vols=($(ls /Volumes) /nix)
-	pics=/Users/ic/Pictures
+    vols=($(ls /Volumes) /nix)
+    pics=/Users/ic/Pictures
 
-	if [ -d $pics ]; then vols+=($pics); fi
+    if [ -d $pics ]; then vols+=($pics); fi
 
-	for v in "${vols[@]}"; do _tu "$v"; done
+    for v in "${vols[@]}"; do _tu "$v"; done
 
-	# TODO: handle spaces
-	mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
-	echo Unmounted volumes were unaffected.
+    # TODO: handle spaces
+    mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
+    echo Unmounted volumes were unaffected.
 
 }
 
@@ -680,7 +694,7 @@ alias l='diskutil list'
 alias di='d info'
 alias dm='d mount'
 dmm() {
-	dm -mountPoint "$1" "$2"
+    dm -mountPoint "$1" "$2"
 }
 
 alias dum='d umount'
@@ -692,36 +706,36 @@ _salias eo diskutil enableOwnership
 # apfs
 _salias apfs.util /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
 msnap() {
-	if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
-		cat <<EOF
+    if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
+        cat <<EOF
 mount apfs snapshot
 
 usage: ms <snapshot name> <device node> <mount point> [ ... mount options ]
 EOF
 
-		return 1
-	fi
+        return 1
+    fi
 
-	local s=$1
-	local d=$2
-	local m="$3"
-	shift 3
+    local s=$1
+    local d=$2
+    local m="$3"
+    shift 3
 
-	local mopt=(-s $s $@)
+    local mopt=(-s $s $@)
 
-	if [ ! -d "$m" ]; then
-		mkdir -p "$m"
-		echo "-- mount point: $m created ( didn't exist )"
-	fi
+    if [ ! -d "$m" ]; then
+        mkdir -p "$m"
+        echo "-- mount point: $m created ( didn't exist )"
+    fi
 
-	mount_apfs ${mopt[*]} "$@" $d "$m"
+    mount_apfs ${mopt[*]} "$@" $d "$m"
 }
 
 alias a='d apfs'
 alias au='a unlock'
 function aunom() {
 
-	au "$1" -nomount
+    au "$1" -nomount
 }
 alias al='a lock'
 alias alu='a listUsers'
@@ -739,44 +753,44 @@ aev() { a encryptVolume "$1" -user disk; }
 adv() { a decryptVolume "$1" -user $(ausr "$1"); }
 
 function aav() {
-	if [[ $# -lt 2 ]]; then
-		echo not enough args
-		return
-	fi
-	a addVolume "$1" APFS "$2"
+    if [[ $# -lt 2 ]]; then
+        echo not enough args
+        return
+    fi
+    a addVolume "$1" APFS "$2"
 }
 
 restore() {
-	local _sudo=
+    local _sudo=
 
-	if (($EUID != 0)); then
-		_sudo=sudo
-	fi
+    if (($EUID != 0)); then
+        _sudo=sudo
+    fi
 
-	local src="$1"
-	local tgt="$2"
-	shift 2
+    local src="$1"
+    local tgt="$2"
+    shift 2
 
-	$_sudo asr restore -s "$src" -t "$tgt" -noprompt -noverify $@
+    $_sudo asr restore -s "$src" -t "$tgt" -noprompt -noverify $@
 }
 
 srestore() {
-	local snap="$1"
-	local src="$2"
-	local tgt="$3"
+    local snap="$1"
+    local src="$2"
+    local tgt="$3"
 
-	shift 3
+    shift 3
 
-	clone "$src" "$tgt" --toSnapshot "$snap" $@
+    clone "$src" "$tgt" --toSnapshot "$snap" $@
 }
 
 function duuid() {
 
-	d info $1 | grep Volume\ UUID | grep -Eo '[0-9A-F-]{36}' | tn
+    d info $1 | grep Volume\ UUID | grep -Eo '[0-9A-F-]{36}' | tn
 }
 
 function dname() {
-	d info $1 | grep Volume\ Name | sed -E 's/^.*Volume Name:[ \t]+//g' | tn
+    d info $1 | grep Volume\ Name | sed -E 's/^.*Volume Name:[ \t]+//g' | tn
 }
 
 # git
@@ -812,8 +826,8 @@ alias gtag=_gt
 alias gtl='_gt -l'
 
 gt() {
-	gtl
-	cat <<'EOF'
+    gtl
+    cat <<'EOF'
 Use `gtag` to create a new tag
 EOF
 }
@@ -843,8 +857,8 @@ alias gluninst='gl uninstall'
 alias glt='gl track'
 
 glu() {
-	gl untrack "$@"
-	garenorm .
+    gl untrack "$@"
+    garenorm .
 }
 alias glut=glu
 alias glc='gl clone'
@@ -861,8 +875,8 @@ alias glfall='glf --all'
 #   see https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
 gltlockable() {
 
-	glt "$1" --lockable &&
-		cat <<EOF
+    glt "$1" --lockable \
+        && cat <<EOF
 IMPORTANT: ensure the desired pattern is in .gitattributes first:
 
 echo "$1" filter=lfs diff=lfs merge=lfs -text lockable >> .gitattributes
@@ -883,7 +897,7 @@ alias glprune='_glprune --verify-remote'
 #  faster `git pull` for lfs
 #   needs configuration of git plfs as per: https://www.atlassian.com/git/tutorials/git-lfs#installing-git-lfs
 function gplfs() {
-	g plfs || cat <<'EOF'
+    g plfs || cat <<'EOF'
 --
 BOOM! lib.sh here. Ain't got a clue? Make sure alias.plfs is configured, otherwise run:
 
@@ -928,17 +942,17 @@ alias gldiffs='glog --all -p -S'
 alias gpush='g push'
 
 gpushdel() {
-	if [[ $# -lt 1 ]]; then
-		cat <<'EOF'
+    if [[ $# -lt 1 ]]; then
+        cat <<'EOF'
 Usage: gpushd <branch|tag> [origin]
 EOF
-		return 1
-	fi
+        return 1
+    fi
 
-	local origin="$2"
-	if [ "$origin" != "" ]; then shift; else origin=origin; fi
+    local origin="$2"
+    if [ "$origin" != "" ]; then shift; else origin=origin; fi
 
-	gpush $origin --delete $1
+    gpush $origin --delete $1
 }
 alias gpusht=gtpush
 
@@ -950,9 +964,9 @@ alias gremv='gre rename'
 alias gregu='gre get-url'
 alias greg=gregu
 gresu() {
-	local origin=$1
-	local url="$2"
-	gre set-url $1 "$2"
+    local origin=$1
+    local url="$2"
+    gre set-url $1 "$2"
 }
 
 # restore
@@ -993,17 +1007,17 @@ alias gcl=gcloud
 
 # cachix
 cpush() {
-	local cache="$1"
-	shift
-	cachix push "$cache" -j$(sysctl hw.ncpu | grep -o '\d') $@
+    local cache="$1"
+    shift
+    cachix push "$cache" -j$(sysctl hw.ncpu | grep -o '\d') $@
 }
 
 cpushinputs() {
-	nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush $@
+    nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush $@
 }
 
 cpushrt() {
-	nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush $@
+    nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush $@
 }
 
 # nomino - superfast renamer - is dangerous to use because of --dry-run (--test)
@@ -1015,7 +1029,7 @@ cpushrt() {
 unset -f nomino
 _nomino="$(which nomino)"
 nomino() {
-	/usr/bin/env bash -c "jq < <('$_nomino' --test $@ -g /dev/fd/1)"
+    /usr/bin/env bash -c "jq < <('$_nomino' --test $@ -g /dev/fd/1)"
 }
 
 alias nom=nomino
@@ -1025,9 +1039,9 @@ alias nominate="$_nomino"
 # jq-view
 function j() {
 
-	local fn="$1"
-	shift
-	cat "$fn" | jq $@
+    local fn="$1"
+    shift
+    cat "$fn" | jq $@
 
 }
 
@@ -1040,59 +1054,59 @@ alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
 
 _init() {
 
-	local exp='self="${BASH_SOURCE[0]:-${(%):-%x}}"'
-	eval $(echo $exp)
+    local exp='self="${BASH_SOURCE[0]:-${(%):-%x}}"'
+    eval $(echo $exp)
 
-	if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then self="$(pwd)/$self"; fi
+    if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then self="$(pwd)/$self"; fi
 
-	echo -- self: $self
+    echo -- self: $self
 
-	alias fsl="source '$self'"
-	alias flel="vi '$self'"
+    alias fsl="source '$self'"
+    alias flel="vi '$self'"
 
-	if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
-		system=/
+    if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
+        system=/
 
-	else
-		local data="$(echo "$self" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
-		local vg=$(d info "$data" | grep 'APFS Volume Group' | grep -Eo '[0-9A-F-]{36}')
+    else
+        local data="$(echo "$self" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
+        local vg=$(d info "$data" | grep 'APFS Volume Group' | grep -Eo '[0-9A-F-]{36}')
 
-		local tmp=$(mktemp)
-		alvg | grep "Volume Group $vg" -A10 >$tmp
+        local tmp=$(mktemp)
+        alvg | grep "Volume Group $vg" -A10 >$tmp
 
-		local svdev=/dev/$(cat $tmp | grep -E 'APFS Volume Disk \(Role\).+System' | grep -oE 'disk[0-9]+s[0-9]+')
-		local dvdev=/dev/$(cat $tmp | grep -E 'APFS Volume Disk \(Role\).+Data' | grep -oE 'disk[0-9]+s[0-9]+')
+        local svdev=/dev/$(cat $tmp | grep -E 'APFS Volume Disk \(Role\).+System' | grep -oE 'disk[0-9]+s[0-9]+')
+        local dvdev=/dev/$(cat $tmp | grep -E 'APFS Volume Disk \(Role\).+Data' | grep -oE 'disk[0-9]+s[0-9]+')
 
-		local system="$(dm $svdev | sed -E 's/(Volume) (.+) on \/dev\/disk[0-9]+s[0-9]+ mounted$/\/\1s\/\2/g')"
-		echo -- mounted $svdev: "$system"
+        local system="$(dm $svdev | sed -E 's/(Volume) (.+) on \/dev\/disk[0-9]+s[0-9]+ mounted$/\/\1s\/\2/g')"
+        echo -- mounted $svdev: "$system"
 
-		local previouspath="/usr/bin:/bin:/usr/sbin:/sbin"
-		export PATH="$data/usr/local/bin:$previouspath$(echo usr/bin:usr/libexec:usr/sbin:sbin:bin | sed -E 's@^|:@:'"$system\/"'@g')"
+        local previouspath="/usr/bin:/bin:/usr/sbin:/sbin"
+        export PATH="$data/usr/local/bin:$previouspath$(echo usr/bin:usr/libexec:usr/sbin:sbin:bin | sed -E 's@^|:@:'"$system\/"'@g')"
 
-		echo -- preparing the persistence in Recovery OS
+        echo -- preparing the persistence in Recovery OS
 
-		local bspath=/etc/profile
-		local bkpath='N/A'
+        local bspath=/etc/profile
+        local bkpath='N/A'
 
-		local tmpfile=$(mktemp)
-		if [ -f $bspath ]; then
-			bkpath=$bspath.orig
-			if [ ! -f $bkpath ]; then
-				cp -a $bspath $bkpath
-			else
-				echo -- not overwriting backed up original profile: $bkpath
-			fi
-		fi
+        local tmpfile=$(mktemp)
+        if [ -f $bspath ]; then
+            bkpath=$bspath.orig
+            if [ ! -f $bkpath ]; then
+                cp -a $bspath $bkpath
+            else
+                echo -- not overwriting backed up original profile: $bkpath
+            fi
+        fi
 
-		# TODO: WTF?!
-		cat $tmpfile >$bspath
+        # TODO: WTF?!
+        cat $tmpfile >$bspath
 
-		# there is no sudo in RecoveryOS
-		_sudo='$@'
+        # there is no sudo in RecoveryOS
+        _sudo='$@'
 
-		# rsync path on Sonoma
-		_rsync="$system/usr/libexec/rsync/rsync.samba"
-		cat <<EOF >$bspath
+        # rsync path on Sonoma
+        _rsync="$system/usr/libexec/rsync/rsync.samba"
+        cat <<EOF >$bspath
 # lib.sh footer written on $(date '+%+')
 __LIBSH_INITIALIZED=1 source "$self"
 
@@ -1116,9 +1130,9 @@ fi
 
 # end of lib.sh footer
 EOF
-		source $bspath
+        source $bspath
 
-		cat <<EOF
+        cat <<EOF
 
 Summary:
 	Bootstrapped to: $bspath
@@ -1132,15 +1146,15 @@ Summary:
 		Data:	$dvdev
 
 EOF
-		echo -- initialized!
-	fi
+        echo -- initialized!
+    fi
 
 }
 
 if [[ $__LIBSH_INITIALIZED != 1 ]]; then
-	_init
-	echo -- updated \$PATH: "$PATH"
-	if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
-		ms
-	fi
+    _init
+    echo -- updated \$PATH: "$PATH"
+    if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
+        ms
+    fi
 fi
