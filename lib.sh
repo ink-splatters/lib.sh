@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231207_60c1109
+LIBSH_VERSION=20231209_3b0ecda
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -136,6 +136,7 @@ alias k9='k -9'
 pk() { pg "$1" | x kill -9; }
 
 alias t=btop
+alias b=t
 _salias bw bandwhich
 
 _salias sc sysctl
@@ -844,9 +845,6 @@ alias gcae='g commit --allow-empty'
 alias gp='g pull'
 alias gpr='gp --rebase'
 
-# grep
-alias gg='g grep'
-
 #  lfs
 alias gl='g lfs'
 
@@ -977,7 +975,7 @@ alias gress='gres --staged'
 alias grhh='g reset --hard HEAD'
 
 #  gitui
-alias gui='gitui'
+alias gi='gitui'
 
 # rust
 alias ru=rustup
@@ -1049,6 +1047,9 @@ function j() {
 # ctp is cli binary
 alias ctpal='inkcat macchiato,mocha,frappe,latte'
 alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
+
+# zstd
+alias z=zstd
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
