@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231209_3b0ecda
+LIBSH_VERSION=20231211_e2cbb9a
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -60,6 +60,7 @@ alias u0='printf "%s" 00000000-0000-0000-0000-000000000000'
 
 # uppercase
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
+alias up=upper
 
 # status / system info
 alias mf=macchina
@@ -118,12 +119,7 @@ EOF
     ((n == 1)) && echo
 }
 
-randn() {
-    rand $@ -n
-}
-
-alias randp='rand 8 | grep -Eo ".{8}"' # pair of short nonces
-alias randup='randp | up'
+alias randp='rand 8 | grep -Eo ".{8}"| cr' # pair of short nonces
 
 # system // resources
 alias pg='pgrep -i'
@@ -413,8 +409,8 @@ alias lsreg=lsregister
 
 alias laa='ls -laO@e'
 alias la='ls -la'
-alias eaa='eza -la@'
-alias ea='eza -la'
+alias ez=eza
+alias ezz='ez -la@'
 
 alias f='fd -u'
 alias ff=find
