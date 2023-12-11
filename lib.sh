@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231211_e2cbb9a
+LIBSH_VERSION=20231211_d842005
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -118,8 +118,6 @@ EOF
 
     ((n == 1)) && echo
 }
-
-alias randp='rand 8 | grep -Eo ".{8}"| cr' # pair of short nonces
 
 # system // resources
 alias pg='pgrep -i'
