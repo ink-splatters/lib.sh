@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231212_7412aab
+LIBSH_VERSION=20231212_fca6660
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -391,6 +391,7 @@ if [[ "$EDITOR" == "" ]]; then
     export EDITOR=vim
 fi
 alias vi="$EDITOR"
+alias v=vi
 alias batlog='bat --paging=never -l log'
 alias e=echo
 
