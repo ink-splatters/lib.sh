@@ -1,4 +1,5 @@
-LIBSH_VERSION=20231212_5b28ec4
+#!/bin/bash
+LIBSH_VERSION=20231212_f4f912a
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -10,9 +11,6 @@ EOF
 # - shellharden
 
 # helpers
-
-_problem() { echo '**' there was a problem running: $@; }
-_maybe() { command -v $@ >/dev/null 2>&1 && $@; }
 
 _alias() {
     local name="$1"
