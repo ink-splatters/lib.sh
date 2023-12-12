@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231212_8411800
+LIBSH_VERSION=20231212_7dee9d5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -114,6 +114,51 @@ EOF
     dd if=/dev/random bs=1 count=$count 2>/dev/null | xxd -p | tn
 
     ((n == 1)) && echo
+}
+
+function randpass() {
+
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        cat <<EOF
+generates random password
+usage: randpass [length]
+default length is 16
+
+<count>		symbol count
+EOF
+        exit 1
+    fi
+
+    if ! command -v python >/dev/null 2>&1; then
+        echo ERROR: python not found
+        exit 1
+    fi
+
+    local length="${1:-16}"
+
+    cat <<EOF | python
+import string
+import secrets
+
+def choice( abc: str, len: int):
+	return (secrets.choice(abc) for x in range(len) )
+
+def choicel( abc: str, len: int) -> list[str]:
+	return list(choice(abc,len))
+
+print(''.join(
+	choice(
+		choicel( string.ascii_letters, $((length / 2)) ) +
+		choicel( string.punctuation, $((length / 2)) ),
+		$((length))
+
+	)
+
+))
+
+
+EOF
+
 }
 
 # system // resources
