@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231211_d842005
+LIBSH_VERSION=20231212_5b28ec4
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -791,76 +791,102 @@ function dname() {
 # git
 
 alias g=git
+alias gx=gix
 
 #  working copy
-alias gs='g status'
+alias gcl='g clone'
+alias gxc='gx clone'
+_shallow() {
+    local cmd="$1"
+    local depth="$2"
+    shift 2
+    "$cmd" --depth=$depth
+}
+
+alias gcs="_shallow g"
+alias gxs="_shallow gx"
+
 alias gco='g checkout'
-alias gcr='gco -b'
+alias gcob='gco -b'
+alias gs='g status'
 
 alias ga='g add'
 alias garenorm='ga --renormalize'
 alias grm='g rm'
-alias grmc='grm --cached'
+
 alias grmr='grm -r'
-alias grmf='grm -rf'
+alias grmrf='grm -rf'
 
-alias grmcr='grmc -r'
-alias grmcrf='grmc -rf'
+alias grmcached='grm --cached'
+alias grmrcached='grmcached -r'
+alias grmrfcached='grmcached -rf'
 
-#  branches  "CRUD"
+#  branches
+
 alias gb='g branch'
 alias gba='gb -a'
 alias gbd='gb -D'
-alias gbc='gco -b'
 
 # tags
-
-alias _gt='g tag'
-alias gtag=_gt
-
-alias gtl='_gt -l'
-
-gt() {
-    gtl
-    cat <<'EOF'
-Use `gtag` to create a new tag
-EOF
-}
-
-alias gtpush='g push --tags'
-alias gtd='_gt -d'
+alias gt='g tag -l' # for consistency with git branch
+alias gtag='g tag'
+alias gtd='gtag -d'
+alias gtl=gt
 
 # commits
 
-alias gc='g commit -a'
-alias gcae='g commit --allow-empty'
+alias gc='g commit'
+alias gca='gc -a'
+alias gcam='gca -m'
+alias gcae='gc --allow-empty'
+alias gcamend='gc --amend'
+alias gam=gcamend
 
-#  merge / rebase
+# pull / fetch / merge / rebase
+alias gf='g fetch -vp'
 alias gp='g pull'
 alias gpr='gp --rebase'
+alias gr='g rebase'
+alias gm='g merge'
+alias gms='gm --squash'
+alias gsq=gms
+alias gchp='g cherry-pick'
+alias gch=gchp
+
+# interactive rebase
+
+alias gri='gr -i'
+grin() {
+    local sp="$1"
+    gri HEAD~"${sp:-1}"
+}
+alias gri1=grin
+alias gri2='grin 2'
+alias gri3='grin 3'
+alias gri4='grin 4'
+alias gr1=grin
+alias gr2='grin 2'
+alias gr3='grin 3'
+alias gr4='grin 4'
 
 #  lfs
 alias gl='g lfs'
 
-#   lfs install
-alias glinst='gl install'
-alias gluninst='gl uninstall'
+alias gltrack='gl track'
+alias glt=gltrack
 
-alias glt='gl track'
-
-glu() {
+gluntrack() {
     gl untrack "$@"
-    garenorm .
+    garenorm
 }
-alias glut=glu
-alias glc='gl clone'
+alias glu=glu
+alias glcl='gl clone'
+alias glc=glcl
 
-#   lfs fetch
 alias glf='gl fetch'
-alias gfl=glf # marry it to gf a.k.a. git fetch
 
 #    lfs fetch recent / all
-alias glfrecent='glf --recent'
+alias glfrec='glf --recent'
 alias glfall='glf --all'
 
 #   locks
@@ -877,10 +903,11 @@ EOF
 
 }
 
-alias gll='gl lock'
-alias glul='gl unlock'
+alias gllock='gl lock'
+alias gll=gllock
+alias glunlock='gl unlock'
+alias glul=glunlock
 
-#   lfs prune
 alias _glprune='gl prune'
 
 #     safety belt if 'git config --global lfs.pruneverifyremotealways true' not set
@@ -899,11 +926,6 @@ EOF
 }
 
 alias glp=gplfs
-alias gpl=glp # marry it to gp a.k.a. git pull
-
-alias gr='g rebase'
-alias gri='gr -i'
-alias gf='g fetch -vp'
 
 # logs
 #   note: gl prefix is shared with git lfs aliases
@@ -923,7 +945,9 @@ alias gdastat='gda --stat --apply' # --apply by some reason means 'dry run'
 alias gdstat=gdastat
 
 alias gdiff='git difftool --no-symlinks --dir-diff' # TODO: check, was it intented to use it with gitui?
-alias gldiff='glog --all -p'
+alias glogdiff='glog --all -p'
+alias gdiffl=glogdiff
+alias gldiff=gdiffl
 
 #  git lfs related, see: https://www.atlassian.com/git/tutorials/git-lfs#fetching-history
 #   -S should follow git lfs sha-256 oid
@@ -932,6 +956,7 @@ alias gldiffs='glog --all -p -S'
 #  pushes
 #   best used with push.autoSetupRemote = true
 alias gpush='g push'
+alias gpusht='gpush --tags'
 
 gpushdel() {
     if [[ $# -lt 1 ]]; then
@@ -966,7 +991,8 @@ alias gres='g restore'
 alias gress='gres --staged'
 
 # reset
-alias grhh='g reset --hard HEAD'
+alias grh='g reset --hard'
+alias grhh='grh HEAD'
 
 #  gitui
 alias gi='gitui'
