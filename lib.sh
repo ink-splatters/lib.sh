@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231212_96a6207
+LIBSH_VERSION=20231212_8411800
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -352,9 +352,11 @@ alias e=echo
 # protonmail
 alias pm='protonmail-bridge'
 
-# themes
+# kitty
+#  themes
 alias themes="kitty +kitten themes"
 alias theme=themes # semtantic sugar in order to do like: `theme '3024 Day'`
+alias th=theme
 alias kt=theme
 
 kcolors() {
@@ -368,8 +370,14 @@ kcolors() {
         echo "$line" | grep -o "#[a-f0-9]\{6\}" | pastel color
     done <"${1:-/dev/stdin}"
 }
+alias kclr=kcolors
+alias kclrs=kcolors
 alias kc=kcolors
 alias kcc='kcolors ~/.config/kitty/current-theme.conf'
+
+#  ssh
+alias kssh='kitty +kitten ssh'
+alias ks=kssh
 
 # launchctl
 
@@ -1073,7 +1081,7 @@ alias ctpal='inkcat macchiato,mocha,frappe,latte'
 alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
 
 # zstd
-alias z=zstd
+alias zst=zstd
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
