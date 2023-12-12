@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231212_7dee9d5
+LIBSH_VERSION=20231212_7412aab
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -925,7 +925,8 @@ alias gr3='grin 3'
 alias gr4='grin 4'
 
 #  lfs
-alias gl='g lfs'
+alias glfs='g lfs'
+alias gl=glfs
 
 alias gltrack='gl track'
 alias glt=gltrack
