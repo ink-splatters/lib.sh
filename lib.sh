@@ -1,5 +1,4 @@
-#!/bin/bash
-LIBSH_VERSION=20231212_f4f912a
+LIBSH_VERSION=20231212_96a6207
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -819,6 +818,11 @@ alias grmcached='grm --cached'
 alias grmrcached='grmcached -r'
 alias grmrfcached='grmcached -rf'
 
+# stash
+alias gstash='g stash'
+alias gst='g stash'
+function gstp() { gst pop; }
+
 #  branches
 
 alias gb='g branch'
@@ -942,8 +946,10 @@ alias gda='gd apply --whitespace=fix'
 alias gdastat='gda --stat --apply' # --apply by some reason means 'dry run'
 alias gdstat=gdastat
 
-alias gdiff='git difftool --no-symlinks --dir-diff' # TODO: check, was it intented to use it with gitui?
+alias gddiff='git difftool --no-symlinks --dir-diff' # git dir diff ; TODO: check, was it intented to use it with gitui?
+alias gdiff='g diff'
 alias glogdiff='glog --all -p'
+alias glogd=glogdiff
 alias gdiffl=glogdiff
 alias gldiff=gdiffl
 
