@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231212_fca6660
+LIBSH_VERSION=20231214_1f61833
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -193,7 +193,7 @@ alias nd='n deactivate'
 alias ni='n install'
 alias nl='nslookup'
 alias nr='n restart'
-alias nstat='n status'
+alias ns='n status'
 alias nun='n uninstall'
 alias ncw='n config wizard'
 alias m=mullvad
@@ -269,8 +269,6 @@ alias wi='ap -I'
 alias winfo=wi
 _salias ng ngrep
 alias ng0='ng -d en0'
-
-_salias ns networksetup
 
 mac() {
 
@@ -353,19 +351,10 @@ msss() {
     printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
 }
 
-nets() {
-
-    local keys=(IP Mask Gateway Ether DNS)
-    local values=($(net -getinfo 'Wi-Fi' | grep -E '^(IP |Sub|Router|^Wi-Fi)' | tr -d ' \t' | sed -E 's/^[^:]+://g'))
-    values+=($(net -getdnsservers 'Wi-Fi'))
-
-    echo
-    echo Network status:
-    for ((i = 1; i <= ${#keys[@]}; i++)); do
-        printf "\t"
-        echo "${keys[i]}: ${values[i]}"
-    done
+dhinfo() {
+    networksetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
+alias dhi=dhinfo
 
 alias br=broot
 
@@ -1234,7 +1223,4 @@ EOF
 if [[ $__LIBSH_INITIALIZED != 1 ]]; then
     _init
     echo -- updated \$PATH: "$PATH"
-    if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
-        ms
-    fi
 fi
