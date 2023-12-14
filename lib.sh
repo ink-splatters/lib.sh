@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231214_1f61833
+LIBSH_VERSION=20231214_5aebdd5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -382,6 +382,9 @@ fi
 alias vi="$EDITOR"
 alias v=vi
 alias batlog='bat --paging=never -l log'
+alias logstream='log stream --color=always'
+alias lstream=logsteram
+
 alias e=echo
 
 # protonmail
