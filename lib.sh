@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231214_5aebdd5
+IBSH_VERSION=20231214_5aebdd5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -194,12 +194,12 @@ alias ni='n install'
 alias nl='nslookup'
 alias nr='n restart'
 alias ns='n status'
-alias nun='n uninstall'
+alias un='n uninstall'
 alias ncw='n config wizard'
 alias m=mullvad
 
 alias mc='m connect ; m status'
-alias md='m disconnect ; m status'
+alias mdis='m disconnect ; m status'
 alias mr='echo Reconnecting... ; m reconnect ; m status'
 alias mvpn='m lockdown-mode set'
 alias isnet='nl google.com && ping google.com'
@@ -385,6 +385,8 @@ alias batlog='bat --paging=never -l log'
 alias logstream='log stream --color=always'
 alias lstream=logsteram
 
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
 alias e=echo
 
 # protonmail
@@ -408,14 +410,22 @@ kcolors() {
         echo "$line" | grep -o "#[a-f0-9]\{6\}" | pastel color
     done <"${1:-/dev/stdin}"
 }
-alias kclr=kcolors
-alias kclrs=kcolors
 alias kc=kcolors
 alias kcc='kcolors ~/.config/kitty/current-theme.conf'
 
 #  ssh
 alias kssh='kitty +kitten ssh'
 alias ks=kssh
+
+#  diff
+#    diff two files or dirs
+
+alias kdiff='git difftool --no-symlinks --dir-diff'
+alias kd=kdiff
+alias kdtwo='kitty +kitten diff'
+
+alias kdt=kdtwo
+alias kd2=kdt
 
 # launchctl
 
@@ -513,8 +523,42 @@ alias o=open
 # attrs
 
 alias xd='xattr -d'
-alias xdp='xattr -d purgeable-drecs-fixed'
+xdrecs() {
+    local path="$1"
+    local pdf="purgeable-drecs-fixed"
+
+    if [[ $(ls -la@ | head -3 | grep -Eo "$pdf") == "" ]]; then
+        echo ERROR: "$path" has no $pdf flag to clear
+        return 1
+    fi
+
+    local flags="$(ls -laO | head -2 | grep -Eo 'uchg|schg' | xargs | sed 's/ /,/g')"
+    local noflags="$(echo $flags | sed -E 's/([a-z]+)/no\1/g')"
+
+    if [[ "$noflags" != "" ]]; then
+        set -x
+        chflags "$noflags" "$path"
+        set +x
+    fi
+
+    set -x
+    xd $pdf "$path"
+    set +x
+
+    if [[ "$flags" != "" ]]; then
+        set -x
+        chflags "$flags" "$path"
+        set +x
+    fi
+
+    echo
+    echo "Done."
+}
+
+_alias xdr xdrecs
+
 alias xsd='xattr -rsd'
+
 _x() {
 
     local args="$1"
@@ -611,11 +655,11 @@ alias unlockr='_chflags -R nouchg,noschg'
 
 # index
 
+alias md=mdutil
 alias mdx='mdutil -X'
 alias mdoff='mdutil -i off -d'
-
-mdon() { mdutil -i on "$1" -E; }
-alias mdoffa='mdoff -a'
+alias mdoffa='md-off -a'
+alias mdon='mdutil -i on -E'
 
 mdcat() {
     glow "$@"
@@ -624,12 +668,9 @@ mdcat() {
 }
 
 if [ -n "${commands[fzf - share]}" ]; then
-    source "$(fzf-share)/key-bindings.zsh"
-    source "$(fzf-share)/completion.zsh"
+    source "$(fzf-share)/key-bindings.bash"
+    source "$(fzf-share)/completion.bash"
 fi
-
-# no myaw in da houze
-# alias kd='kitty +kitten diff'
 
 alias mk=mkdir
 alias mkp='mk -p'
@@ -993,7 +1034,6 @@ alias gda='gd apply --whitespace=fix'
 alias gdastat='gda --stat --apply' # --apply by some reason means 'dry run'
 alias gdstat=gdastat
 
-alias gddiff='git difftool --no-symlinks --dir-diff' # git dir diff ; TODO: check, was it intented to use it with gitui?
 alias gdiff='g diff'
 alias glogdiff='glog --all -p'
 alias glogd=glogdiff
@@ -1120,7 +1160,41 @@ alias ctpal='inkcat macchiato,mocha,frappe,latte'
 alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
 
 # zstd
-alias zst=zstd
+alias zs=zstd
+
+zst() {
+    if [[ $# -lt 2 ]]; then
+        cat <<EOF
+Usage: zst <output> [ tar -c - additional arguments ] <files...>
+
+example: zst output.tar.zst -v *
+EOF
+        return 1
+    fi
+
+    local out="$1"
+    shift
+
+    tar -c -f - $@ | zstd -z -o "$out"
+}
+
+alias xzs='zstd -d'
+
+xzst() {
+    if [[ $# -lt 1 ]]; then
+        cat <<EOF
+Usage: xzst <input> [tar -x additional arguments...]
+
+example: mkdir ./archive ; xzst archive.tar.zst -v -C ./acrhive
+EOF
+        return 1
+    fi
+
+    local in="$1"
+    shift
+
+    zstd -d --stdout "$in" | tar -x $@
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
