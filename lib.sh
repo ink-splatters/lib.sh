@@ -1,4 +1,4 @@
-IBSH_VERSION=20231214_5aebdd5
+LIBSH_VERSION=20231216_07605e7
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1029,16 +1029,25 @@ alias gl8='glog -8'
 
 # patches and diffs
 
-alias gd='g diff'
-alias gda='gd apply --whitespace=fix'
-alias gdastat='gda --stat --apply' # --apply by some reason means 'dry run'
-alias gdstat=gdastat
-
 alias gdiff='g diff'
+alias gd=gdiff
+
+function gdn() {
+
+    local sp="$1"
+    gd HEAD~${sp:-1}
+}
+
+alias gd1=gdn
+alias gd2='gdn 2'
+alias gd3='gdn 3'
+alias gd4='gdn 4'
+
+alias gdaapply='gd apply --whitespace=fix'
+alias gdastat='gda --stat --apply' # --apply by some reason means 'dry run'
+
 alias glogdiff='glog --all -p'
 alias glogd=glogdiff
-alias gdiffl=glogdiff
-alias gldiff=gdiffl
 
 #  git lfs related, see: https://www.atlassian.com/git/tutorials/git-lfs#fetching-history
 #   -S should follow git lfs sha-256 oid
