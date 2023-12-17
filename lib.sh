@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231216_07605e7
+LIBSH_VERSION=20231217_fb4bc6b
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -387,7 +387,7 @@ alias lstream=logsteram
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-alias e=echo
+alias ec=echo
 
 # protonmail
 alias pm='protonmail-bridge'
@@ -458,10 +458,28 @@ tree() {
 _salias lsregister /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
 alias lsreg=lsregister
 
-alias laa='ls -laO@e'
-alias la='ls -la'
-alias ez=eza
-alias ezz='ez -la@'
+# ls / eza
+#
+_alias ll ls -l
+_alias la ll -a
+_alias laa la -O@e
+_alias l1 ls -1
+_alias l1a l1 -a
+
+_alias la1 l1a
+_alias la2 laa
+
+_alias e eza
+_alias el e -l
+_alias ea el -a
+_alias eaa ea -@o
+
+_alias e1 e -1
+_alias e1a e1 -a
+_alias ea1 e1a
+
+_alias ea2 eaa
+_alias ea3 ea2 -F
 
 alias f='fd -u'
 alias ff=find
