@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231217_fb4bc6b
+LIBSH_VERSION=20231219_eac42eb
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -229,7 +229,7 @@ rewifi() {
     mvpn off
     md
     nd
-    nun
+    nu
     sleep 1
 
     rt -n flush
@@ -383,7 +383,7 @@ alias vi="$EDITOR"
 alias v=vi
 alias batlog='bat --paging=never -l log'
 alias logstream='log stream --color=always'
-alias lstream=logsteram
+alias lstream=logstream
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
@@ -555,17 +555,17 @@ xdrecs() {
 
     if [[ "$noflags" != "" ]]; then
         set -x
-        chflags "$noflags" "$path"
+        sudo chflags "$noflags" "$path"
         set +x
     fi
 
     set -x
-    xd $pdf "$path"
+    sudo xd $pdf "$path"
     set +x
 
     if [[ "$flags" != "" ]]; then
         set -x
-        chflags "$flags" "$path"
+        sudo chflags "$flags" "$path"
         set +x
     fi
 
@@ -573,7 +573,7 @@ xdrecs() {
     echo "Done."
 }
 
-_alias xdr xdrecs
+alias xdr=xdrecs
 
 alias xsd='xattr -rsd'
 
@@ -912,7 +912,8 @@ alias gco='g checkout'
 alias gcob='gco -b'
 alias gs='g status'
 
-alias ga='g add'
+alias gadd='g add'
+alias ga='gadd'
 alias garenorm='ga --renormalize'
 alias grm='g rm'
 
@@ -1223,7 +1224,10 @@ EOF
     zstd -d --stdout "$in" | tar -x $@
 }
 
-# TODO: ✂ - - - - - - - - - - - - - - - - - - -
+# opens macOS profiles pane
+alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
+
+TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
 
