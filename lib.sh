@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231220_ca76dac
+LIBSH_VERSION=20231220_557949e
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1223,6 +1223,7 @@ EOF
 
     zstd -d --stdout "$in" | tar -x $@
 }
+alias unzst=xzst
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
