@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231219_eac42eb
+LIBSH_VERSION=20231220_ca76dac
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -560,7 +560,7 @@ xdrecs() {
     fi
 
     set -x
-    sudo xd $pdf "$path"
+    sudo xattr -d $pdf "$path"
     set +x
 
     if [[ "$flags" != "" ]]; then
