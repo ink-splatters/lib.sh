@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231220_557949e
+LIBSH_VERSION=20231223_2fc6bfb
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -14,13 +14,13 @@ EOF
 _alias() {
     local name="$1"
     shift
-    args=($@)
+    args=("$@")
     alias $name="${args[*]}"
 }
 _salias() {
     local name="$1"
     shift
-    args=($@)
+    args=("$@")
     alias $name="sudo ${args[*]}"
 }
 
@@ -171,8 +171,9 @@ alias k9='k -9'
 
 pk() { pg "$1" | x kill -9; }
 
-alias t=btop
-alias b=t
+alias bt=btop
+alias t=bt
+
 _salias bw bandwhich
 
 _salias sc sysctl
@@ -355,6 +356,7 @@ dhinfo() {
     networksetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
 alias dhi=dhinfo
+alias ifc0=dhi
 
 alias br=broot
 
@@ -368,9 +370,17 @@ alias upkg=pkgf
 alias mm=mamba
 alias um=micromamba
 alias uml='um env list'
+alias umll='um list'
 alias uma='um activate'
 alias umd='um deactivate'
-alias uenv='um env'
+alias umc='um env create -n'
+alias umi='um install'
+alias umr='um remove'
+alias umrm='um env remove -n'
+alias venv='python -m venv'
+alias vc='venv .venv'
+alias va='source .venv/bin/activate'
+alias vd='deactivate'
 
 # editing / viewing
 
@@ -381,11 +391,27 @@ if [[ "$EDITOR" == "" ]]; then
 fi
 alias vi="$EDITOR"
 alias v=vi
+alias b=bat
 alias batlog='bat --paging=never -l log'
+alias blog=batlog
+alias bathelp='bat -l help -p'
+alias bhelp=bathelp
 alias logstream='log stream --color=always'
 alias lstream=logstream
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+_help() {
+    "$@" -h | bhelp
+
+}
+_longhelp() {
+    "$@" --help | bhelp
+
+}
+
+alias ?=_help
+alias ??=_longhelp
 
 alias ec=echo
 
@@ -711,7 +737,7 @@ function drv() {
     local _1="$1"
     shift
 
-    local cmd=(nix derivation $_1 $@)
+    local cmd=(nix derivation $_1 "$@")
 
     if [[ $_1 == "show" ]]; then
         ${cmd[*]} | jq
@@ -818,7 +844,7 @@ EOF
     local m="$3"
     shift 3
 
-    local mopt=(-s $s $@)
+    local mopt=(-s $s "$@")
 
     if [ ! -d "$m" ]; then
         mkdir -p "$m"
@@ -868,7 +894,7 @@ restore() {
     local tgt="$2"
     shift 2
 
-    $_sudo asr restore -s "$src" -t "$tgt" -noprompt -noverify $@
+    $_sudo asr restore -s "$src" -t "$tgt" -noprompt -noverify "$@"
 }
 
 srestore() {
@@ -878,7 +904,7 @@ srestore() {
 
     shift 3
 
-    clone "$src" "$tgt" --toSnapshot "$snap" $@
+    clone "$src" "$tgt" --toSnapshot "$snap" "$@"
 }
 
 function duuid() {
@@ -894,6 +920,7 @@ function dname() {
 
 alias g=git
 alias gx=gix
+alias gxc='gx clone'
 
 #  working copy
 alias gcl='g clone'
@@ -1146,15 +1173,15 @@ alias gcl=gcloud
 cpush() {
     local cache="$1"
     shift
-    cachix push "$cache" -j$(sysctl hw.ncpu | grep -o '\d') $@
+    cachix push "$cache" -j$(sysctl hw.ncpu | grep -o '\d') "$@"
 }
 
 cpushinputs() {
-    nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush $@
+    nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush "$@"
 }
 
 cpushrt() {
-    nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush $@
+    nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush "$@"
 }
 
 # nomino - superfast renamer - is dangerous to use because of --dry-run (--test)
@@ -1178,7 +1205,7 @@ function j() {
 
     local fn="$1"
     shift
-    cat "$fn" | jq $@
+    cat "$fn" | jq "$@"
 
 }
 
@@ -1203,7 +1230,7 @@ EOF
     local out="$1"
     shift
 
-    tar -c -f - $@ | zstd -z -o "$out"
+    tar -c -f - "$@" | zstd -z -o "$out"
 }
 
 alias xzs='zstd -d'
@@ -1221,7 +1248,7 @@ EOF
     local in="$1"
     shift
 
-    zstd -d --stdout "$in" | tar -x $@
+    zstd -d --stdout "$in" | tar -x "$@"
 }
 alias unzst=xzst
 
