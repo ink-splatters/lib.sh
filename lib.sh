@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231224_53078ed
+LIBSH_VERSION=20231224_d9727c5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -928,6 +928,7 @@ function dname() {
 alias g=git
 alias gx=gix
 alias gxc='gx clone'
+alias gxf='gx fetch'
 
 #  working copy
 alias gcl='g clone'
