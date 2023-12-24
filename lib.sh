@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231223_2fc6bfb
+LIBSH_VERSION=20231224_53078ed
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -374,9 +374,16 @@ alias umll='um list'
 alias uma='um activate'
 alias umd='um deactivate'
 alias umc='um env create -n'
+
+umca() {
+    umc "$1"
+    uma "$1"
+}
+
 alias umi='um install'
 alias umr='um remove'
 alias umrm='um env remove -n'
+alias ums='um search'
 alias venv='python -m venv'
 alias vc='venv .venv'
 alias va='source .venv/bin/activate'
@@ -1125,11 +1132,22 @@ alias grea='gre add'
 alias grerm='gre remove'
 alias gremv='gre rename'
 alias gregu='gre get-url'
-alias greg=gregu
+
 gresu() {
     local origin=$1
     local url="$2"
     gre set-url $1 "$2"
+}
+
+remotes() {
+    local rems=($(gre))
+
+    for r in ${rems[@]}; do
+        cat <<EOF
+$r:
+    $(gregu $r)
+EOF
+    done
 }
 
 # restore
@@ -1251,6 +1269,7 @@ EOF
     zstd -d --stdout "$in" | tar -x "$@"
 }
 alias unzst=xzst
+alias uzst=unzst
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
