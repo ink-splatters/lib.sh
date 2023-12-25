@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231224_d9727c5
+LIBSH_VERSION=20231225_c105bff
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -369,11 +369,13 @@ alias upkg=pkgf
 # python
 alias mm=mamba
 alias um=micromamba
-alias uml='um env list'
-alias umll='um list'
 alias uma='um activate'
 alias umd='um deactivate'
 alias umc='um env create -n'
+alias uml='um env list'
+alias umll='um list'
+alias umu='um update'
+alias umua='umu -a'
 
 umca() {
     umc "$1"
