@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231225_c105bff
+LIBSH_VERSION=20231227_2d62caa
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -28,6 +28,7 @@ _salias() {
 
 alias s=sudo
 alias si='sudo -i'
+alias xit='exit'
 
 # tr & clipboard
 
