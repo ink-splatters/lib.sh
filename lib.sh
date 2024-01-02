@@ -1,4 +1,4 @@
-LIBSH_VERSION=20231227_2d62caa
+LIBSH_VERSION=20240102_76e83da
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1274,6 +1274,15 @@ EOF
 }
 alias unzst=xzst
 alias uzst=unzst
+
+alias ipa=ipatool
+idownload() {
+    ipa download -b $1 -o ~/Downloads
+}
+alias idown=idownload
+alias ilogin='ipa auth login -e'
+alias isearch='ipa search'
+alias ipurchase='ipa purchase -b'
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
