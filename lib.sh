@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240102_76e83da
+LIBSH_VERSION=20240103_250a973
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -196,7 +196,7 @@ alias ni='n install'
 alias nl='nslookup'
 alias nr='n restart'
 alias ns='n status'
-alias un='n uninstall'
+alias nun='n uninstall'
 alias ncw='n config wizard'
 alias m=mullvad
 
@@ -353,6 +353,7 @@ msss() {
     printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
 }
 
+alias nets=networksetup
 dhinfo() {
     networksetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
@@ -429,6 +430,10 @@ alias ec=echo
 alias pm='protonmail-bridge'
 
 # kitty
+
+# +kitten
+alias kk='kitty +kitten'
+
 #  themes
 alias themes="kitty +kitten themes"
 alias theme=themes # semtantic sugar in order to do like: `theme '3024 Day'`
@@ -765,7 +770,26 @@ alias i=_i
 alias ncg='nix-collect-garbage'
 alias ncgd='ncg -d'
 alias nso='nix store optimise'
-alias nu='nix-env --upgrade'
+alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
+
+# creates upggradeable list of packages as --attr parameters to nix-env --upgrade
+_nuattrs() {
+
+    nix-shell -p ripgrep --run sh < <(
+        cat <<'EOF'
+nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-unstable//g'
+EOF
+    )
+}
+
+_nu() {
+    _nuattrs $@ | xargs nix-env --upgrade
+
+}
+
+alias nu-attrs=_nuattrs
+alias nu=_nu
+
 alias ncu='nix-channel --update'
 
 alias u='nix-env -e'
@@ -1275,6 +1299,7 @@ EOF
 alias unzst=xzst
 alias uzst=unzst
 
+# ipatool
 alias ipa=ipatool
 idownload() {
     ipa download -b $1 -o ~/Downloads
@@ -1283,6 +1308,10 @@ alias idown=idownload
 alias ilogin='ipa auth login -e'
 alias isearch='ipa search'
 alias ipurchase='ipa purchase -b'
+
+# sublime text
+alias sublime=sublime_text
+alias sub=sublime
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
