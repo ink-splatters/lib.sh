@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240103_250a973
+LIBSH_VERSION=20240106_2518501
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -24,11 +24,13 @@ _salias() {
     alias $name="sudo ${args[*]}"
 }
 
-# sudo
+# sudo / system
 
-alias s=sudo
-alias si='sudo -i'
-alias xit='exit'
+_salias s
+_salias si -i
+_salias efs vi /etc/fstab # efs - edit fstab
+_salias enx
+alias xx='exit'
 
 # tr & clipboard
 
@@ -45,8 +47,8 @@ function cr() {
 
 # xattrs and related
 alias x=xargs
+
 alias x1='x -n1'
-alias x2='xs -n2'
 
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
@@ -163,6 +165,7 @@ EOF
 }
 
 # system // resources
+
 alias pg='pgrep -i'
 
 _salias k kill
@@ -402,6 +405,8 @@ if [[ "$EDITOR" == "" ]]; then
 fi
 alias vi="$EDITOR"
 alias v=vi
+alias virc='vi ~/.vimrc'
+alias vrc=virc
 alias b=bat
 alias batlog='bat --paging=never -l log'
 alias blog=batlog
@@ -425,6 +430,7 @@ alias ?=_help
 alias ??=_longhelp
 
 alias ec=echo
+alias eco=ec
 
 # protonmail
 alias pm='protonmail-bridge'
@@ -479,9 +485,21 @@ alias lcks='lc kickstart -k'
 
 # plists
 
-alias pb=/usr/libexec/PlistBuddy
+_pb=/usr/libexec/PlistBuddy
+alias pb=$_pb
+# ergonomics shortcut
+pl() {
+
+    if ! command $_pb "$@" && [ $# -gt 0 ]; then
+        cat <<'EOF'
+
+lib.sh: pl is a new shortcut for PlistBuddy.
+plutil should be called by its name
+EOF
+    fi
+
+}
 alias pp='pb -c print'
-alias pl=plutil
 alias plc='pl -convert'
 alias xml1='plc xml1'
 alias bin1='plc binary1'
@@ -744,15 +762,32 @@ alias rgi='_rg -iuuu'
 # }
 
 # nix
-alias xx=nix
-alias ix=nix
-alias flake='nix flake'
+
+alias nx=nix
+
+# new nix cli
+
+alias nxp='nx profile'
+alias nxpl='nxp list'
+alias nxw='nxp wipe-history'
+alias nxf='nx flake'
+alias nxi='nxp install'
+alias nxu='nxp remove'
+alias nxd='nxp remove'
+alias nxr='nx registry'
+alias nxrl='nxr list'
+alias nxrlr='nxrl --refresh'
+alias nxdrv='nx derivation'
+alias nxds='nxdrv show'
+alias nxl='nxp list'
+alias nxc='vi ~/.config/nix/nix.conf'
+
 function drv() {
 
     local _1="$1"
     shift
 
-    local cmd=(nix derivation $_1 "$@")
+    local cmd=(nxdrv $_1 "$@")
 
     if [[ $_1 == "show" ]]; then
         ${cmd[*]} | jq
@@ -795,25 +830,18 @@ alias ncu='nix-channel --update'
 alias u='nix-env -e'
 alias q='nix-env -q'
 
-#TM snapshots
+# filesystem
+
+#  time machine snapshots
 
 alias tm=tmutil
 alias ts='tmutil localsnapshot'
-alias _tu='tmutil deletelocalsnapshots'
 
-function tu() {
+tu() {
+    local _del="tm deletelocalsnapshot"
 
-    vols=($(ls /Volumes) /nix)
-    pics=/Users/ic/Pictures
-
-    if [ -d $pics ]; then vols+=($pics); fi
-
-    for v in "${vols[@]}"; do _tu "$v"; done
-
-    # TODO: handle spaces
-    mount | grep -E '/dev.+on /' | sed -E "s/^.+on (.+) \(.+/\'\1'/g" | xargs -n1 -J% tmutil deletelocalsnapshots %
+    mount | grep -E '^/dev' | sed -E 's/\/dev.+on (.+) \(.*$/\1/g' | xargs -n1 $_del
     echo Unmounted volumes were unaffected.
-
 }
 
 # General APFS snapshots
@@ -1316,7 +1344,14 @@ alias sub=sublime
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
 
-TODO: ✂ - - - - - - - - - - - - - - - - - - -
+# python
+
+alias pi=pip
+alias px=pipx
+alias hch=hatch
+alias pd=pdm
+
+# TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
 
