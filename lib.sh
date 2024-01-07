@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240106_2518501
+LIBSH_VERSION=20240107_f838e00
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -29,7 +29,7 @@ _salias() {
 _salias s
 _salias si -i
 _salias efs vi /etc/fstab # efs - edit fstab
-_salias enx
+_salias enx vi /etc/nix/nix.conf
 alias xx='exit'
 
 # tr & clipboard
@@ -769,7 +769,8 @@ alias nx=nix
 
 alias nxp='nx profile'
 alias nxpl='nxp list'
-alias nxw='nxp wipe-history'
+alias nxpw='nxp wipe-history'
+alias nxw=nxpw
 alias nxf='nx flake'
 alias nxi='nxp install'
 alias nxu='nxp remove'
@@ -1028,6 +1029,7 @@ alias gbd='gb -D'
 # tags
 alias gt='g tag -l' # for consistency with git branch
 alias gtag='g tag'
+alias tag=gtag
 alias gtd='gtag -d'
 alias gtl=gt
 
@@ -1168,47 +1170,62 @@ alias gpush='g push'
 alias gpusht='gpush --tags'
 
 gpushdel() {
-    if [[ $# -lt 1 ]]; then
+    if [ ! $# ]; then
         cat <<'EOF'
 Usage: gpushd <branch|tag> [origin]
 EOF
         return 1
     fi
 
-    local origin="$2"
-    if [ "$origin" != "" ]; then shift; else origin=origin; fi
-
-    gpush $origin --delete $1
+    gpush ${2:-origin} --delete $1
 }
 alias gpusht=gtpush
 
 #  remotes
 alias gre='g remote'
-alias grea='gre add'
-alias grerm='gre remove'
-alias gremv='gre rename'
-alias gregu='gre get-url'
+alias grl=gre
 
-gresu() {
-    local origin=$1
-    local url="$2"
-    gre set-url $1 "$2"
-}
+function gra() {
 
-remotes() {
-    local rems=($(gre))
-
-    for r in ${rems[@]}; do
-        cat <<EOF
-$r:
-    $(gregu $r)
+    if [ $# -lt 2 ]; then
+        cat <<'EOF'
+Usage: gra <origin> <url>
 EOF
-    done
+        return 1
+    fi
+
+    gr add ${1:-origin} $2
 }
+
+alias gra='gre add'
+alias grrm='gre remove'
+alias grr=grrm
+alias grd=grr
+alias grmv='gre rename'
+
+function grgu() {
+
+    gre get-url ${1:-origin}
+
+}
+alias grg=grgu
+
+grsu() {
+    if [[ ! $# ]]; then
+        cat <<'EOF'
+Usage: grsu <url> [origin]
+EOF
+        return 1
+    fi
+
+    gre set-url ${2:-origin} $1
+}
+
+alias grs=grsu
 
 # restore
 alias gres='g restore'
-alias gress='gres --staged'
+alias grest='gres --staged'
 
 # reset
 alias grh='g reset --hard'
@@ -1326,6 +1343,7 @@ EOF
 }
 alias unzst=xzst
 alias uzst=unzst
+alias unz=xzst
 
 # ipatool
 alias ipa=ipatool
@@ -1349,6 +1367,8 @@ alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.exte
 alias pi=pip
 alias px=pipx
 alias hch=hatch
+alias ach=hch
+alias tch=hch
 alias pd=pdm
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
