@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240107_f838e00
+LIBSH_VERSION=20240109_6e4736d
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -488,7 +488,7 @@ alias lcks='lc kickstart -k'
 _pb=/usr/libexec/PlistBuddy
 alias pb=$_pb
 # ergonomics shortcut
-pl() {
+function pl() {
 
     if ! command $_pb "$@" && [ $# -gt 0 ]; then
         cat <<'EOF'
@@ -498,9 +498,12 @@ plutil should be called by its name
 EOF
     fi
 
+    $_pb $@
+
 }
 alias pp='pb -c print'
-alias plc='pl -convert'
+
+alias plc='/usr/bin/plutil -convert'
 alias xml1='plc xml1'
 alias bin1='plc binary1'
 
