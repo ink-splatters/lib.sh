@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240109_6e4736d
+LIBSH_VERSION=20240110_9fcfbaf
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -816,7 +816,7 @@ _nuattrs() {
 
     nix-shell -p ripgrep --run sh < <(
         cat <<'EOF'
-nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-unstable//g'
+nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-(wrapped|unstable)//g'
 EOF
     )
 }
@@ -842,7 +842,7 @@ alias tm=tmutil
 alias ts='tmutil localsnapshot'
 
 tu() {
-    local _del="tm deletelocalsnapshot"
+    local _del="tmutil deletelocalsnapshot"
 
     mount | grep -E '^/dev' | sed -E 's/\/dev.+on (.+) \(.*$/\1/g' | xargs -n1 $_del
     echo Unmounted volumes were unaffected.
