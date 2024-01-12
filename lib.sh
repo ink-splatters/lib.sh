@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240110_9fcfbaf
+LIBSH_VERSION=20240112_c39cbe9
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -842,7 +842,7 @@ alias tm=tmutil
 alias ts='tmutil localsnapshot'
 
 tu() {
-    local _del="tmutil deletelocalsnapshot"
+    local _del="tmutil deletelocalsnapshots"
 
     mount | grep -E '^/dev' | sed -E 's/\/dev.+on (.+) \(.*$/\1/g' | xargs -n1 $_del
     echo Unmounted volumes were unaffected.
@@ -1374,14 +1374,24 @@ alias ach=hch
 alias tch=hch
 alias pd=pdm
 
+# littlesnitch
+
+_salias lts littlesnitch
+
+alias diff='diff --colors=always'
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
 
-    local exp='self="${BASH_SOURCE[0]:-${(%):-%x}}"'
+    # this is ugly...
+    local exp='local self="${BASH_SOURCE[0]:-${(%):-%x}}"'
     eval $(echo $exp)
 
-    if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then self="$(pwd)/$self"; fi
+    if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then
+        echo -- failed getting self using BASH_SOURCE ';' using pwd...
+        local self="$(pwd)/$self"
+    fi
 
     echo -- self: $self
 
@@ -1392,6 +1402,9 @@ _init() {
         system=/
 
     else
+        local selfdir="$(dirname $self)"
+        echo -- selfdir: $selfdir
+
         local data="$(echo "$self" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
         local vg=$(d info "$data" | grep 'APFS Volume Group' | grep -Eo '[0-9A-F-]{36}')
 
@@ -1407,9 +1420,21 @@ _init() {
         local previouspath="/usr/bin:/bin:/usr/sbin:/sbin"
         export PATH="$data/usr/local/bin:$previouspath$(echo usr/bin:usr/libexec:usr/sbin:sbin:bin | sed -E 's@^|:@:'"$system\/"'@g')"
 
+        echo -- linking vim runtime from system volume to: $HOME/vim
+
+        rm -rf "$HOME"/vim
+        ln -sf "$system"/usr/share/vim "$HOME"/vim
+
+        local vimrc="$HOME"/.vimrc
+        echo -- copying .vimrc to: $vimrc
+        cp "$selfdir"/.vimrc "$vimrc"
+        chmod 644 "$vimrc"
+        chown $(whoami) "$vimrc"
+
         echo -- preparing the persistence in Recovery OS
 
         local bspath=/etc/profile
+
         local bkpath='N/A'
 
         local tmpfile=$(mktemp)
@@ -1422,7 +1447,7 @@ _init() {
             fi
         fi
 
-        # TODO: WTF?!
+        # TODO: WTF?
         cat $tmpfile >$bspath
 
         # there is no sudo in RecoveryOS
@@ -1445,6 +1470,8 @@ echo -- PATH: "$PATH"
 sudo() {
 	$_sudo
 }
+
+export VIMRUNTIME="$HOME"/vim/vim90
 
 # on Sonoma we must create rsync alias
 # pointing to unusual location
