@@ -178,7 +178,7 @@ pk() { pg "$1" | x kill -9; }
 alias bt=btop
 alias t=bt
 
-_salias bw bandwhich
+_salias bw bandwhich --show-dns
 
 _salias sc sysctl
 alias sw='sc -w'
@@ -391,9 +391,21 @@ alias umi='um install'
 alias umr='um remove'
 alias umrm='um env remove -n'
 alias ums='um search'
+
 alias venv='python -m venv'
-alias vc='venv .venv'
-alias va='source .venv/bin/activate'
+
+function vc() {
+    local name="${1:-.venv}"
+
+    venv "$name"
+}
+
+function va() {
+    local name="${1:-.venv}"
+
+    source "$name"/bin/activate
+}
+
 alias vd='deactivate'
 
 # editing / viewing
