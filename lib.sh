@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240112_c39cbe9
+LIBSH_VERSION=20240119_13b50a5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1020,7 +1020,6 @@ alias gs='g status'
 
 alias gadd='g add'
 alias ga='gadd'
-alias garenorm='ga --renormalize'
 alias grm='g rm'
 
 alias grmr='grm -r'
@@ -1042,10 +1041,8 @@ alias gba='gb -a'
 alias gbd='gb -D'
 
 # tags
-alias gt='g tag -l' # for consistency with git branch
-alias gtag='g tag'
-alias tag=gtag
-alias gtd='gtag -d'
+alias gt='g tag'
+alias gtd='gt -d'
 alias gtl=gt
 
 # commits
@@ -1093,8 +1090,13 @@ alias glt=gltrack
 
 gluntrack() {
     gl untrack "$@"
-    garenorm
+    g rm --cached -r "$@"
+    ga --renormalize "$@"
 }
+# stop using git-lfs
+alias glmigrateref="gl migrate export"
+alias glunroll="glmigrateref --everything"
+
 alias glu=glu
 alias glcl='gl clone'
 alias glc=glcl
