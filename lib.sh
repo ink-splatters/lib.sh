@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240119_13b50a5
+LIBSH_VERSION=20240121_dc8bfc8
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1020,6 +1020,7 @@ alias gs='g status'
 
 alias gadd='g add'
 alias ga='gadd'
+alias gmv='g mv'
 alias grm='g rm'
 
 alias grmr='grm -r'
