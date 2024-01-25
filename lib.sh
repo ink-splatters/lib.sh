@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240125_0a1f550
+LIBSH_VERSION=20240125_af85f1b
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -795,7 +795,7 @@ alias nxu='nxp remove'
 alias nxd='nxp remove'
 alias nxr='nx registry'
 alias nxrl='nxr list'
-alias nxrlr='nxrl --refresh'
+alias nxru='nxrl --refresh'
 alias nxdrv='nx derivation'
 alias nxds='nxdrv show'
 alias nxl='nxp list'
