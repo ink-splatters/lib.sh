@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240125_af85f1b
+LIBSH_VERSION=20240125_2c32c1e
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -786,20 +786,20 @@ alias nx=nix
 # new nix cli
 
 alias nxp='nx profile'
-alias nxpl='nxp list'
-alias nxpw='nxp wipe-history'
-alias nxw=nxpw
-alias nxf='nx flake'
+alias nxl='nxp list'
 alias nxi='nxp install'
-alias nxu='nxp remove'
-alias nxd='nxp remove'
+alias nxu='nxp upgrade'
+alias nxr='nxp remove'
+alias nxw='nxp wipe-history'
+alias nxf='nx flake'
+alias nxfu='nxf update'
+alias nxfuc='nxfu --commit-lock-file'
 alias nxr='nx registry'
 alias nxrl='nxr list'
 alias nxru='nxrl --refresh'
 alias nxdrv='nx derivation'
 alias nxds='nxdrv show'
-alias nxl='nxp list'
-alias nxc='vi ~/.config/nix/nix.conf'
+alias enxp='vi ~/.config/nix/nix.conf'
 
 function drv() {
 
