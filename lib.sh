@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240121_dc8bfc8
+LIBSH_VERSION=20240125_0a1f550
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -58,9 +58,12 @@ alias uuid=uuidgen
 alias ugen="uuid | tn"
 alias u0='printf "%s" 00000000-0000-0000-0000-000000000000'
 
-# uppercase
+# case
 alias upper='tr "[[:lower:]]" "[[:upper:]]"'
 alias up=upper
+
+alias lower='tr "[[:upper:]]" "[[:lower:]]"'
+alias low=lower
 
 # status / system info
 alias mf=macchina
