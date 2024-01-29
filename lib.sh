@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240125_2c32c1e
+LIBSH_VERSION=20240129_e79bc9e
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -234,10 +234,10 @@ rewifi() {
     set +e
     set -x
 
-    mvpn off
-    md
-    nd
-    nu
+    mvpn off || true
+    mdis || true
+    nd || true
+    nun || true
     sleep 1
 
     rt -n flush
@@ -246,15 +246,15 @@ rewifi() {
 
     sleep 1
 
-    na
-    ni
-    mc
+    na || true
+    nia || true
+    mc || true
     sleep 1
-    mc
-    nr
+    mc || true
+    nr || true
     sleep 1
 
-    mvpn on
+    mvpn on || true
 
     set +x
     set -e
@@ -798,7 +798,10 @@ alias nxr='nx registry'
 alias nxrl='nxr list'
 alias nxru='nxrl --refresh'
 alias nxdrv='nx derivation'
-alias nxds='nxdrv show'
+alias nxdev='nx develop'
+alias nxdevi='nxdev --impure'
+alias nxre='nx repl'
+alias nxrep="nxre --expr 'import <nixpkgs>{}'"
 alias enxp='vi ~/.config/nix/nix.conf'
 
 function drv() {
