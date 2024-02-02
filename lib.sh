@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240202_83f77f3
+LIBSH_VERSION=20240202_f8f0b71
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -803,6 +803,7 @@ alias nxf='nx flake'
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxi='nxp install'
+alias nxia='nxi --accept-flake-config'
 alias nxl='nxp list'
 alias nxp='nx profile'
 alias nxr='nx registry'
