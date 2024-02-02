@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240202_d787c62
+LIBSH_VERSION=20240202_8bd3e8f
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -805,7 +805,9 @@ alias nxrl='nxr list'
 alias nxru='nxrl --refresh'
 alias nxdrv='nx derivation'
 alias nxd='nx develop'
-alias nxdi='nxdev --impure'
+alias nxdi='nxd --impure'
+alias nxda='nxd --accept-flake-config'
+alias nxdia='nxdi --accept-flake-config'
 alias nxre='nx repl'
 alias nxrep="nxre --expr 'import <nixpkgs>{}'"
 alias enxp='vi ~/.config/nix/nix.conf'
