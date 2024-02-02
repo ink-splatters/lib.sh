@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240129_e79bc9e
+LIBSH_VERSION=20240202_714f9d5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -489,6 +489,12 @@ alias kdtwo='kitty +kitten diff'
 alias kdt=kdtwo
 alias kd2=kdt
 
+# TODO
+# notify
+# notify() {
+#    terminal-notifier -title "Kitty" -message "Done with task! Exit status: $?" -activate net.kovidgoyal.kitty
+# }
+
 # launchctl
 
 alias lc='launchctl'
@@ -953,6 +959,9 @@ alias alvg='a listVolumeGroups'
 alias adelvg='a deleteVolumeGroup'
 alias als='a listSnapshots'
 alias adels='a deleteSnapshot'
+xadels() {
+    adels "$1" -xid "$2"
+}
 alias aav='a addVolume'
 alias adel='a deleteVolume'
 
@@ -1381,7 +1390,7 @@ alias ipurchase='ipa purchase -b'
 
 # sublime text
 alias sublime=sublime_text
-alias sub=sublime
+alias sub='subl . &'
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
@@ -1400,6 +1409,13 @@ alias pd=pdm
 _salias lts littlesnitch
 
 alias diff='diff --colors=always'
+
+# meson
+
+alias mx=meson
+alias mxs='mx setup build'
+alias mxre='mx setup --reconfigure build'
+alias mxc='mx compile -C build'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
