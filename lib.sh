@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240202_714f9d5
+LIBSH_VERSION=20240202_d787c62
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -804,8 +804,8 @@ alias nxr='nx registry'
 alias nxrl='nxr list'
 alias nxru='nxrl --refresh'
 alias nxdrv='nx derivation'
-alias nxdev='nx develop'
-alias nxdevi='nxdev --impure'
+alias nxd='nx develop'
+alias nxdi='nxdev --impure'
 alias nxre='nx repl'
 alias nxrep="nxre --expr 'import <nixpkgs>{}'"
 alias enxp='vi ~/.config/nix/nix.conf'
