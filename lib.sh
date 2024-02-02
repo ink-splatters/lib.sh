@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240202_2b10b5e
+LIBSH_VERSION=20240202_4a425ec
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -799,7 +799,15 @@ alias nxda='nxd --accept-flake-config'
 alias nxdi='nxd --impure'
 alias nxdia='nxdi --accept-flake-config'
 alias nxdrv='nx derivation'
+alias nxdrvshow='nxdrv show'
+alias nxdrvs=nxdrvshow
 alias nxf='nx flake'
+alias nxfs='nxf show'
+alias nxs=nxfs
+alias nxfmeta='nxf metadata'
+alias nxmeta=nxfmeta
+alias nxfm=nxfmeta
+alias nxm=nxfm
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxi='nxp install'
