@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240202_8bd3e8f
+LIBSH_VERSION=20240202_83f77f3
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -791,26 +791,28 @@ alias nx=nix
 
 # new nix cli
 
-alias nxp='nx profile'
-alias nxl='nxp list'
-alias nxi='nxp install'
-alias nxu='nxp upgrade'
-alias nxr='nxp remove'
-alias nxw='nxp wipe-history'
+alias enxp='vi ~/.config/nix/nix.conf'
+alias nxb='nx build'
+alias nxba='nxb --accept-flake-config'
+alias nxd='nx develop'
+alias nxda='nxd --accept-flake-config'
+alias nxdi='nxd --impure'
+alias nxdia='nxdi --accept-flake-config'
+alias nxdrv='nx derivation'
 alias nxf='nx flake'
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
+alias nxi='nxp install'
+alias nxl='nxp list'
+alias nxp='nx profile'
 alias nxr='nx registry'
-alias nxrl='nxr list'
-alias nxru='nxrl --refresh'
-alias nxdrv='nx derivation'
-alias nxd='nx develop'
-alias nxdi='nxd --impure'
-alias nxda='nxd --accept-flake-config'
-alias nxdia='nxdi --accept-flake-config'
+alias nxr='nxp remove'
 alias nxre='nx repl'
 alias nxrep="nxre --expr 'import <nixpkgs>{}'"
-alias enxp='vi ~/.config/nix/nix.conf'
+alias nxrl='nxr list'
+alias nxru='nxrl --refresh'
+alias nxu='nxp upgrade'
+alias nxw='nxp wipe-history'
 
 function drv() {
 
