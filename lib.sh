@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240202_4a425ec
+LIBSH_VERSION=20240203_34012fd
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -68,8 +68,8 @@ alias low=lower
 # status / system info
 alias mf=macchina
 alias bf=bunnyfetch
-alias sysinfo=mf # big info
-alias sinfo=bf   # small info
+alias info=mf  # big info
+alias sinfo=bf # small info
 
 # generation using /dev/random
 
@@ -799,27 +799,32 @@ alias nxda='nxd --accept-flake-config'
 alias nxdi='nxd --impure'
 alias nxdia='nxdi --accept-flake-config'
 alias nxdrv='nx derivation'
-alias nxdrvshow='nxdrv show'
 alias nxdrvs=nxdrvshow
+alias nxdrvshow='nxdrv show'
 alias nxf='nx flake'
-alias nxfs='nxf show'
-alias nxs=nxfs
-alias nxfmeta='nxf metadata'
-alias nxmeta=nxfmeta
+alias nxfi='nxf info'
+alias nxfc='nxf check'
 alias nxfm=nxfmeta
-alias nxm=nxfm
+alias nxfmeta='nxf metadata'
+alias nxfs='nxf show'
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxi='nxp install'
 alias nxia='nxi --accept-flake-config'
 alias nxl='nxp list'
+alias nxm=nxfm
+alias nxmeta=nxfmeta
 alias nxp='nx profile'
-alias nxr='nx registry'
+alias nxpl=nxl
+alias nxpi=nxi
 alias nxr='nxp remove'
+alias nxpr=nxr
 alias nxre='nx repl'
+alias nxreg='nx registry'
 alias nxrepkgs="nxre --expr 'import <nixpkgs>{}'"
-alias nxrl='nxr list'
-alias nxru='nxrl --refresh'
+alias nxregl='nxreg list'
+alias nxregu='nxregl --refresh'
+alias nxs=nxfs
 alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
 
@@ -1370,6 +1375,13 @@ EOF
     tar -c -f - "$@" | zstd -z -o "$out"
 }
 
+zsta() {
+    local name="${1%\/}"
+
+    echo "Will archive $name to $name.tz and remove unarchived coppy if succeeded..."
+    zst "$name".tz "$name" && rm -rf "$name" && echo && echo Done || echo Error: $?
+}
+
 alias xzs='zstd -d'
 
 xzst() {
@@ -1387,9 +1399,21 @@ EOF
 
     zstd -d --stdout "$in" | tar -x "$@"
 }
+
+xzsta() {
+    local name="$1"
+    echo "Will unarchive $name to ${name%.*} and remove $name if succeeded..."
+
+    xzst "$name" && rm -rf "$name" && echo && echo Done || echo Error: $?
+}
+
 alias unzst=xzst
 alias uzst=unzst
 alias unz=xzst
+
+alias unzsta=xzsta
+alias uzsta=unzsta
+alias unza=xzsta
 
 # ipatool
 alias ipa=ipatool
@@ -1421,7 +1445,7 @@ alias pd=pdm
 
 _salias lts littlesnitch
 
-alias diff='diff --colors=always'
+#alias diff='diff --colors=always'
 
 # meson
 
