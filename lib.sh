@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240203_34012fd
+LIBSH_VERSION=20240209_515ad4e
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -801,9 +801,10 @@ alias nxdia='nxdi --accept-flake-config'
 alias nxdrv='nx derivation'
 alias nxdrvs=nxdrvshow
 alias nxdrvshow='nxdrv show'
+alias nxff='nx fmt'
 alias nxf='nx flake'
-alias nxfi='nxf info'
 alias nxfc='nxf check'
+alias nxfi='nxf info'
 alias nxfm=nxfmeta
 alias nxfmeta='nxf metadata'
 alias nxfs='nxf show'
@@ -1025,6 +1026,21 @@ function duuid() {
 
 function dname() {
     d info $1 | grep Volume\ Name | sed -E 's/^.*Volume Name:[ \t]+//g' | tn
+}
+
+# github
+
+alias ghsd='gh repo set-default'
+
+ghs() {
+
+    local src="$1"
+    local srcrepo="$2"
+    local tgt="${3:-ink-splatters}"
+    local tgtrepo="${4:-$srcrepo}"
+
+    gh repo sync "$tgt/$tgtrepo" --source "$src/$srcrepo"
+
 }
 
 # git
@@ -1453,6 +1469,46 @@ alias mx=meson
 alias mxs='mx setup build'
 alias mxre='mx setup --reconfigure build'
 alias mxc='mx compile -C build'
+
+# jc
+
+j() {
+    local cmd="$1"
+    shift
+
+    $cmd "$@" | jc --$cmd --pretty
+
+}
+_in() {
+    local needle="$1"
+    shift
+    local haystack="$@"
+    for x in ${haystack[@]}; do
+        if [[ "$x" == "$needle" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+everhex() {
+
+    local values=(8 16 32)
+    _in "$1" ${values[@]} \
+        || {
+            cat <<EOF
+generates infinite sequence of hexademical values
+usage: everhex [length]
+
+args:
+    length	value length, must be one of ${values[@]}
+EOF
+            return 1
+        }
+
+    od -t x -An /dev/random | tr -d " " | fold -w ${1:-8}
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
