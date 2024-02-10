@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240209_515ad4e
+LIBSH_VERSION=20240210_f6bb77e
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1108,6 +1108,7 @@ alias gam=gcamend
 alias gf='g fetch -vp'
 alias gp='g pull'
 alias gpr='gp --rebase'
+alias gprff='gpr --ff-only'
 alias gr='g rebase'
 alias gm='g merge'
 alias gms='gm --squash'
