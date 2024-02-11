@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240211_f292af9
+LIBSH_VERSION=20240211_4806337
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -794,6 +794,8 @@ alias nx=nix
 alias enxp='vi ~/.config/nix/nix.conf'
 alias nxb='nx build'
 alias nxba='nxb --accept-flake-config'
+alias nxconf='nx show-config'
+alias nxc=nxconf
 alias nxd='nx develop'
 alias nxda='nxd --accept-flake-config'
 alias nxdi='nxd --impure'
