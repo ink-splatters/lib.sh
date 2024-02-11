@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240210_f6bb77e
+LIBSH_VERSION=20240211_f292af9
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -801,7 +801,7 @@ alias nxdia='nxdi --accept-flake-config'
 alias nxdrv='nx derivation'
 alias nxdrvs=nxdrvshow
 alias nxdrvshow='nxdrv show'
-alias nxff='nx fmt'
+alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
 alias nxfi='nxf info'
@@ -1033,11 +1033,20 @@ function dname() {
 alias ghsd='gh repo set-default'
 
 ghs() {
+    if [ $# -lt 1 ]; then
+        cat <<'EOF'
+gh repo sync
+
+usage: ghs SOURCE [SRCREPO=${PWD##*/}] [TGTREPO=SRCREPO] [TARGET=ink-splatters]
+EOF
+        return 1
+    fi
 
     local src="$1"
-    local srcrepo="$2"
-    local tgt="${3:-ink-splatters}"
-    local tgtrepo="${4:-$srcrepo}"
+    local dir="${PWD##*/}"
+    local srcrepo="${2:-$dir}"
+    local tgtrepo="${3:-$srcrepo}"
+    local tgt="${4:-ink-splatters}"
 
     gh repo sync "$tgt/$tgtrepo" --source "$src/$srcrepo"
 
