@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240213_3ddbf81
+LIBSH_VERSION=20240213_7a4d073
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -801,8 +801,7 @@ alias nxda='nxd --accept-flake-config'
 alias nxdi='nxd --impure'
 alias nxdia='nxdi --accept-flake-config'
 alias nxdrv='nx derivation'
-alias nxdrvs=nxdrvshow
-alias nxdrvshow='nxdrv show'
+alias nxds='nxdrv show | jq'
 alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
@@ -830,21 +829,6 @@ alias nxregu='nxregl --refresh'
 alias nxs=nxfs
 alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
-
-function drv() {
-
-    local _1="$1"
-    shift
-
-    local cmd=(nxdrv $_1 "$@")
-
-    if [[ $_1 == "show" ]]; then
-        ${cmd[*]} | jq
-    else
-        ${cmd[*]}
-    fi
-
-}
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
