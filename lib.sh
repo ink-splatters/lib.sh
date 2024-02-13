@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240211_4806337
+LIBSH_VERSION=20240213_38d7195
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1521,6 +1521,9 @@ EOF
 
     od -t x -An /dev/random | tr -d " " | fold -w ${1:-8}
 }
+
+# atomicparsley
+alias apars=atomicparsley
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
