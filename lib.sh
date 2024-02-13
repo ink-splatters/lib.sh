@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240213_38d7195
+LIBSH_VERSION=20240213_3ddbf81
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1524,6 +1524,12 @@ EOF
 
 # atomicparsley
 alias apars=atomicparsley
+
+wttr() {
+    local url="wttr.in"
+
+    curl "$url"/"$1"
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
