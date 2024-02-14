@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240213_7a4d073
+LIBSH_VERSION=20240214_9be46f3
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -8,6 +8,8 @@ EOF
 # TODO:
 # - shellcheck
 # - shellharden
+
+shopt -s globstar
 
 # helpers
 
@@ -24,6 +26,14 @@ _salias() {
     alias $name="sudo ${args[*]}"
 }
 
+_exists() {
+    if ! command -v "$1" 1>/dev/null; then
+        echo ERROR: "$1" does not exist or not in PATH
+        return 1
+    fi
+    return 0
+}
+
 # sudo / system
 
 _salias s
@@ -35,7 +45,7 @@ alias xx='exit'
 # tr & clipboard
 
 alias td='tr -d'
-alias tn="tr -d '\n'"
+alias tdn="tr -d '\n'"
 alias c=pbcopy
 alias p=pbpaste
 
@@ -1514,6 +1524,72 @@ wttr() {
 
     curl "$url"/"$1"
 }
+
+# FLAC to ALAC
+#
+flac2alac() {
+    _noart=0
+    case $1 in
+        --no-art | --noart)
+            _noart=1
+            ;;
+        -h | --help)
+            cat <<'EOF'
+
+flac2alac [ artwork ]
+recursively converts FLAC to ALAC, starting from the current directory (.)
+
+artwork:
+    jpeg or png filename containing the artwork to be embedded in the
+    resulting m4a; searched in every subdir
+
+    default names being searched:
+	cover.jpg
+	cover.jpeg
+	cover.png
+
+EOF
+            return 1
+            ;;
+    esac
+    _exists ffmpeg || return 1
+
+    for f in ./**/*.flac; do
+        echo -- converting "$f" to "${f%.*}.m4a"...
+        echo
+        ffmpeg -nostdin -i "$f" -c:a alac -c:v copy "${f%.*}".m4a
+
+        _exists atomicparsley && {
+
+            if [ $_noart = 1 ]; then
+                echo -- user chose not to overwrite the artwork
+                continue
+            fi
+
+            _dn="$(dirname "$f")"
+            _cnames=("$1" cover.jpg cover.jpeg cover.png)
+
+            for c in "${_cnames[@]}"; do
+                if [ -f "$_dn/$c" ]; then
+                    _cover="$_dn/$c"
+                    break
+                fi
+            done
+
+            if [ -f "$_cover" ]; then
+                echo -- embedding artwork: "$_cover" to: "${f%.*}.m4a"...
+                echo
+
+                atomicparsley "${f%.*}.m4a" --artwork "$_cover" --overWrite
+            else
+                echo -- not embedding artwork: "$_cover" does not exist
+            fi
+        }
+
+    done
+}
+
+alias f2a=flac2alac
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
