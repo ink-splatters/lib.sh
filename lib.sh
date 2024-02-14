@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240214_9be46f3
+LIBSH_VERSION=20240214_c6c27d6
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1530,7 +1530,7 @@ wttr() {
 flac2alac() {
     _noart=0
     case $1 in
-        --no-art | --noart)
+        --no-art | -noart | --no-cover | -nocover)
             _noart=1
             ;;
         -h | --help)
