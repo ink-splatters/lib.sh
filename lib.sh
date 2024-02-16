@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240214_c6c27d6
+LIBSH_VERSION=20240216_b10cd38
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -816,6 +816,7 @@ alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
 alias nxfi='nxf info'
+alias nxfl='nxf lock'
 alias nxfm=nxfmeta
 alias nxfmeta='nxf metadata'
 alias nxfs='nxf show'
@@ -1590,7 +1591,8 @@ EOF
 }
 
 alias f2a=flac2alac
-
+alias tl='tldr --platform macos'
+alias tt='tt -theme nord'
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
