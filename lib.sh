@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240218_74abec3
+LIBSH_VERSION=20240218_c6c48ef
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1027,7 +1027,9 @@ function dname() {
 
 # github
 
-alias ghsd='gh repo set-default'
+alias ghr='gh repo'
+alias ghrf='ghr fork'
+alias ghrsd='ghr set-default'
 
 ghs() {
     if [[ "$1" == "-h" || "$1" == "--help" ]]; then
@@ -1047,9 +1049,7 @@ EOF
         return 1
     fi
 
-    _exists gh
-    _exists jq
-    _exists rg
+    _exists gh jq rg || return 1
 
     local remote="${1:-origin}"
 
@@ -1060,7 +1060,7 @@ EOF
 
     if ! command gh auth token >/dev/null 2>&1; then gh auth login; fi
 
-    local target=$(git remote get-url $remote | rg -o 'github\.com.([-./\w]+)\.git$' --replace '$1')
+    local target=$(git remote get-url $remote | rg -o 'github\.com.([-./\w]+)(?:\.git)?$' --replace '$1')
     local source=$(gh api repos/$target | jq .source.full_name | tr -d '"')
 
     if [ "$source" == "null" ]; then
@@ -1070,6 +1070,50 @@ EOF
 
     gh repo sync $target --source $source
 }
+
+refresharchive() {
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        cat <<'EOF'
+
+- searches for .tz (tar zstd) archives in the current directory
+- unpacks them, for forks - syncs with sources (using GitHub cli)
+- hard-resets to HEAD
+- fetches changes
+- pulls --ff-only
+- cleans everything but .git folder
+- rearchives back to .tz
+
+requires fd.
+
+usage: refresharchive [--no-gix]
+
+--no-gix - do not use gitoxide for fetch, even if available
+
+EOF
+        return 1
+    fi
+
+    _exists fd || return 1
+
+    local git=git
+
+    if [[ "$1" != "--no-gix" ]] && command -v gix >/dev/null 2>&1; then
+        git=gix
+    fi
+
+    for f in $(fd '.tar.zst|.tz'); do
+        xzsta "$f"
+        pushd "${f%.*}"
+        ghs
+        $git fetch
+        git reset --hard HEAD
+        git pull --ff-only
+        fd -u -d 1 --exclude '.git' -x rm -rf
+        popd
+        zsta "${f%.*}"
+    done
+}
+alias updatearchive=refresharchive
 
 # git
 
@@ -1136,7 +1180,7 @@ alias gam=gcamend
 alias gf='g fetch -vp'
 alias gp='g pull'
 alias gpr='gp --rebase'
-alias gprff='gpr --ff-only'
+alias gpff='gp --ff-only'
 alias gr='g rebase'
 alias gm='g merge'
 alias gms='gm --squash'
