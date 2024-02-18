@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240218_c6c48ef
+LIBSH_VERSION=20240218_a874a43
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1060,7 +1060,7 @@ EOF
 
     if ! command gh auth token >/dev/null 2>&1; then gh auth login; fi
 
-    local target=$(git remote get-url $remote | rg -o 'github\.com.([-./\w]+)(?:\.git)?$' --replace '$1')
+    local target=$(git remote get-url $remote | sed 's/.git$//g' | rg -o 'github\.com.([-./\w]+)' --replace '$1')
     local source=$(gh api repos/$target | jq .source.full_name | tr -d '"')
 
     if [ "$source" == "null" ]; then
