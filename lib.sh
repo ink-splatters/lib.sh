@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240216_b10cd38
+LIBSH_VERSION=20240218_74abec3
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1030,23 +1030,45 @@ function dname() {
 alias ghsd='gh repo set-default'
 
 ghs() {
-    if [ $# -lt 1 ]; then
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
         cat <<'EOF'
-gh repo sync
 
-usage: ghs SOURCE [SRCREPO=${PWD##*/}] [TGTREPO=SRCREPO] [TARGET=ink-splatters]
+performs GitHub fork synchronization with the source repo,
+using github-cli (must be installed and authenticated).
+also requires ripgrep and jq
+
+usage: ghs [target remote]
 EOF
         return 1
     fi
 
-    local src="$1"
-    local dir="${PWD##*/}"
-    local srcrepo="${2:-$dir}"
-    local tgtrepo="${3:-$srcrepo}"
-    local tgt="${4:-ink-splatters}"
+    if [ ! -d "$(pwd)"/.git ]; then
+        echo ERROR: not a git repository
+        return 1
+    fi
 
-    gh repo sync "$tgt/$tgtrepo" --source "$src/$srcrepo"
+    _exists gh
+    _exists jq
+    _exists rg
 
+    local remote="${1:-origin}"
+
+    if [[ $(git remote | rg '^'$remote'$') == "" ]]; then
+        echo ERROR: remote "$remote" does not exist
+        return 1
+    fi
+
+    if ! command gh auth token >/dev/null 2>&1; then gh auth login; fi
+
+    local target=$(git remote get-url $remote | rg -o 'github\.com.([-./\w]+)\.git$' --replace '$1')
+    local source=$(gh api repos/$target | jq .source.full_name | tr -d '"')
+
+    if [ "$source" == "null" ]; then
+        echo "ERROR: the repo: $target is not a fork. Cannot sync"
+        return 1
+    fi
+
+    gh repo sync $target --source $source
 }
 
 # git
@@ -1593,6 +1615,7 @@ EOF
 alias f2a=flac2alac
 alias tl='tldr --platform macos'
 alias tt='tt -theme nord'
+alias img=chafa
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
