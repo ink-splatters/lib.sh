@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240218_a874a43
+LIBSH_VERSION=20240222_10cedd7
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -27,11 +27,13 @@ _salias() {
 }
 
 _exists() {
-    if ! command -v "$1" 1>/dev/null; then
-        echo ERROR: "$1" does not exist or not in PATH
-        return 1
-    fi
-    return 0
+    for f in "$@"; do
+
+        if ! command -v "$f" 1>/dev/null; then
+            echo ERROR: "$f" does not exist or not in PATH
+            return 1
+        fi
+    done
 }
 
 # sudo / system
@@ -46,6 +48,7 @@ alias xx='exit'
 
 alias td='tr -d'
 alias tdn="tr -d '\n'"
+alias tn=tdn
 alias c=pbcopy
 alias p=pbpaste
 
@@ -859,6 +862,7 @@ _nuattrs() {
 nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-(wrapped|unstable)//g'
 EOF
     )
+    return 0
 }
 
 _nu() {
@@ -1594,7 +1598,7 @@ wttr() {
 
 # FLAC to ALAC
 #
-flac2alac() {
+function flac2alac() {
     _noart=0
     case $1 in
         --no-art | -noart | --no-cover | -nocover)
@@ -1622,41 +1626,71 @@ EOF
     _exists ffmpeg || return 1
 
     for f in ./**/*.flac; do
-        echo -- converting "$f" to "${f%.*}.m4a"...
-        echo
+        echo converting "$f" to "${f%.*}.m4a"...
         ffmpeg -nostdin -i "$f" -c:a alac -c:v copy "${f%.*}".m4a
+    done
 
-        _exists atomicparsley && {
+    _exists atomicparsley && {
+        if [ $_noart = 1 ]; then
+            echo user chose not to overwrite the artwork
+            continue
+        fi
 
-            if [ $_noart = 1 ]; then
-                echo -- user chose not to overwrite the artwork
-                continue
+        _dn="$(dirname "$f")"
+        _cnames=("$1" cover.jpg cover.jpeg cover.png)
+
+        for c in "${_cnames[@]}"; do
+            if [ -f "$_dn/$c" ]; then
+                _cover="$_dn/$c"
+                break
             fi
+        done
 
-            _dn="$(dirname "$f")"
-            _cnames=("$1" cover.jpg cover.jpeg cover.png)
-
-            for c in "${_cnames[@]}"; do
-                if [ -f "$_dn/$c" ]; then
-                    _cover="$_dn/$c"
-                    break
-                fi
-            done
+        for f in ./**/*.m4a; do
 
             if [ -f "$_cover" ]; then
-                echo -- embedding artwork: "$_cover" to: "${f%.*}.m4a"...
+                echo embedding artwork: "$_cover" to: "${f%.*}.m4a"...
                 echo
 
                 atomicparsley "${f%.*}.m4a" --artwork "$_cover" --overWrite
             else
-                echo -- not embedding artwork: "$_cover" does not exist
+                echo not embedding artwork: "$_cover" does not exist
             fi
-        }
-
-    done
+        done
+    }
 }
 
 alias f2a=flac2alac
+
+# cue split
+
+flac2many() {
+
+    if [ $# -lt 2 ]; then
+        cat <<'EOF'
+splits FLAC to many using cuesheet
+
+Usage: flac2many <cue sheet> <flac to split>
+
+EOF
+        return 1
+    fi
+
+    local cue="$1"
+    local flac="$2"
+
+    # cuetag is part of 'cuetools'
+    _exists flac shntool cuetag fd || return 1
+
+    shnsplit -t "%n. %t" -f "$cue" -o "flac flac -s -8 -o %f -" "$flac"
+
+    echo writing metadata...
+    fd -d 1 '^[\d]+\.' -0 | x -0 cuetag *.cue
+    echo 'Done'
+    echo
+}
+alias f2m=flac2many
+
 alias tl='tldr --platform macos'
 alias tt='tt -theme nord'
 alias img=chafa
