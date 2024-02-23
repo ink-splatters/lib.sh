@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240222_10cedd7
+LIBSH_VERSION=20240223_edc5379
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1124,6 +1124,7 @@ alias updatearchive=refresharchive
 alias g=git
 alias gx=gix
 alias gxc='gx clone'
+alias gxc1='gxc --depth=1'
 alias gxf='gx fetch'
 
 #  working copy
@@ -1685,7 +1686,7 @@ EOF
     shnsplit -t "%n. %t" -f "$cue" -o "flac flac -s -8 -o %f -" "$flac"
 
     echo writing metadata...
-    fd -d 1 '^[\d]+\.' -0 | x -0 cuetag *.cue
+    fd -d 1 '^[\d]+\.' -0 | x -0 cuetag "$cue"
     echo 'Done'
     echo
 }
