@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240223_edc5379
+LIBSH_VERSION=20240225_f8d0669
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1637,18 +1637,17 @@ EOF
             continue
         fi
 
-        _dn="$(dirname "$f")"
         _cnames=("$1" cover.jpg cover.jpeg cover.png)
-
-        for c in "${_cnames[@]}"; do
-            if [ -f "$_dn/$c" ]; then
-                _cover="$_dn/$c"
-                break
-            fi
-        done
 
         for f in ./**/*.m4a; do
 
+            _dn="$(dirname "$f")"
+            for c in "${_cnames[@]}"; do
+                if [ -f "$_dn/$c" ]; then
+                    _cover="$_dn/$c"
+                    break
+                fi
+            done
             if [ -f "$_cover" ]; then
                 echo embedding artwork: "$_cover" to: "${f%.*}.m4a"...
                 echo
@@ -1695,6 +1694,15 @@ alias f2m=flac2many
 alias tl='tldr --platform macos'
 alias tt='tt -theme nord'
 alias img=chafa
+
+# jq cat
+jqc() {
+    local f="$1"
+    shift
+
+    cat "$f" | jq $@
+
+}
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
