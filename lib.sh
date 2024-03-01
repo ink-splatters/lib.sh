@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240225_f8d0669
+LIBSH_VERSION=20240301_6777675
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1694,6 +1694,23 @@ alias f2m=flac2many
 alias tl='tldr --platform macos'
 alias tt='tt -theme nord'
 alias img=chafa
+
+ramdisk() {
+    if [ $# != 1 ]; then
+        cat <<'EOF'
+Usage: ramdisk <size in MiB>
+EOF
+        return 1
+    fi
+
+    if (($1 < 16384 || $1 > (8 * 1024 * 1024))); then
+        echo "ERROR: guard ($1)"
+        return 1
+    fi
+
+    ha -nomount ram://$(($1 * 2))
+
+}
 
 # jq cat
 jqc() {
