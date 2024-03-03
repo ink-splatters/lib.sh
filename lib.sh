@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240301_6777675
+LIBSH_VERSION=20240303_bb53231
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -788,9 +788,8 @@ fi
 
 alias mk=mkdir
 alias mkp='mk -p'
-alias _rg=rg
-alias rg='_rg -uuu'
-alias rgi='_rg -iuuu'
+alias rgu='rg -uuu'
+alias rgi='rg -iuuu'
 
 # TODO: mind that c is for pbcopy
 # c() {
@@ -812,6 +811,7 @@ alias nxc=nxconf
 alias nxd='nx develop'
 alias nxda='nxd --accept-flake-config'
 alias nxdi='nxd --impure'
+alias nxdia='nxdi --accept-flake-config'
 alias nxdia='nxdi --accept-flake-config'
 alias nxdrv='nx derivation'
 alias nxds='nxdrv show | jq'
