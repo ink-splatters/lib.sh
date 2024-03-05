@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240303_bb53231
+LIBSH_VERSION=20240305_5868518
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -786,7 +786,7 @@ if [ -n "${commands[fzf - share]}" ]; then
     source "$(fzf-share)/completion.bash"
 fi
 
-alias mk=mkdir
+alias mkd=mkdir
 alias mkp='mk -p'
 alias rgu='rg -uuu'
 alias rgi='rg -iuuu'
@@ -1720,6 +1720,9 @@ jqc() {
     cat "$f" | jq $@
 
 }
+
+alias mk=make
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
