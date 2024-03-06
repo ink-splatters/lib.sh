@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240306_a8211e5
+LIBSH_VERSION=20240306_9eaad25
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1130,7 +1130,28 @@ EOF
         zsta "${f%.*}"
     done
 }
+
 alias updatearchive=refresharchive
+
+alias ghsxfff='ghs && gxf && gff'
+alias aghsxfff='ghsxfff &'
+
+gcohsxfff() {
+    gco "$1" && ghsxfff
+}
+
+agcohsxfff() {
+    gcohsxfff "$1" &
+}
+
+grhhhsxfff() {
+    grhh && gcohsxfff "$1"
+}
+
+# TODO
+#agcohsxfff() {
+# gcohsxfff "$1" &
+#}
 
 # git
 
