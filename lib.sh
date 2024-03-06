@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240305_5868518
+LIBSH_VERSION=20240306_a8211e5
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -61,7 +61,17 @@ function cr() {
 # xattrs and related
 alias x=xargs
 
+alias xn='x -n'
 alias x1='x -n1'
+alias x2='x -n2'
+alias xi='x -I@'
+alias xj='x -J%'
+alias xni='xi -n'
+alias xnj='xj -n'
+alias x1i='x1 -I@'
+alias x1j='x1 -J'
+alias x2i='x2 -I@'
+alias x2j='x2 -J'
 
 alias xpp="xargs -n1 -I@ -R -1 sh -c 'echo @ ; echo ; /usr/libexec/PlistBuddy -c print @'"
 alias xfetch="ls | xargs -n1 -I@ -R -1 sh -c 'pushd @ ; git fetch -vp ; popd'"
@@ -457,8 +467,11 @@ _longhelp() {
 alias ?=_help
 alias ??=_longhelp
 
-alias ec=echo
-alias eco=ec
+alias e=echo
+
+eseq() {
+    echo $(seq $1)
+}
 
 # protonmail
 alias pm='protonmail-bridge'
@@ -565,19 +578,19 @@ _alias l1a l1 -a
 _alias la1 l1a
 _alias la2 laa
 
-_alias e eza
-_alias el e -l
+_alias ee eza
+_alias el ee -l
 _alias ea el -a
 _alias eaa ea -@o
 
-_alias e1 e -1
+_alias e1 ee -1
 _alias e1a e1 -a
 _alias ea1 e1a
 
 _alias ea2 eaa
 _alias ea3 ea2 -F
 
-alias f='fd -u'
+alias f='fd -uuu'
 alias ff=find
 
 # TODO: fix broken
@@ -1186,6 +1199,7 @@ alias gf='g fetch -vp'
 alias gp='g pull'
 alias gpr='gp --rebase'
 alias gpff='gp --ff-only'
+alias gff=gpff
 alias gr='g rebase'
 alias gm='g merge'
 alias gms='gm --squash'
@@ -1376,8 +1390,13 @@ alias grest='gres --staged'
 alias grh='g reset --hard'
 alias grhh='grh HEAD'
 
-#  gitui
+# gitui
 alias gi='gitui'
+
+# sleep fraction of second
+function fsleep() {
+    /usr/bin/perl -e "select(undef, undef, undef, $1)"
+}
 
 # rust
 alias ru=rustup
