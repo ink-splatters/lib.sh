@@ -62,10 +62,8 @@ Otherwise - can be perceived as alpha quality. Works for author's purpose.
 
 #### Contributions
 
-##### My discretion
-
-The project was not intented for public eyes initially, rather I could not keep it with myself and just had to share with the community. Given it's part of my current
-workflows, I leave my right to decline your PR without a reason. Thus, open an issue first, please.
+Currently it's a whole mess craving for refactoring or rewriting probably not in bash. It's not that contributions are completely discouraged,
+but please open an issue first.
 
 ##### pre-commit
 

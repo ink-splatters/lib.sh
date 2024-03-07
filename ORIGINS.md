@@ -10,35 +10,96 @@ The Following paragraph is generously sponsored by Trent:
 
 [![NIN - Hurt](http://img.youtube.com/vi/PbHz9p7Z4OU/1.jpg)](http://www.youtube.com/watch?v=PbHz9p7Z4OU "NIN - Hurt")
 
-_Recovery_ has been always half-baked environment. Apple has been continously disabling it, arming against user's mental health. If one needs more than changing Security Policy via menu (1TR needs to be correctly booted!), it's all pain and dispair. It's taken over by bitrot. E.g., at some point in the past, more dylibs were moved to `dyldcache` which broke tons of CLI tools. This has become persistent, only to get even worse with each major release.
+_Recovery_ has been always half-baked environment. Apple hardly could care less, however, and let it rot in every aspect but related to Platform Security.
 
-Apple hardly could care less, however: Recovery is stub OS, meaning they have a freedom to put absolute nonsense as far as it fulfills the minimum viable requirements.
+More, when it comes to improving Platform Security across the products, Apple assumes a user must pay for it with damn degrade in their experience.
+Well, _because they always pay no matter what_.
+
+Take _Sonoma_: why the hell manipulating `~/Library/Containers` is so slow, even under root?
+
+And even more interesting: why does
+
+```sh
+mv ~/Library/C{ontainers,}
+do_hacky_stuff
+mv ~/Library/C{,ontainers}
+```
+
+make `hucky_stuff` **FAST AGAIN** as it had been with pre-Sonoma releases?
+
+_Apple, do you count on a poor malicious actor suddenly having succumbed to Comprehending the Essense of the Slowness?_
 
 ### Hope not found
 
-```
+Again, _Sonoma_:
+
+```sh
 bash: rsync: command not found
 
 bash-3.2 #
 ```
 
-Nice move, Apple! It's because `rsync` now lives at `/Volumes/Macintosh HD/usr/libexec/rsync/rsync.samba`, as of _Sonoma_.
+That's due to `rsync` now suddenly living at `/Volumes/Macintosh HD/usr/libexec/rsync/rsync.samba`. Nothing to worry about though
+as this is exactly how caring even less looks like. In the end, consistency is half of the success!
+
+_"All is going according to the plan"_ (C)
 
 ### Deliberate assault
 
-Sometimes, however, it gets worse on purpose. That is: rockstar engineering workforce hired from all over the world is being wasted for pushing the limits of noncense. Indeed, why not enmasculate `gpt`:
+Sometimes, however, it gets worse on purpose which makes me imagine that _Apple rockstar 10x engineers_ are pushed to their limits in terms of
+building Security via Emasculation.
 
-```
+Figurally speaking, penile shaft of `gpt` utility bundled with RecoveryOS, was left without its _satellites_ if say so, for good or not:
+
+```sh
 bash-3.2 # gpt add
 gpt: add: operation not permitted: add
 ```
 
-Srsly, Apple, what did it do to you? Or is it perverted approach to security?
+This is:
 
-Good that [`gdisk`](https://sourceforge.net/projects/gptfdisk) just works fine.
+```c
+if (true) { fuck_you(); }
+```
+
+that was planted to `gpt.c` to sit like a stuck fishbone in the throat, _in order for thou, user, to know your place!_
+
+Annoying? Of course! But only a little bit: it takes up next to no time to download `gdisk`
+which is _allowed_ to make GPT modifications:
+
+```sh
+bash-3.2 # curl -LO https://sourceforge.net/projects/gptfdisk/files/gdisk-1.0.10.pkg
+   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   408    0   408    0     0    955      0 --:--:-- --:--:-- --:--:--   955
+100   649    0   649    0     0    545      0 --:--:--  0:00:01 --:--:--   545
+100   387  100   387    0     0    199      0  0:00:01  0:00:01 --:--:--   675
+100  472k  100  472k    0     0   194k      0  0:00:02  0:00:02 --:--:-- 2954k
+
+bash-3.2 # pkgutil --expand-all gdisk-* gdisk
+```
+
+and `./gdisk/Payload/usr/local/bin/gdisk` is now your Jedi GPT force!
+
+Loks like the art of eunuchizing fails to deliver.
+
+______________________________________________________________________
+
+But what I can't underestimate Apple for, is how they disable the fuck out of User Input
+
+That _Failed to create activation request_ screen which can be done nothing about (most of times),
+even appeals to somewhat masochistic statisfaction.
+
+Somtimes. (if you made a backup)
 
 ### tmp1
 
-Finishing my rant with a really funny stuff: some _Monterey_ release frorbade creating a user named `tmp`. In a couple of incremental updates it has been reverted :)
+Finishing it with absolutely hilarious stuff:
+
+some _Monterey_ release once had _forbidden creating a user named `tmp`_ in Setup Assistant.
+
+In a couple of _incremental_ updates **THIS CHANGE WAS REVERTED**
 
 ![image](https://github.com/ink-splatters/lib.sh/assets/2706884/03a29a17-c840-4391-9e7f-d9a2798715bd)
+
+Please feel free to post issues with only wrong stories about what was taking place at Apple's Setup Assistant team, back then between those releases :)
