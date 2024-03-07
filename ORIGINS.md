@@ -1,4 +1,4 @@
-## Origins
+# Origins
 
 _`lib.sh`_ intially emerged as sanity - preserving kit, aimed to make the unforgiving, barely recoverable experience of Apple _RecoveryOS_ - less punishing.
 
@@ -92,7 +92,8 @@ even appeals to somewhat masochistic statisfaction.
 
 Somtimes. (if you made a backup)
 
-### tmp1
+
+# tmp1
 
 Finishing it with absolutely hilarious stuff:
 
@@ -102,4 +103,5 @@ In a couple of _incremental_ updates **THIS CHANGE WAS REVERTED**
 
 ![image](https://github.com/ink-splatters/lib.sh/assets/2706884/03a29a17-c840-4391-9e7f-d9a2798715bd)
 
-Please feel free to post issues with only wrong stories about what was taking place at Apple's Setup Assistant team, back then between those releases :)
+The reader is encouraged to open an issue, speculating about what was taking place at Apple between the mentioned releases!
+Only the wrong stories!
