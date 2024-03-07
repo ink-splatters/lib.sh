@@ -1,37 +1,44 @@
-## lib.sh
+# lib.sh
 
-Opinionated POSIX shell utils and aliases, for Apple operating systems.
+Opinionated Apple-specific utils and aliases for bash and zsh. Fishes swim by!
 
-### [Origins](ORIGINS.md)
+## Status
 
-### Documentation
+`lib.sh` will never be released. You are strictly encouraged to read the LICENSE. By
+using this software you are acknowledging and accepting the accompanying risks.
 
-There is no explicit documentation, but it should not be hard to make sense of it by reading the code.
+Consider the current `master` safe, with caution. Always know what you run!
 
-### Installing
+## [Origins](ORIGINS.md)
 
-#### macOS
+## Getting started
 
-##### User shell
+### macOS
 
-Just `source` lib.sh from `.zshrc`
+```sh
+#!/usr/bin/env bash
 
-As `flel` is alias for editing `lib.sh` code itself, there are those two I use
-along with it, to edit / reload `.zshrc`
+set -e
 
-```shell
-cd ~
-git clone https://github.com/ink-splatters/lib.sh
-cat <<'EOF' >> ~/.zshrc
+rc=~/$([[ "${SHELL##*.}" =~ .*bash$ ]] && echo .bashrc || echo .zshrc)
 
+git clone https://github.com/ink-splatters/lib.sh "$HOME"/lib.sh
+
+touch $rc
+
+cat <<EOF >> $rc
 source "$HOME"/lib.sh/lib.sh
 
-alias fle='vi ~/.zshrc`
-alias fs='source ~/.zshrc'
+alias fle='vi $rc'
+alias fs='source $rc'
+# alias flp='source ~/.profile'
+# alias flbp='source ~/.bash_profile'
 EOF
+
+source $rc
 ```
 
-##### Root shell
+#### Root shell
 
 ```shell
 cat <<'EOF' >> /var/root/.profile
@@ -42,30 +49,17 @@ alias fs='source ~/.profile'
 EOF
 ```
 
-#### RecoveryOS
+### RecoveryOS
 
-```
--bash-3.2# diskutil mount /Volumes/Data # or `diskutil apfs unlock Data` if applicabl
--bash-3.2# source /Volumes/Data/Users/<username>/lib.sh/lib.sh
-```
+As `RecoveryOS` was initially the first citizen:
 
-it will bootstrap itself the way it survives between interactive shell sessions (it however doesn't
+`source` it and lib.sh will bootstrap itself properly, the way it survives between interactive shell sessions (it however doesn't
 survive reboots).
+
 As well as, aliases: `fle`, `flel` and `fs` described above become available automatically, upon `source`-ing lib.sh
 
-#### Status
 
-Never will be explicitly released. Contains code potentially able to destroy things in a very bad way, if used wrong / due to  potential bugs.
-Users are encouraged to fork and test a _particular commit_, on systems they don't use for production workloads.
-
-Otherwise - can be perceived as alpha quality. Works for author's purpose.
-
-#### Contributions
-
-Currently it's a whole mess craving for refactoring or rewriting probably not in bash. It's not that contributions are completely discouraged,
-but please open an issue first.
-
-##### pre-commit
+## Misc
 
 `pre-commit` is used for formatting purposes, as well as for bumping `lib.sh` version. Contributors are expected to run it before submitting a PR.
 
@@ -74,3 +68,13 @@ Before running, it should be initialized by executing the following in the proje
 ```shell
 pre-commit install --install-hooks
 ```
+
+`lib.sh` uses a lot of external cli tools. In order to get the best experience, you will want to inspect the code and install all the tools used.
+
+## Contributions
+
+Currently it's a whole mess craving for refactoring or rewriting. It's not that contributions are not welcome, but rather please
+open an issue first.
+
+_PR with the list of tools used in the form of markdown, is welcome :)_
+
