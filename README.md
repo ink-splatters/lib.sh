@@ -11,7 +11,7 @@ Consider the current `master` safe, with caution. Always know what you run!
 
 ## [Origins](ORIGINS.md)
 
-## Getting started
+## Installing
 
 ### macOS
 
