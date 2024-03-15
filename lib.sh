@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240307_7073b2b
+LIBSH_VERSION=20240315_dcac4d2
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1741,6 +1741,7 @@ jqc() {
 }
 
 alias mk=make
+alias hc=hashcat
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
