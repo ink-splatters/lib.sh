@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240315_dcac4d2
+LIBSH_VERSION=20240320_957bcd0
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -884,7 +884,7 @@ _nu() {
 }
 
 alias nu-attrs=_nuattrs
-alias nu=_nu
+alias nupg=_nu
 
 alias ncu='nix-channel --update'
 
