@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240324_94ec83f
+LIBSH_VERSION=20240401_74311c6
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -301,7 +301,7 @@ alias winfo=wi
 _salias ng ngrep
 alias ng0='ng -d en0'
 
-mac() {
+if0() {
 
     local interface=en0
 
@@ -713,7 +713,7 @@ xsv() {
 # xsp q m # echo com.apple.{quarantine,macl}
 
 # as it shadows legitimate app:
-alias csv=/nix/var/nix/profiles/default/bin/xsv
+alias csv="$HOME"/.nix-profile/bin/xsv
 
 # fs lockers
 
@@ -818,7 +818,9 @@ alias nx=nix
 
 alias enxp='vi ~/.config/nix/nix.conf'
 alias nxb='nx build'
+alias nxbi='nxb --impure'
 alias nxba='nxb --accept-flake-config'
+alias nxbiia='nxbi --accept-flake-config'
 alias nxconf='nx show-config'
 alias nxc=nxconf
 alias nxd='nx develop'
@@ -840,6 +842,8 @@ alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxi='nxp install'
 alias nxia='nxi --accept-flake-config'
+alias nxii='nxi --impure'
+alias nxiia='nxii --accept-flake-config'
 alias nxl='nxp list'
 alias nxm=nxfm
 alias nxmeta=nxfmeta
@@ -1742,6 +1746,9 @@ jqc() {
 
 alias mk=make
 alias hc=hashcat
+
+# fastboot
+alias fb=fastboot
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
