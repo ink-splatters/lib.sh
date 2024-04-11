@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240401_74311c6
+LIBSH_VERSION=20240411_418b9b6
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -833,7 +833,6 @@ alias nxds='nxdrv show | jq'
 alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
-alias nxfi='nxf info'
 alias nxfl='nxf lock'
 alias nxfm=nxfmeta
 alias nxfmeta='nxf metadata'
