@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240411_418b9b6
+LIBSH_VERSION=20240418_ab921b0
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -856,7 +856,6 @@ alias nxreg='nx registry'
 alias nxrepkgs="nxre --expr 'import <nixpkgs>{}'"
 alias nxregl='nxreg list'
 alias nxregu='nxregl --refresh'
-alias nxs=nxfs
 alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
 
@@ -1267,7 +1266,6 @@ EOF
 }
 
 alias gllock='gl lock'
-alias gll=gllock
 alias glunlock='gl unlock'
 alias glul=glunlock
 
@@ -1293,12 +1291,17 @@ alias glp=gplfs
 # logs
 #   note: gl prefix is shared with git lfs aliases
 alias glog='g log'
-alias glo=glog
-alias gl1='glog -1'
-alias gl2='glog -2'
-alias gl3='glog -3'
-alias gl4='glog -4'
-alias gl8='glog -8'
+alias gll=glog
+alias g1='glog -1'
+alias g2='glog -2'
+alias g3='glog -3'
+alias g4='glog -4'
+alias g8='glog -8'
+
+# visualise git branches
+alias gl1='g lg1'
+alias gl2='g lg2'
+alias glg='g lg'
 
 # patches and diffs
 
@@ -1394,7 +1397,8 @@ alias grh='g reset --hard'
 alias grhh='grh HEAD'
 
 # gitui
-alias gi='gitui'
+alias gui='gitui'
+alias gi=gui
 
 # sleep fraction of second
 function fsleep() {
