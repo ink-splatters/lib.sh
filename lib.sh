@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240418_ab921b0
+LIBSH_VERSION=20240422_0cfaf5b
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -853,7 +853,7 @@ alias nxr='nxp remove'
 alias nxpr=nxr
 alias nxre='nx repl'
 alias nxreg='nx registry'
-alias nxrepkgs="nxre --expr 'import <nixpkgs>{}'"
+alias nxrepkgs="nxre --expr 'import <nixpkgs>{}' -I nixpkgs=flake:nixpkgs"
 alias nxregl='nxreg list'
 alias nxregu='nxregl --refresh'
 alias nxu='nxp upgrade'
@@ -1752,6 +1752,16 @@ alias hc=hashcat
 
 # fastboot
 alias fb=fastboot
+
+# uv
+alias uvenv='uv venv'
+alias _pip="python -m pip"
+alias pip="uv pip"
+
+alias pipi='pip install'
+alias pipu='pipi -U'
+alias pipe='pipi -e'
+alias piped='pipe .' #pipe + dot
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
