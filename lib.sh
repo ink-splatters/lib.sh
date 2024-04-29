@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240422_0cfaf5b
+LIBSH_VERSION=20240429_08b4948
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -824,6 +824,7 @@ alias nxbiia='nxbi --accept-flake-config'
 alias nxconf='nx show-config'
 alias nxc=nxconf
 alias nxd='nx develop'
+alias nxs='nx shell'
 alias nxda='nxd --accept-flake-config'
 alias nxdi='nxd --impure'
 alias nxdia='nxdi --accept-flake-config'
@@ -839,6 +840,7 @@ alias nxfmeta='nxf metadata'
 alias nxfs='nxf show'
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
+alias nxrun='nx run'
 alias nxi='nxp install'
 alias nxia='nxi --accept-flake-config'
 alias nxii='nxi --impure'
@@ -853,7 +855,36 @@ alias nxr='nxp remove'
 alias nxpr=nxr
 alias nxre='nx repl'
 alias nxreg='nx registry'
-alias nxrepkgs="nxre --expr 'import <nixpkgs>{}' -I nixpkgs=flake:nixpkgs"
+alias nxrega='nxreg add'
+alias nxrep='nxreg pin'
+alias nxrerm='nxreg remove'
+
+nxrepkgs() {
+
+    nix repl --file <(
+        cat <<'EOF'
+import <nixpkgs> {
+  overlays = [
+    (_:
+      (prev:
+        let
+          b = builtins;
+
+          inherit (prev.lib) lists;
+          l = lists;
+
+        in rec {
+          inherit b l;
+          n = b.attrNames;
+          v = b.attrValues;
+        }))
+  ];
+}
+EOF
+    )
+
+}
+
 alias nxregl='nxreg list'
 alias nxregu='nxregl --refresh'
 alias nxu='nxp upgrade'
@@ -1396,6 +1427,10 @@ alias grest='gres --staged'
 alias grh='g reset --hard'
 alias grhh='grh HEAD'
 
+# submodules
+alias gsa='g submodule add'
+alias gsu='g submodule update --init --recursive'
+
 # gitui
 alias gui='gitui'
 alias gi=gui
@@ -1762,6 +1797,13 @@ alias pipi='pip install'
 alias pipu='pipi -U'
 alias pipe='pipi -e'
 alias piped='pipe .' #pipe + dot
+
+# ollama
+alias llm=ollama
+alias llml='llm list'
+alias llmr='llm run'
+alias llms='llm serve'
+alias llmp='llm pull'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
