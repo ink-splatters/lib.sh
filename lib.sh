@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240429_08b4948
+LIBSH_VERSION=20240510_775f9dc
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -418,7 +418,19 @@ alias umr='um remove'
 alias umrm='um env remove -n'
 alias ums='um search'
 
-alias venv='python -m venv'
+# venv / uv
+alias _venv='python -m venv'
+alias venv='uv venv'
+alias _pip="python -m pip"
+alias pip="uv pip"
+
+# pip
+#
+alias pipi='pip install'
+alias pipu='pipi -U'
+alias pipe='pipi -e'
+alias piped='pipe .' #pipe + dot
+alias pipuall='uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U'
 
 function vc() {
     local name="${1:-.venv}"
@@ -591,6 +603,13 @@ _alias ea2 eaa
 _alias ea3 ea2 -F
 
 alias f='fd -uuu'
+alias ffo="f -d 1"
+alias ffd='f -t d'
+alias fff='f -t f'
+
+alias fdo='ffd -d 1'
+alias ffo="fff -d 1"
+
 alias ff=find
 
 # TODO: fix broken
@@ -816,19 +835,36 @@ alias nx=nix
 
 # new nix cli
 
-alias enxp='vi ~/.config/nix/nix.conf'
-alias nxb='nx build'
-alias nxbi='nxb --impure'
-alias nxba='nxb --accept-flake-config'
-alias nxbiia='nxbi --accept-flake-config'
+_nxv='--verbose --show-trace --print-build-logs'
+_nxi='--impure'
+_nxafc='--accept-flake-config'
+
+alias enxc='vi ~/.config/nix/nix.conf'
+
 alias nxconf='nx show-config'
 alias nxc=nxconf
-alias nxd='nx develop'
 alias nxs='nx shell'
-alias nxda='nxd --accept-flake-config'
-alias nxdi='nxd --impure'
-alias nxdia='nxdi --accept-flake-config'
-alias nxdia='nxdi --accept-flake-config'
+
+alias nxb='nx build'
+alias nxbi="nxb $_nxi"
+alias nxba="nxb $_nxafc"
+alias nxbia="nxbi $_nxafc"
+
+alias nxbv="nxb $_nxv"
+alias nxbvi="nxbv $_nxi"
+alias nxbva="nxbv $_nxafc"
+alias nxbvia="nxbvi $_nxafc"
+
+alias nxd='nx develop'
+alias nxda="nxd $_nxafc"
+alias nxdi="nxd $_nxi"
+alias nxdia="nxdi $_nxafc"
+
+alias nxdv="nxd $_nxv"
+alias nxdva="nxdv $_nxafc"
+alias nxdvi="nxdv $_nxi"
+alias nxdvia="nxdvi $_nxafc"
+
 alias nxdrv='nx derivation'
 alias nxds='nxdrv show | jq'
 alias nxfmt='nx fmt'
@@ -1787,16 +1823,6 @@ alias hc=hashcat
 
 # fastboot
 alias fb=fastboot
-
-# uv
-alias uvenv='uv venv'
-alias _pip="python -m pip"
-alias pip="uv pip"
-
-alias pipi='pip install'
-alias pipu='pipi -U'
-alias pipe='pipi -e'
-alias piped='pipe .' #pipe + dot
 
 # ollama
 alias llm=ollama
