@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240518_fa5855c
+LIBSH_VERSION=20240518_42d8d79
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -843,7 +843,8 @@ alias enxc='vi ~/.config/nix/nix.conf'
 
 alias nxconf='nx show-config'
 alias nxc=nxconf
-alias nxs='nx shell'
+alias nxsh='nx shell'
+alias nxs='nix-search'
 
 alias nxb='nx build'
 alias nxbi="nxb $_nxi"
