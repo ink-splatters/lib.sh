@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240510_775f9dc
+LIBSH_VERSION=20240518_fa5855c
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1821,8 +1821,9 @@ jqc() {
 alias mk=make
 alias hc=hashcat
 
-# fastboot
+# android
 alias fb=fastboot
+alias aemu=emulator
 
 # ollama
 alias llm=ollama
