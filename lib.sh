@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240518_42d8d79
+LIBSH_VERSION=20240525_c205b07
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -429,6 +429,7 @@ alias pip="uv pip"
 alias pipi='pip install'
 alias pipu='pipi -U'
 alias pipe='pipi -e'
+alias pipl='pip list'
 alias piped='pipe .' #pipe + dot
 alias pipuall='uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U'
 
@@ -601,6 +602,8 @@ _alias ea1 e1a
 
 _alias ea2 eaa
 _alias ea3 ea2 -F
+
+alias dustpr='dust -prR'
 
 alias f='fd -uuu'
 alias ffo="f -d 1"
@@ -890,11 +893,11 @@ alias nxpl=nxl
 alias nxpi=nxi
 alias nxr='nxp remove'
 alias nxpr=nxr
-alias nxre='nx repl'
-alias nxreg='nx registry'
-alias nxrega='nxreg add'
-alias nxrep='nxreg pin'
-alias nxrerm='nxreg remove'
+alias nxrepl='nx repl'
+alias nxre='nx registry'
+alias nxrea='nxre add'
+alias nxrep='nxre pin'
+alias nxrerm='nxre remove'
 
 nxrepkgs() {
 
@@ -922,8 +925,9 @@ EOF
 
 }
 
-alias nxregl='nxreg list'
-alias nxregu='nxregl --refresh'
+alias nxrel='nxre list'
+alias nxreu='nxrel --refresh'
+alias nxrelu=nxreu
 alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
 
@@ -1832,6 +1836,17 @@ alias llml='llm list'
 alias llmr='llm run'
 alias llms='llm serve'
 alias llmp='llm pull'
+
+# npm/npx
+
+alias npi='npm i'
+alias npu='npm update'
+alias ngi='npi -g'
+alias ngu='npu -g'
+
+alias npid='npm i -D'
+alias npr='npm run dev'
+alias ntsx='npx tsx'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
