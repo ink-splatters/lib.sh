@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240525_5b4f995
+LIBSH_VERSION=20240602_035121c
 cat <<EOF
                        lib.sh v$LIBSH_VERSION
 Initializing...
@@ -876,6 +876,7 @@ alias nxf='nx flake'
 alias nxfc='nxf check'
 alias nxfl='nxf lock'
 alias nxfm=nxfmeta
+alias nxfi=nxfm
 alias nxfmeta='nxf metadata'
 alias nxfs='nxf show'
 alias nxfu='nxf update'
@@ -1847,6 +1848,10 @@ alias ngu='npu -g'
 alias npid='npm i -D'
 alias npr='npm run dev'
 alias ntsx='npx tsx'
+
+# font smoothing
+alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -int 0'
+alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
