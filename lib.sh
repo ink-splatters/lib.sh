@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240608_4b3f90a
+LIBSH_VERSION=20240608_138f021
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1858,16 +1858,28 @@ alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 function rye() {
     local _rye="$(which rye)"
 
-    if [[ "$1" == "self" ]]; then
-        echo 'lib.sh: due to rye is being managed with nix, refusing self harm'
-        return 1
-    fi
-    "$_rye" $@
+    local cmd="$1"
+
+    case "$cmd" in
+        self)
+            echo 'lib.sh: due to rye is being managed with nix, refusing self harm'
+            return 1
+            ;;
+        list)
+            cmd="tools"
+            ;;
+        *)
+            shift
+            ;;
+    esac
+
+    "$_rye" "$cmd" $@
 }
 
 alias re=rye
 alias rei='re install'
 alias rer='re uninstall'
+alias rel='re list'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
