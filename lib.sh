@@ -1,6 +1,6 @@
-LIBSH_VERSION=20240602_035121c
+LIBSH_VERSION=20240608_4b3f90a
 cat <<EOF
-                       lib.sh v$LIBSH_VERSION
+		       lib.sh v$LIBSH_VERSION
 Initializing...
 
 EOF
@@ -430,6 +430,7 @@ alias pipi='pip install'
 alias pipu='pipi -U'
 alias pipe='pipi -e'
 alias pipl='pip list'
+alias pipr='pip uninstall'
 alias piped='pipe .' #pipe + dot
 alias pipuall='uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U'
 
@@ -908,17 +909,17 @@ import <nixpkgs> {
   overlays = [
     (_:
       (prev:
-        let
-          b = builtins;
+	let
+	  b = builtins;
 
-          inherit (prev.lib) lists;
-          l = lists;
+	  inherit (prev.lib) lists;
+	  l = lists;
 
-        in rec {
-          inherit b l;
-          n = b.attrNames;
-          v = b.attrValues;
-        }))
+	in rec {
+	  inherit b l;
+	  n = b.attrNames;
+	  v = b.attrValues;
+      }))
   ];
 }
 EOF
@@ -1852,6 +1853,21 @@ alias ntsx='npx tsx'
 # font smoothing
 alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -int 0'
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
+
+# rye
+function rye() {
+    local _rye="$(which rye)"
+
+    if [[ "$1" == "self" ]]; then
+        echo 'lib.sh: due to rye is being managed with nix, refusing self harm'
+        return 1
+    fi
+    "$_rye" $@
+}
+
+alias re=rye
+alias rei='re install'
+alias rer='re uninstall'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
