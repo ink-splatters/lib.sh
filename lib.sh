@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240608_138f021
+LIBSH_VERSION=20240609_9f6aa63
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
 Initializing...
@@ -398,6 +398,13 @@ alias pkgd=pkgf
 alias upkg=pkgf
 
 # python
+
+alias px=pixi
+alias hch=hatch
+alias ach=hch
+alias tch=hch
+alias pd=pdm
+
 alias mm=mamba
 alias um=micromamba
 alias uma='um activate'
@@ -433,6 +440,8 @@ alias pipl='pip list'
 alias pipr='pip uninstall'
 alias piped='pipe .' #pipe + dot
 alias pipuall='uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U'
+#alias pi=pip
+#alias px=pipx
 
 function vc() {
     local name="${1:-.venv}"
@@ -447,6 +456,13 @@ function va() {
 }
 
 alias vd='deactivate'
+
+alias pxg='px global'
+alias pxi='pxg install'
+alias pxr='pxg remove'
+alias pxu='pxg upgrade'
+alias pxua='px upgrade-all'
+alias pxl='pxg list'
 
 # editing / viewing
 
@@ -1630,15 +1646,6 @@ alias sub='subl . &'
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
 
-# python
-
-alias pi=pip
-alias px=pipx
-alias hch=hatch
-alias ach=hch
-alias tch=hch
-alias pd=pdm
-
 # littlesnitch
 
 _salias lts littlesnitch
@@ -1855,9 +1862,8 @@ alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -in
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 
 # rye
+alias _rye="$(which rye)"
 function rye() {
-    local _rye="$(which rye)"
-
     local cmd="$1"
 
     case "$cmd" in
@@ -1875,11 +1881,10 @@ function rye() {
 
     "$_rye" "$cmd" $@
 }
-
 alias re=rye
 alias rei='re install'
 alias rer='re uninstall'
-alias rel='re list'
+alias rel='re tools list'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
