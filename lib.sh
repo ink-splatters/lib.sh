@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240609_9f6aa63
+LIBSH_VERSION=20240611_60b69ed
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
 Initializing...
@@ -1711,7 +1711,7 @@ wttr() {
 # FLAC to ALAC
 #
 function flac2alac() {
-    _noart=0
+    local _noart=0
     case $1 in
         --no-art | -noart | --no-cover | -nocover)
             _noart=1
@@ -1748,14 +1748,14 @@ EOF
             continue
         fi
 
-        _cnames=("$1" cover.jpg cover.jpeg cover.png)
+        local _cnames=("$1" cover.jpg cover.jpeg cover.png)
 
         for f in ./**/*.m4a; do
 
-            _dn="$(dirname "$f")"
+            local _dn="$(dirname "$f")"
             for c in "${_cnames[@]}"; do
                 if [ -f "$_dn/$c" ]; then
-                    _cover="$_dn/$c"
+                    local _cover="$_dn/$c"
                     break
                 fi
             done
@@ -1774,7 +1774,6 @@ EOF
 alias f2a=flac2alac
 
 # cue split
-
 flac2many() {
 
     if [ $# -lt 2 ]; then
@@ -1802,8 +1801,34 @@ EOF
 }
 alias f2m=flac2many
 
+function ape2flac() {
+    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        cat <<'EOF'
+ape2flac
+
+recursively converts APE to FLAC
+EOF
+        return 1
+    fi
+
+    _exists ffmpeg || return 1
+
+    for f in ./**/*.ape; do
+        echo converting "$f" to "${f%.*}.m4a"...
+        ffmpeg -nostdin -i "$f" -c:a flac -c:v copy "${f%.*}".flac
+    done
+
+}
+
+alias a2f=ape2flac
+
+# tldr
 alias tl='tldr --platform macos'
+
+# lorem ipsum
 alias tt='tt -theme nord'
+
+# img viewer
 alias img=chafa
 
 ramdisk() {
@@ -1861,30 +1886,142 @@ alias ntsx='npx tsx'
 alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -int 0'
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 
-# rye
-alias _rye="$(which rye)"
-function rye() {
-    local cmd="$1"
-
-    case "$cmd" in
-        self)
-            echo 'lib.sh: due to rye is being managed with nix, refusing self harm'
-            return 1
-            ;;
-        list)
-            cmd="tools"
-            ;;
-        *)
-            shift
-            ;;
-    esac
-
-    "$_rye" "$cmd" $@
-}
 alias re=rye
 alias rei='re install'
 alias rer='re uninstall'
 alias rel='re tools list'
+
+function howmuch() {
+    local seconds=$1
+    local days=$((seconds / 86400))
+    local hours=$(((seconds % 86400) / 3600))
+    local minutes=$(((seconds % 3600) / 60))
+    local secs=$((seconds % 60))
+
+    output=""
+
+    if [ $days -gt 0 ]; then
+        output+="$days day"
+        [ $days -gt 1 ] && output+="s"
+        output+=", "
+    fi
+    if [ $hours -gt 0 ]; then
+        output+="$hours hour"
+        [ $hours -gt 1 ] && output+="s"
+        output+=", "
+    fi
+    if [ $minutes -gt 0 ]; then
+        output+="$minutes minute"
+        [ $minutes -gt 1 ] && output+="s"
+        output+=", "
+    fi
+    if [ $secs -gt 0 ]; then
+        output+="$secs second"
+        [ $secs -gt 1 ] && output+="s"
+    fi
+
+    # Remove trailing comma and space if they exist
+    echo $(echo $output | sed 's/, $//')
+}
+
+# downloads
+function dl() {
+    if [ $# -lt 2 ]; then
+        cat <<'EOF'
+download files to the current directory using `dlm`
+
+usage:
+
+dl <maxConcurrentDownloads> <urls>...
+EOF
+        return 1
+    fi
+
+    local tmp="$(mktemp)"
+    local max="$1"
+    shift
+
+    for url in "$@"; do
+        echo "'$url'" >>"$tmp"
+    done
+
+    dlm --inputFile "$tmp" \
+        --maxConcurrentDownloads "$max" \
+        --outputDir .
+}
+
+function y() {
+    if [ "$1" = "" ]; then
+        cat <<'EOF'
+yt-dlp -F
+exports previewed URL as YT_DLP_URL
+
+Usage:
+    y <URL>
+EOF
+        return 1
+    fi
+
+    export YT_DLP_URL="$1"
+    export YT_DLP_TS="$(date "+%s")"
+
+    yt-dlp -F "$1"
+    echo 'lib.sh: the url has been exported as YT_DLP_URL': "$YT_DLP_URL"
+    echo
+}
+
+function yea() {
+    local url="${YT_DLP_URL:-$1}"
+
+    if [[ $# = 1 && "$url" = "" || $# -gt 2 ]]; then
+        cat <<'EOF'
+yt-dlp based downloader
+Usage:
+
+yea <yt-dlp config> [URL]
+EOF
+        return 1
+    fi
+
+    if [ $# = 2 ]; then
+        shift
+    elif [ "$YT_DLP_TS" != "" ]; then
+        local ts="$(date "+%s")"
+
+        local duration="$(($ts - $YT_DLP_TS))"
+
+        if [ ! $duration -le 60 ]; then
+            cat <<EOF
+
+I found non-empty YT_DLP_URL: $url
+As it was prefetched $(howmuch duration) ago, I want to ask you if
+it's still relevand and you would like to download the media? [Yes/No]
+
+EOF
+            select yn in "Yes" "No"; do
+                case $yn in
+                    Yes)
+                        break
+                        ;;
+                    No)
+                        return 1
+                        ;;
+                esac
+            done
+        fi
+    fi
+
+    yt-dlp $url $1
+}
+
+function dlogin() {
+    local pat=${*:-$(cat)}
+
+    local url="${2:-ghcr.io}"
+    local user="${3:-ink-splatters}"
+
+    echo $pat | docker login "$url" -u $user --password-stdin
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
