@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240616_ec2bc9e
+LIBSH_VERSION=
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
 Initializing...
@@ -8,8 +8,6 @@ EOF
 # TODO:
 # - shellcheck
 # - shellharden
-
-shopt -s globstar
 
 # helpers
 
@@ -494,9 +492,6 @@ _longhelp() {
 
 }
 
-alias ?=_help
-alias ??=_longhelp
-
 alias e=echo
 
 eseq() {
@@ -974,26 +969,8 @@ alias i=_i
 alias ncg='nix-collect-garbage'
 alias ncgd='ncg -d'
 alias nso='nix store optimise'
-alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
 
-# creates upggradeable list of packages as --attr parameters to nix-env --upgrade
-_nuattrs() {
-
-    nix-shell -p ripgrep --run sh < <(
-        cat <<'EOF'
-nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-(wrapped|unstable)//g'
-EOF
-    )
-    return 0
-}
-
-_nu() {
-    _nuattrs $@ | xargs nix-env --upgrade
-
-}
-
-alias nu-attrs=_nuattrs
-alias nupg=_nu
+alias nu='nix-env --upgrade'
 
 alias ncu='nix-channel --update'
 
