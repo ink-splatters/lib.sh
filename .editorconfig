@@ -9,6 +9,9 @@
 # This file is at the root of the git repo.
 root = true
 
+[*.nix]
+indent_size = 2
+
 [*]
 indent_style = space
 indent_size = 4
