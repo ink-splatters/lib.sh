@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240616_c4948be
+LIBSH_VERSION=20240616_ec2bc9e
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
 Initializing...
@@ -622,15 +622,32 @@ _alias ea3 ea2 -F
 
 alias dustpr='dust -prR'
 
-alias f='fd -uuu'
-alias ffo="f -d 1"
-alias ffd='f -t d'
-alias fff='f -t f'
+# search
 
-alias fdo='ffd -d 1'
-alias ffo="fff -d 1"
+alias f='fd -uuu'
+alias f1="f -d 1"
+alias f2="f -d 2"
+alise f2e="f --exact-depth 2"
 
 alias ff=find
+
+function files() {
+    local pattern=()
+
+    for ext in "$@"; do
+        pattern+=(-e "$ext")
+    done
+
+    fd "${pattern[@]}"
+}
+
+alias imgs="files jpeg jfif jpg jxl png tiff webp heic heif"
+alias allimgs="imgs bmp icns ico tga"
+alias xs="f -t x"
+alias dmgs="files dmg"
+alias zips="files zip"
+alias zstds="files zst tz"
+alias archives="files z dmg zip zst tz xz bz2 tar tgz tbz2 tz gzip"
 
 # TODO: fix broken
 # find helpers:
