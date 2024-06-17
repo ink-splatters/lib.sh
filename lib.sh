@@ -1,4 +1,4 @@
-LIBSH_VERSION=
+LIBSH_VERSION=20240617_a1f767f
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
 Initializing...
@@ -437,7 +437,7 @@ alias pipe='pipi -e'
 alias pipl='pip list'
 alias pipr='pip uninstall'
 alias piped='pipe .' #pipe + dot
-alias pipuall='uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U'
+alias pipuall="uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U"
 #alias pi=pip
 #alias px=pipx
 
@@ -622,7 +622,7 @@ alias dustpr='dust -prR'
 alias f='fd -uuu'
 alias f1="f -d 1"
 alias f2="f -d 2"
-alise f2e="f --exact-depth 2"
+alias f2e="f --exact-depth 2"
 
 alias ff=find
 
@@ -969,7 +969,6 @@ alias i=_i
 alias ncg='nix-collect-garbage'
 alias ncgd='ncg -d'
 alias nso='nix store optimise'
-
 alias nu='nix-env --upgrade'
 
 alias ncu='nix-channel --update'
