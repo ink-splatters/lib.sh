@@ -427,7 +427,7 @@ alias ums='um search'
 
 # venv / uv
 alias _venv='python -m venv'
-alias venv='uv venv'
+alias venv='uv venv -p $(which python)'
 alias _pip="python -m pip"
 alias pip="uv pip"
 
