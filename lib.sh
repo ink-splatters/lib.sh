@@ -1000,6 +1000,9 @@ alias ncu='nix-channel --update'
 alias u='nix-env -e'
 alias q='nix-env -q'
 
+# direnv / nix-direnv
+alias renv=nix-direnv-reload
+
 # filesystem
 
 #  time machine snapshots
