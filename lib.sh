@@ -1906,10 +1906,25 @@ alias ntsx='npx tsx'
 alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -int 0'
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 
+# rye
+
 alias re=rye
-alias rei='re install'
-alias rer='re uninstall'
-alias rel='re tools list'
+alias rea='re add'
+alias rerm='re remove'
+alias rel='re list'
+alias res='re sync'
+alias rer='re run'
+
+alias reli='rer lint'
+alias rell=reli
+alias reff='rer fix'
+alias resh='re show'
+alias relock='re lock'
+
+#alias ret='re tools'
+#alias rei='ret install'
+#alias rer='ret uninstall'
+#alias rel='ret list'
 
 function howmuch() {
     local seconds=$1
@@ -2041,6 +2056,22 @@ function dlogin() {
     local user="${3:-ink-splatters}"
 
     echo $pat | docker login "$url" -u $user --password-stdin
+}
+
+function qlean() { # quick cleanup
+    sudo rm -rf /{,/var}/tmp/.* /{,/var}/tmp/*
+    s rm -f /var/vm/sleepimage
+    s rm -rf /var/logs
+    fd -t f . /var/log -x sudo rm -f
+    sudo rm -rf /var/networkd/*
+    sudo rm -rf /var/db/{diagnostics,analytics,systemstats}/*
+    sudo rm -rf /var/db/{NANDTelemetryServices,awdd,fsevents,spindump,uuidtext}
+
+    cld ~/Library/Logs
+    sudo rm -rf /Library/{Logs,Caches}/*
+
+    rm -rf ~/Library/{Developer,Metadata}
+    sudo rm -rf /Library/Bluetooth
 }
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
