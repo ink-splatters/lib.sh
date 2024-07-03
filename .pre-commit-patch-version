@@ -4,6 +4,6 @@ old_version=$(grep ^LIBSH_VERSION lib.sh | sed -E 's/LIBSH_VERSION=//g')
 version="$(date -u +'%Y%m%d')_$(git log -1 --oneline | grep -Eo '^[0-9a-f]+')"
 
 if [[ $version != $old_version ]]; then
-    sed -i '' -E "s/^(LIBSH_VERSION=).+$/\1${version}/g" lib.sh
+    sed -i '' -E "s/^(LIBSH_VERSION=).*$/\1${version}/g" lib.sh
     echo LIBSH_VERSION updated to: $version
 fi
