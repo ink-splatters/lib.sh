@@ -2074,6 +2074,23 @@ function qlean() { # quick cleanup
     sudo rm -rf /Library/Bluetooth
 }
 
+function cconv() {
+    if [ ! $# ]; then
+        cat <<EOF
+1. detects input encoding using chardet
+2. converts input data using iconv
+
+Usage: $(basename $0) <input file name>
+EOF
+        return 1
+    fi
+
+    _exists chardetect || return 1
+    _exists iconv || return 1
+
+    iconv -f $(chardetect "$1" --minimal) -t utf-8 "$1"
+}
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
