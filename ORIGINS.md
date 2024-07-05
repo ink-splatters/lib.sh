@@ -92,7 +92,6 @@ even appeals to somewhat masochistic statisfaction.
 
 Somtimes. (if you made a backup)
 
-
 # tmp1
 
 Finishing it with absolutely hilarious stuff:

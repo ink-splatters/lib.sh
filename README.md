@@ -58,7 +58,6 @@ survive reboots).
 
 As well as, aliases: `fle`, `flel` and `fs` described above become available automatically, upon `source`-ing lib.sh
 
-
 ## Misc
 
 `pre-commit` is used for formatting purposes, as well as for bumping `lib.sh` version. Contributors are expected to run it before submitting a PR.
@@ -77,4 +76,3 @@ Currently it's a whole mess craving for refactoring or rewriting. It's not that 
 open an issue first.
 
 _PR with the list of tools used in the form of markdown, is welcome :)_
-
