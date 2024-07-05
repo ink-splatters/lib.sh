@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240705_aaada8a
+LIBSH_VERSION=20240705_38a58b5
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2091,6 +2091,17 @@ EOF
 
     iconv -f $(chardetect "$1" --minimal) -t utf-8 "$1"
 }
+
+# fzf
+
+alias ezf='fzf -e'
+alias izf='fzf -i'
+alias iezf='fzf -e -i'
+
+alias azf='fzf --bind ctrl-a:select-all,ctrl-d:deselect-all,ctrl-t:toggle-all'
+alias mez='azf -e -m'
+alias miz='azf -i -m'
+alias miez='azf -e -i -m'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
