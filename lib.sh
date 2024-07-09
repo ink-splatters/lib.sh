@@ -10,7 +10,7 @@ EOF
 # - shellcheck
 # - shellharden
 
-shopt -s globstar
+# shopt -s globstar
 
 # helpers
 
@@ -484,7 +484,9 @@ alias bhelp=bathelp
 alias logstream='log stream --color=always'
 alias lstream=logstream
 
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+if command -v bat >/dev/null 2>&1 ; then
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+fi
 
 _help() {
     "$@" -h | bhelp
@@ -565,23 +567,10 @@ alias lcks='lc kickstart -k'
 
 _pb=/usr/libexec/PlistBuddy
 alias pb=$_pb
-# ergonomics shortcut
-function pl() {
-
-    if ! command $_pb "$@" && [ $# -gt 0 ]; then
-        cat <<'EOF'
-
-lib.sh: pl is a new shortcut for PlistBuddy.
-plutil should be called by its name
-EOF
-    fi
-
-    $_pb $@
-
-}
 alias pp='pb -c print'
-
-alias plc='/usr/bin/plutil -convert'
+alias pl=plutil
+alias plc='pl -convert'
+alias ple='pl -extract'
 alias xml1='plc xml1'
 alias bin1='plc binary1'
 
@@ -1922,10 +1911,10 @@ alias reff='rer fix'
 alias resh='re show'
 alias relock='re lock'
 
-#alias ret='re tools'
-#alias rei='ret install'
-#alias rer='ret uninstall'
-#alias rel='ret list'
+alias ret='re tools'
+alias rei='ret install'
+alias rer='ret uninstall'
+alias rel='ret list'
 
 function howmuch() {
     local seconds=$1
@@ -2176,6 +2165,14 @@ _init() {
         # there is no sudo in RecoveryOS
         _sudo='$@'
 
+	# patching man
+	#_man=/tmp/man
+
+	#cat $(which man) | sed -E '/^.+setup_cattool[^(].*/d' | \
+	#   sed 's/\$cattool/\$CATTOOL/g' | \
+	#   sed -E '/^(CAT|FIND|GREP|MANDOC|SED|XCSELECT|LESS|CMD|MORE|CMD|LOCALE|STTY)=/d' > $_man
+	#chmod +x /tmp/man
+
         # rsync path on Sonoma
         _rsync="$system/usr/libexec/rsync/rsync.samba"
         cat <<EOF >$bspath
@@ -2187,14 +2184,23 @@ alias flel="vi '$self'"
 alias fs="source /etc/profile"
 alias fle="vi /etc/profile"
 
-export PATH="$PATH"
+export PATH="/tmp:$PATH"
 echo -- PATH: "$PATH"
 
 sudo() {
 	$_sudo
 }
 
-export VIMRUNTIME="$HOME"/vim/vim90
+# poor man's man
+man() {
+    local mantype=1
+    if [[ "\$1" =~ [1-8] ]]; then
+	local mantype="\$1"
+	shift
+    fi
+
+    find '$system'/usr/share | grep "\$1.\$mantype" | xargs mandoc | less
+}
 
 # on Sonoma we must create rsync alias
 # pointing to unusual location
