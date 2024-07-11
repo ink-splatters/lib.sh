@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240705_38a58b5
+LIBSH_VERSION=20240711_b7641e3
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1303,9 +1303,19 @@ alias gtl=gt
 alias gc='g commit'
 alias gca='gc -a'
 alias gcam='gca -m'
-alias gcae='gc --allow-empty'
-alias gcamend='gc --amend'
-alias gam=gcamend
+# find dangling entities
+alias glostfound='g fsck --lost-found'
+_glfhash() {
+    local what="$1"
+
+    glostfound | rg "$what" | rg -o '[\da-f]{40}'
+}
+
+alias glfcommits='_glfhash commit'
+alias glfblobs='_glfhash blob'
+
+# print commits provided as list of hashes via stdin
+alias gdump='x | git -P show'
 
 # pull / fetch / merge / rebase
 alias gf='g fetch -vp'
