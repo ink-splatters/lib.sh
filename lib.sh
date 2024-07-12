@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240711_b7641e3
+LIBSH_VERSION=20240712_61d6457
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1602,7 +1602,8 @@ alias ctpal='inkcat macchiato,mocha,frappe,latte'
 alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
 
 # zstd
-alias zs=zstd
+alias zz='zstd -z'
+alias zd='zstd -z'
 
 zst() {
     if [[ $# -lt 2 ]]; then
