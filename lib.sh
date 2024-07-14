@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240712_61d6457
+LIBSH_VERSION=20240714_cbcde32
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -191,7 +191,7 @@ EOF
 
 }
 
-# system // resources
+# system process management
 
 alias pg='pgrep -i'
 
@@ -199,6 +199,16 @@ _salias k kill
 _salias kall killall
 
 alias k9='k -9'
+alias kstop='k -SIGSTOP'
+alias kcont='k -SIGCONT'
+
+runpaused() {
+    "$@" &
+    PID=$!
+    kill -STOP $PID
+    echo $PID
+    wait $PID
+}
 
 pk() { pg "$1" | x kill -9; }
 
@@ -1603,7 +1613,7 @@ alias ctpl='cat ~/.local/share/catppuccin-cli/repos.json  | jq'
 
 # zstd
 alias zz='zstd -z'
-alias zd='zstd -z'
+alias zd='zstd -d'
 
 zst() {
     if [[ $# -lt 2 ]]; then
@@ -1806,6 +1816,9 @@ EOF
 alias f2a=flac2alac
 
 # cue split
+
+# to decode non-UTF-8 cuesheets -> `cconv`
+# to find missing album art: https://bendodson.com/projects/itunes-artwork-finder/
 flac2many() {
 
     if [ $# -lt 2 ]; then
