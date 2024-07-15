@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240714_cbcde32
+LIBSH_VERSION=20240715_2f0db0f
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -201,14 +201,6 @@ _salias kall killall
 alias k9='k -9'
 alias kstop='k -SIGSTOP'
 alias kcont='k -SIGCONT'
-
-runpaused() {
-    "$@" &
-    PID=$!
-    kill -STOP $PID
-    echo $PID
-    wait $PID
-}
 
 pk() { pg "$1" | x kill -9; }
 
@@ -1856,11 +1848,13 @@ EOF
         return 1
     fi
 
+    local ext="flac"
+
     _exists ffmpeg || return 1
 
     for f in ./**/*.ape; do
-        echo converting "$f" to "${f%.*}.m4a"...
-        ffmpeg -nostdin -i "$f" -c:a flac -c:v copy "${f%.*}".flac
+        echo converting "$f" to "${f%.*}.${ext}"...
+        ffmpeg -nostdin -i "$f" -c:a flac -c:v copy "${f%.*}.${ext}"
     done
 
 }
@@ -1935,21 +1929,33 @@ alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 
 alias re=rye
 alias rea='re add'
-alias rerm='re remove'
-alias rel='re list'
-alias res='re sync'
-alias rer='re run'
+alias rer='re remove'
 
-alias reli='rer lint'
-alias rell=reli
-alias reff='rer fix'
+function rel() {
+    if [[ -f "$PWD/pyproject.toml" &&
+        "$(cat pyproject.toml)" =~ \[tool.rye\] ]]; then
+        re list
+    else
+        re tools list
+    fi
+
+}
+alias resync='re sync'
+alias res=resync
+alias rerun='re run'
+alias rer=rerun
+
+alias relint='rrun lint'
+alias reli=rlint
+alias refix='rrun fix'
+alias refi=rfix
+alias reshow='re show'
 alias resh='re show'
 alias relock='re lock'
 
-#alias ret='re tools'
-#alias rei='ret install'
-#alias rer='ret uninstall'
-#alias rel='ret list'
+alias ret='re tools'
+alias rei='ret install'
+alias reu='ret uninstall'
 
 function howmuch() {
     local seconds=$1
