@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240715_2f0db0f
+LIBSH_VERSION=20240718_26eea6a
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -35,6 +35,26 @@ _exists() {
             return 1
         fi
     done
+}
+
+# loops over arguments after --
+# prepends arguments before -- every call
+_foreach() {
+
+    local cmd_rdy=0
+    local cmd=()
+
+    for x in "$@"; do
+        if [ "$x" == "--" ]; then
+            cmd_rdy=1
+            continue
+        elif [ "$cmd_rdy" = 0 ]; then
+            cmd+=("$x")
+        else
+            ${cmd[*]} "$x"
+        fi
+    done
+
 }
 
 # sudo / system
@@ -554,15 +574,28 @@ alias kd2=kdt
 #    terminal-notifier -title "Kitty" -message "Done with task! Exit status: $?" -activate net.kovidgoyal.kitty
 # }
 
-# launchctl
+# launchctl & processes
+
+function users() {
+
+    local ulist=($(ps -ef | rg -o '^[\t ]+([\d]+)' | sort -u))
+    if [ "$1" = "-u" ]; then
+        echo "${ulist[*]}" | x -n1
+    else
+        local pat="pat=$(ps -ef | rg -o '^[\t ]+([\d]+)' | sort -u | x | rg '([^ ]+) ' --replace ' $1$|')"
+        dscl . -list /Users UniqueID | rg "$pat"
+    fi
+}
 
 alias lc='launchctl'
 alias lcbo='lc bootout'
 alias lcd='lc disable'
+alias lce='lc enable'
 alias lcbs='lc bootstrap'
 alias lck='lc kill'
 alias lcks='lc kickstart -k'
-
+alias lcds='lc dumpstate'
+lcbu() { lcbo user/"$1"; }
 # plists
 
 _pb=/usr/libexec/PlistBuddy
@@ -1682,7 +1715,11 @@ alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.exte
 
 # littlesnitch
 
-_salias lts littlesnitch
+_lts=littlesnitch
+
+_salias lts $_lts
+_salias ltse $_lts export-model $_lts.json
+_salias ltsr $_lts restore-model $_lts.json
 
 #alias diff='diff --colors=always'
 
@@ -1926,12 +1963,12 @@ alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -in
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 
 # rye
-
 alias re=rye
+
 alias rea='re add'
 alias rer='re remove'
 
-function rel() {
+rel() {
     if [[ -f "$PWD/pyproject.toml" &&
         "$(cat pyproject.toml)" =~ \[tool.rye\] ]]; then
         re list
@@ -1943,7 +1980,6 @@ function rel() {
 alias resync='re sync'
 alias res=resync
 alias rerun='re run'
-alias rer=rerun
 
 alias relint='rrun lint'
 alias reli=rlint
@@ -1954,8 +1990,11 @@ alias resh='re show'
 alias relock='re lock'
 
 alias ret='re tools'
-alias rei='ret install'
-alias reu='ret uninstall'
+
+function rei() { _foreach rye tools install -- "$@"; }
+function reu() { _foreach rye tools uninstall -- "$@"; }
+
+alias retl='ret list'
 
 function howmuch() {
     local seconds=$1
@@ -2132,6 +2171,14 @@ alias azf='fzf --bind ctrl-a:select-all,ctrl-d:deselect-all,ctrl-t:toggle-all'
 alias mez='azf -e -m'
 alias miz='azf -i -m'
 alias miez='azf -e -i -m'
+
+# time
+alias diso='date  "+%Y-%m-%d"'
+alias dtiso='date  "+%Y-%m-%dT%H:%M:%S"'
+alias dt='date  "+%Y-%m-%d %H:%M:%S"'
+
+# ripgrep
+alias rgnc='rg --color=never'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
