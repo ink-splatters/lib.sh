@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240718_26eea6a
+LIBSH_VERSION=20240719_b97b31d
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -879,12 +879,6 @@ alias mdx='mdutil -X'
 alias mdoff='mdutil -i off -d'
 alias mdoffa='md-off -a'
 alias mdon='mdutil -i on -E'
-
-mdcat() {
-    glow "$@"
-
-    echo "this is not actual mdcat"
-}
 
 if [ -n "${commands[fzf - share]}" ]; then
     source "$(fzf-share)/key-bindings.bash"
