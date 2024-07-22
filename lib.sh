@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240719_b97b31d
+LIBSH_VERSION=20240722_2b4cda1
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1943,6 +1943,7 @@ alias llmp='llm pull'
 
 # npm/npx
 
+alias npm='npm --no-fund'
 alias npi='npm i'
 alias npu='npm update'
 alias ngi='npi -g'
@@ -1975,15 +1976,17 @@ alias resync='re sync'
 alias res=resync
 alias rerun='re run'
 
-alias relint='rrun lint'
+alias relint='rerun lint'
 alias reli=rlint
-alias refix='rrun fix'
+alias refix='rerun fix'
 alias refi=rfix
 alias reshow='re show'
 alias resh='re show'
 alias relock='re lock'
 
 alias ret='re tools'
+
+alias retest='rerun test'
 
 function rei() { _foreach rye tools install -- "$@"; }
 function reu() { _foreach rye tools uninstall -- "$@"; }
