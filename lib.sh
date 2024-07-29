@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240722_2b4cda1
+LIBSH_VERSION=20240729_4039e56
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1549,6 +1549,15 @@ alias grhh='grh HEAD'
 # submodules
 alias gsa='g submodule add'
 alias gsu='g submodule update --init --recursive'
+
+# revlist
+alias grevlist='g rev-list'
+alias gallrevs='grevlist --all'
+alias grevs=gallrevs
+
+ggrep() {
+    g grep "$1" $(grevs)
+}
 
 # gitui
 alias gui='gitui'
