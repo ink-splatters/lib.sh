@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240729_4039e56
+LIBSH_VERSION=20240804_e9b25ae
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1818,8 +1818,8 @@ EOF
 
     _exists atomicparsley && {
         if [ $_noart = 1 ]; then
-            echo user chose not to overwrite the artwork
-            continue
+            echo "not embedding artwork ($_noart)"
+            return
         fi
 
         local _cnames=("$1" cover.jpg cover.jpeg cover.png)
@@ -1857,7 +1857,9 @@ flac2many() {
         cat <<'EOF'
 splits FLAC to many using cuesheet
 
-Usage: flac2many <cue sheet> <flac to split>
+Usage: flac2many <cue sheet> <flac to split> [--no-meta]
+
+--no-meta: don't embed cue metadata
 
 EOF
         return 1
@@ -1866,40 +1868,68 @@ EOF
     local cue="$1"
     local flac="$2"
 
+    if [[ "$3" =~ (--no-|-no)meta ]]; then
+        local nometa=1
+    else
+        echo ERROR: unknown flag: "$3"
+        return 1
+    fi
+
+    local tools=(flac shnsplit)
+
+    if [ "$nometa" != 1 ]; then
+        tools+=(cuetag fd)
+    fi
+
     # cuetag is part of 'cuetools'
-    _exists flac shntool cuetag fd || return 1
+    _exists ${tools[*]} || return 1
 
     shnsplit -t "%n. %t" -f "$cue" -o "flac flac -s -8 -o %f -" "$flac"
 
-    echo writing metadata...
-    fd -d 1 '^[\d]+\.' -0 | x -0 cuetag "$cue"
-    echo 'Done'
+    if [ "$nometa" != 1 ]; then
+
+        echo writing metadata...
+        fd -d 1 '^[\d]+\.' -0 | x -0 cuetag "$cue"
+        echo 'Done'
+    else
+        echo not writing metadata: --no-meta specified
+    fi
     echo
 }
 alias f2m=flac2many
 
-function ape2flac() {
+function any2any() {
     if [[ "$1" == "-h" || "$1" == "--help" ]]; then
         cat <<'EOF'
-ape2flac
+any2any <src files extensions> [ dst codec ] [ dst files extension ]
 
-recursively converts APE to FLAC
+recursively converts source to destination.
+if destination is not specified, flac is used.
+
+e.g.:
+
+any2any ape alac m4a
+any2any m4a
+any2any flac alac m4a
+
 EOF
         return 1
     fi
 
-    local ext="flac"
+    local src="$1"
+    local dst_codec="${2:-flac}"
+    local dst_ext="${3:-$dst_codec}"
 
     _exists ffmpeg || return 1
 
-    for f in ./**/*.ape; do
-        echo converting "$f" to "${f%.*}.${ext}"...
-        ffmpeg -nostdin -i "$f" -c:a flac -c:v copy "${f%.*}.${ext}"
+    for f in ./**/*."$src"; do
+        echo converting "$f" to "${f%.*}.${dst_ext} (codec: ${dst_codec})"...
+        ffmpeg -nostdin -i "$f" -c:a "$dst_codec" -c:v copy "${f%.*}.${dst_ext}"
     done
 
 }
 
-alias a2f=ape2flac
+alias a2a=any2any
 
 # tldr
 alias tl='tldr --platform macos'
@@ -1909,6 +1939,8 @@ alias tt='tt -theme nord'
 
 # img viewer
 alias img=chafa
+alias cf=chafa
+alias pic=chafa
 
 ramdisk() {
     if [ $# != 1 ]; then
