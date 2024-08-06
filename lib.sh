@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240804_e9b25ae
+LIBSH_VERSION=20240806_51efdfd
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2115,6 +2115,7 @@ EOF
 
 function yea() {
     local url="${YT_DLP_URL:-$1}"
+    shift
 
     if [[ $# = 1 && "$url" = "" || $# -gt 2 ]]; then
         cat <<'EOF'
@@ -2134,27 +2135,28 @@ EOF
         local duration="$(($ts - $YT_DLP_TS))"
 
         if [ ! $duration -le 60 ]; then
-            cat <<EOF
 
-I found non-empty YT_DLP_URL: $url
-As it was prefetched $(howmuch duration) ago, I want to ask you if
-it's still relevand and you would like to download the media? [Yes/No]
+            while true; do
+                read -p "$(
+                    cat <<EOF
 
+I found non-empty YT_DLP_URL, prefetched $(howmuch duration) ago:
+
+$url
+
+Do you still want to use it for your download? [Yy]|[Nn]
 EOF
-            select yn in "Yes" "No"; do
+                )" yn
                 case $yn in
-                    Yes)
-                        break
-                        ;;
-                    No)
-                        return 1
-                        ;;
+                    [Yy]*) break ;;
+                    [Nn]*) return ;;
+                    *) echo "Please answer yes or no." ;;
                 esac
             done
         fi
     fi
 
-    yt-dlp $url $1
+    yt-dlp $url "$@"
 }
 
 function dlogin() {
