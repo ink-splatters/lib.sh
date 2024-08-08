@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240806_51efdfd
+LIBSH_VERSION=20240808_6362b11
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -124,9 +124,9 @@ the util takes <count> bytes from /dev/random and outputs lower-case hex values
 
 usage: rand <count> [-f] [-n]
 
-<count>		byte count
--f, --force	if count > 64, the flag is required
--n, --newline	if specified, '\n' is added after the output
+<count>         byte count
+-f, --force     if count > 64, the flag is required
+-n, --newline   if specified, '\n' is added after the output
 
 example: to get 256 bit nonce use: $(rand 32)
 
@@ -167,7 +167,6 @@ EOF
 }
 
 function randpass() {
-
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         cat <<EOF
 generates random password
@@ -1852,7 +1851,6 @@ alias f2a=flac2alac
 # to decode non-UTF-8 cuesheets -> `cconv`
 # to find missing album art: https://bendodson.com/projects/itunes-artwork-finder/
 flac2many() {
-
     if [ $# -lt 2 ]; then
         cat <<'EOF'
 splits FLAC to many using cuesheet
@@ -1868,11 +1866,13 @@ EOF
     local cue="$1"
     local flac="$2"
 
-    if [[ "$3" =~ (--no-|-no)meta ]]; then
-        local nometa=1
-    else
-        echo ERROR: unknown flag: "$3"
-        return 1
+    if [ "$3" != "" ]; then
+        if [[ "$3" =~ (--no-|-no)meta ]]; then
+            local nometa=1
+        else
+            echo ERROR: unknown flag: "$3"
+            return 1
+        fi
     fi
 
     local tools=(flac shnsplit)
@@ -2094,9 +2094,9 @@ EOF
 }
 
 function y() {
-    if [ "$1" = "" ]; then
+    if [ $# = 0 ]; then
         cat <<'EOF'
-yt-dlp -F
+list youtube video streams using yt-dlp
 exports previewed URL as YT_DLP_URL
 
 Usage:
@@ -2105,24 +2105,26 @@ EOF
         return 1
     fi
 
-    export YT_DLP_URL="$1"
+    local url="$1"
+    shift
+
+    export YT_DLP_URL="$url"
     export YT_DLP_TS="$(date "+%s")"
 
-    yt-dlp -F "$1"
+    yt-dlp -F "$url" "$@"
     echo 'lib.sh: the url has been exported as YT_DLP_URL': "$YT_DLP_URL"
     echo
 }
 
-function yea() {
+function ye() {
     local url="${YT_DLP_URL:-$1}"
-    shift
 
     if [[ $# = 1 && "$url" = "" || $# -gt 2 ]]; then
         cat <<'EOF'
 yt-dlp based downloader
 Usage:
 
-yea <yt-dlp config> [URL]
+ye <yt-dlp config> [URL]
 EOF
         return 1
     fi
@@ -2157,6 +2159,12 @@ EOF
     fi
 
     yt-dlp $url "$@"
+}
+
+function yea() {
+    _exists aria2c || return 1
+
+    ye "$@" --downloader=aria2c
 }
 
 function dlogin() {
@@ -2195,8 +2203,7 @@ EOF
         return 1
     fi
 
-    _exists chardetect || return 1
-    _exists iconv || return 1
+    _exists chardetect iconv || return 1
 
     iconv -f $(chardetect "$1" --minimal) -t utf-8 "$1"
 }
