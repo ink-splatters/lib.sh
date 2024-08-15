@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240808_6362b11
+LIBSH_VERSION=20240815_fbc40a8
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2119,7 +2119,7 @@ EOF
 function ye() {
     local url="${YT_DLP_URL:-$1}"
 
-    if [[ $# = 1 && "$url" = "" || $# -gt 2 ]]; then
+    if [[ $# = 1 && "$url" = "" ]]; then
         cat <<'EOF'
 yt-dlp based downloader
 Usage:
