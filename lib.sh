@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240815_fbc40a8
+LIBSH_VERSION=20240822_1ff2d37
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -664,8 +664,6 @@ alias f1="f -d 1"
 alias f2="f -d 2"
 alias f2e="f --exact-depth 2"
 
-alias ff=find
-
 function files() {
     local pattern=()
 
@@ -684,24 +682,47 @@ alias zips="files zip"
 alias zstds="files zst tz"
 alias archives="files z dmg zip zst tz xz bz2 tar tgz tbz2 tz gzip"
 
-# TODO: fix broken
-# find helpers:
-# - support 1 search term (for now) in 1 or more locations
-# - search term gets globbed from both sides, by default
-# - case insensitive versions are postfixed with i
-# - globbing is tunable with prefix: no prefix, l, r, n[no globbing]
+function _f() {
 
-# f() { local what="$1" ; shift ; echo find $@ -name "'*${what}*'"; }
-# fi() { local what="$1" ; shift ; find $@ -iname "'*${what}*'"; }
+    local n="$1"
+    shift
+    find . -name '*'"$n"'*' "$@"
+}
 
-# lf() { local what="$1" ; shift ; find $@ -name "'*${what}'" ; }
-# lfi() { local what="$1" ; shift ; find $@ -iname "'*${what}'" ; }
+function _fi() {
 
-# rf() { local what="$1" ; shift ; find $@ -name "${what}*'"; }
-# rfi() { local what="$1" ; shift ; find $@ -iname "${what}*'"; }
+    local n="$1"
+    shift
+    find . -iname '*'"$n"'*' "$@"
+}
 
-# nf() { local what="$1" ; shift ; find $@ -name "${what}'" ; }
-# nfi() { local what="$1" ; shift ; find $@ -iname "${what}" ; }
+function ff() {
+
+    for f in "$@"; do
+        _f "$f"
+    done
+}
+
+function fif() {
+
+    for f in "$@"; do
+        _fi "$f"
+    done
+}
+
+function fr() {
+
+    for f in "$@"; do
+        _f "$f" -exec rm -rf {} \;
+    done
+}
+
+function fir() {
+
+    for f in "$@"; do
+        _fi "$f" -exec rm -rf {} \;
+    done
+}
 
 alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
 alias ecp='_editto --acl'
@@ -1812,7 +1833,7 @@ EOF
 
     for f in ./**/*.flac; do
         echo converting "$f" to "${f%.*}.m4a"...
-        ffmpeg -nostdin -i "$f" -c:a alac -c:v copy "${f%.*}".m4a
+        ffmpeg -i "$f" -c:a alac -strict experimental -c:v copy "${f%.*}".m4a
     done
 
     _exists atomicparsley && {
@@ -1918,13 +1939,12 @@ EOF
 
     local src="$1"
     local dst_codec="${2:-flac}"
-    local dst_ext="${3:-$dst_codec}"
 
     _exists ffmpeg || return 1
 
     for f in ./**/*."$src"; do
         echo converting "$f" to "${f%.*}.${dst_ext} (codec: ${dst_codec})"...
-        ffmpeg -nostdin -i "$f" -c:a "$dst_codec" -c:v copy "${f%.*}.${dst_ext}"
+        ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "${f%.*}.${dst_ext}"
     done
 
 }
