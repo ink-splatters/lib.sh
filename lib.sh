@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240822_1ff2d37
+LIBSH_VERSION=20240822_9cbc287
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -10,6 +10,7 @@ EOF
 # - shellcheck
 # - shellharden
 
+# crucial for the things like `for f in ./**/*.ext ; do...`
 shopt -s globstar
 
 # helpers
