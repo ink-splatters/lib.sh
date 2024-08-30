@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240822_9cbc287
+LIBSH_VERSION=20240830_12ef8fb
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -451,6 +451,17 @@ alias ums='um search'
 # venv / uv
 alias _venv='python -m venv'
 alias venv='uv venv -p $(which python)'
+
+function venvwith() {
+    local py="$(fd -u python"$1"\$ -t x ~/.rye)"
+
+    if ! command -v "$py" >/dev/null 2>&1; then
+        echo "not found (internal error)"
+        return 1
+    fi
+    uv venv -p "$py"
+}
+
 alias _pip="python -m pip"
 alias pip="uv pip"
 
@@ -1251,6 +1262,11 @@ EOF
     gh repo sync $target --source $source
 }
 
+ghallrepos() {
+    local user="${1:-ink-splatters}"
+    gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /users/"$user"/repos --jq '.[].name' -X GET --paginate
+}
+
 refresharchive() {
     if [[ "$1" == "-h" || "$1" == "--help" ]]; then
         cat <<'EOF'
@@ -2016,8 +2032,9 @@ alias npr='npm run dev'
 alias ntsx='npx tsx'
 
 # font smoothing
-alias fontsmoothingnomore='defaults -currentHost write -g AppleFontSmoothing -int 0'
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
+alias setfontsmoothing='defaults -currentHost write -g AppleFontSmoothing -int'
+alias delfontsmoothing='defaults -currentHost delete -g AppleFontSmoothing'
 
 # rye
 alias re=rye
