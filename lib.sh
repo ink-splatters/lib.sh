@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240830_12ef8fb
+LIBSH_VERSION=20240902_8f4be6d
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1937,9 +1937,9 @@ EOF
 alias f2m=flac2many
 
 function any2any() {
-    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    if [[ "$#" -lt 2 || "$1" == "-h" || "$1" == "--help" ]]; then
         cat <<'EOF'
-any2any <src files extensions> [ dst codec ] [ dst files extension ]
+any2any <src files extensions> <dst codec> [ dst files extension ]
 
 recursively converts source to destination.
 if destination is not specified, flac is used.
@@ -1947,7 +1947,7 @@ if destination is not specified, flac is used.
 e.g.:
 
 any2any ape alac m4a
-any2any m4a
+any2any m4a flac
 any2any flac alac m4a
 
 EOF
@@ -1955,9 +1955,16 @@ EOF
     fi
 
     local src="$1"
-    local dst_codec="${2:-flac}"
+    local dst_codec="$2"
+    local dst_ext="${3:-$2}"
 
     _exists ffmpeg || return 1
+
+    echo FROM: "$1"
+    echo TO: "$2"
+    if [ "$2" != "$3" ]; then
+        echo EXT: "$3"
+    fi
 
     for f in ./**/*."$src"; do
         echo converting "$f" to "${f%.*}.${dst_ext} (codec: ${dst_codec})"...
