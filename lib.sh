@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240902_8f4be6d
+LIBSH_VERSION=20240911_7a1b2cd
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1883,6 +1883,8 @@ EOF
 }
 
 alias f2a=flac2alac
+alias metaf=metaflac
+alias metafall='metaflac --show-all-tags'
 
 # cue split
 
