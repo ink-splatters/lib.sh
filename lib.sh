@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240912_52bf101
+LIBSH_VERSION=20240912_16ad508
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -29,8 +29,9 @@ _salias() {
 }
 
 _exec() {
-    echo -- $@
-    $@
+    mapfile -t x < <(echo "$@")
+    echo -- "$@"
+    "$@"
 }
 
 _exists() {
@@ -410,10 +411,18 @@ msss() {
     printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
 }
 
-alias nets=networksetup
-dhinfo() {
+function nets() {
+    _exec networksetup "$@"
+
+}
+function dhinfo() {
     networksetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
+
+function netsocks() {
+    nets -setsocksfirewallproxy "Wi-Fi" "$1" "$2"
+}
+
 alias dhi=dhinfo
 alias ifc0=dhi
 
@@ -2280,10 +2289,10 @@ alias dt='date  "+%Y-%m-%d %H:%M:%S"'
 alias rgnc='rg --color=never'
 
 # tor
-function torsocks() {
-    _exec networksetup -setsocksfirewallproxy "Wi-Fi" localhost 9050
+torsocks() {
+    _exec netsocks localhost 9050
     tor
-    _exec networksetup -setsocksfirewallproxy "Wi-Fi" '""' '""'
+    _exec netsocks "" ""
 }
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
