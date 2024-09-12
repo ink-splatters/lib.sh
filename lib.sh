@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240911_7a1b2cd
+LIBSH_VERSION=20240912_52bf101
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -26,6 +26,11 @@ _salias() {
     shift
     args=("$@")
     alias $name="sudo ${args[*]}"
+}
+
+_exec() {
+    echo -- $@
+    $@
 }
 
 _exists() {
@@ -2273,6 +2278,13 @@ alias dt='date  "+%Y-%m-%d %H:%M:%S"'
 
 # ripgrep
 alias rgnc='rg --color=never'
+
+# tor
+function torsocks() {
+    _exec networksetup -setsocksfirewallproxy "Wi-Fi" localhost 9050
+    tor
+    _exec networksetup -setsocksfirewallproxy "Wi-Fi" '""' '""'
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
