@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240912_16ad508
+LIBSH_VERSION=20240913_4aa94a2
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2294,6 +2294,9 @@ torsocks() {
     tor
     _exec netsocks "" ""
 }
+
+# gollama
+alias gollama='gollama -lm-dir ~/.lm-studio/models'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
