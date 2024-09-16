@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240913_4aa94a2
+LIBSH_VERSION=20240916_141c4e0
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -12,6 +12,7 @@ EOF
 
 # crucial for the things like `for f in ./**/*.ext ; do...`
 shopt -s globstar
+set -o pipefail
 
 # helpers
 
@@ -29,9 +30,15 @@ _salias() {
 }
 
 _exec() {
-    mapfile -t x < <(echo "$@")
+    # doesn't work in RecoveryOS because there is bash-3.2
+    # mapfile -t x < <(echo "$@")
     echo -- "$@"
     "$@"
+}
+
+_sexec() {
+    echo -- "sudo $@"
+    sudo "$@"
 }
 
 _exists() {
@@ -62,6 +69,52 @@ _foreach() {
         fi
     done
 
+}
+
+# self
+getself() {
+    local exp='local self="${BASH_SOURCE[0]:-${(%):-%x}}"'
+    eval "$(echo $exp)"
+
+    if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then
+        >&2 echo -- failed getting self using BASH_SOURCE ';' using pwd...
+        local self="$(pwd)/$self"
+    fi
+
+    echo "$self"
+}
+
+getselfdir() {
+    local selfdir="$(dirname "$(getself)")"
+    echo "$selfdir"
+}
+
+getdatadir() {
+    local data="$(echo "$(getself)" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
+    echo "$data"
+}
+
+gethome() {
+    if [ $# -lt 1 ]; then
+        cat <<'EOF'
+Usage: gethome <uid>
+EOF
+        return 1
+    fi
+
+    if [ "$__OSINSTALL_ENVIRONMENT" == 1 ]; then
+        local _dscl=(dscl -plist -f "$(getdatadir)"/private/var/db/dslocal/nodes/Default localonly)
+        local users=/Local/Target/Users
+    else
+        local _dscl=(dscl -plist .)
+        local users=/Users
+    fi
+    local uid=$1
+
+    local user=$(${_dscl[@]} -search $users UniqueID "$uid" | grep -Eo '^[a-z0-9_]+')
+    /usr/libexec/PlistBuddy -c "print :dsAttrTypeStandard\:NFSHomeDirectory:0" /dev/stdin <<<$(
+        ${_dscl[@]} -read "$users/$user" NFSHomeDirectory
+    )
 }
 
 # sudo / system
@@ -1272,7 +1325,8 @@ EOF
         echo "ERROR: the repo: $target is not a fork. Cannot sync"
         return 1
     fi
-
+    echo From: "$source"
+    echo To: "$target"
     gh repo sync $target --source $source
 }
 
@@ -2298,20 +2352,57 @@ torsocks() {
 # gollama
 alias gollama='gollama -lm-dir ~/.lm-studio/models'
 
+# proper .Trash / .Trashes folders setup
+
+ensuretrashfor() {
+    local u=$1
+    #    local g=$(id -gn $u)
+    local h=$(gethome $u)
+
+    if [ "$__OSINSTALL_ENVIRONMENT" == 1 ]; then
+        local h="$(getdatadir)$h"
+    fi
+
+    local t="$h/.Trash"
+
+    _sexec rm -rf "$h/.Trashes"
+
+    _sexec mkdir -p "$t"
+    #    _sexec chmod 1311 "$t"
+    _sexec chmod 700 "$t"
+    _sexec chown $u "$t"
+}
+
+ensuretrashesfor() {
+
+    local u=$1
+    local g=$(id -gn $u)
+    shift
+
+    for v in "$@"; do
+        local t="$v/.Trashes"
+        _sexec mkdir -p "$t"
+        _sexec chmod 1311 "$t"
+        _sexec chown root:wheel "$t"
+
+        if [ $u != 0 ]; then
+            local tu="$t/$u"
+            _sexec mkdir -p "$tu"
+            _sexec chown $u:$g "$tu"
+            _sexec chmod 700 "$tu"
+        fi
+    done
+}
+
+alias ensuretrash='ensuretrashfor $(id -u)'
+alias ensuretrashes='ensuretrashesfor $(id -u)'
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
 
-    # this is ugly...
-    local exp='local self="${BASH_SOURCE[0]:-${(%):-%x}}"'
-    eval $(echo $exp)
-
-    if [[ $(echo "$self" | grep -Eo '^[/]') == "" ]]; then
-        echo -- failed getting self using BASH_SOURCE ';' using pwd...
-        local self="$(pwd)/$self"
-    fi
-
-    echo -- self: $self
+    local self="$(getself)"
+    echo -- self: "$self"
 
     alias fsl="source '$self'"
     alias flel="vi '$self'"
@@ -2320,10 +2411,11 @@ _init() {
         system=/
 
     else
-        local selfdir="$(dirname $self)"
-        echo -- selfdir: $selfdir
+        local selfdir="$(getselfdir)"
+        echo -- selfdir: "$selfdir"
 
-        local data="$(echo "$self" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
+        local data="$(getdatadir)"
+
         local vg=$(d info "$data" | grep 'APFS Volume Group' | grep -Eo '[0-9A-F-]{36}')
 
         local tmp=$(mktemp)
@@ -2369,7 +2461,7 @@ _init() {
         cat $tmpfile >$bspath
 
         # there is no sudo in RecoveryOS
-        _sudo='$@'
+        _sudo='"$@"'
 
         # rsync path on Sonoma
         _rsync="$system/usr/libexec/rsync/rsync.samba"
