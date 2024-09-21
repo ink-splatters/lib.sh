@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240916_141c4e0
+LIBSH_VERSION=20240921_98c4325
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1684,6 +1684,7 @@ alias _ha='h attach'
 alias _hnv='_ha -noverify'
 alias _hnvo='_hnv -owners on'
 alias hm=_hnvo
+alias hmro='hm -readonly'
 alias ha='hm -nomount'
 alias has='ha -shadow'
 alias hms='hm -shadow'
@@ -2276,6 +2277,7 @@ EOF
     yt-dlp $url "$@"
 }
 
+alias a2='aria2c --file-allocation=none --optimize-concurrent-downloads'
 function yea() {
     _exists aria2c || return 1
 
@@ -2396,6 +2398,9 @@ ensuretrashesfor() {
 
 alias ensuretrash='ensuretrashfor $(id -u)'
 alias ensuretrashes='ensuretrashesfor $(id -u)'
+
+alias trt=tart
+alias trr='tart run --serial --no-audio  --root-disk-opts sync=fsync --capture-system-keys'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
