@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240921_98c4325
+LIBSH_VERSION=20240921_f39e293
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2399,8 +2399,9 @@ ensuretrashesfor() {
 alias ensuretrash='ensuretrashfor $(id -u)'
 alias ensuretrashes='ensuretrashesfor $(id -u)'
 
+# tart
 alias trt=tart
-alias trr='tart run --serial --no-audio  --root-disk-opts sync=fsync --capture-system-keys'
+alias trr='tart run --no-audio --net-bridged=en0 --root-disk-opts="sync=fsync" --capture-system-keys'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
