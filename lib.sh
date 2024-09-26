@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240921_f39e293
+LIBSH_VERSION=20240926_0da2d0c
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -581,8 +581,8 @@ alias batlog='bat --paging=never -l log'
 alias blog=batlog
 alias bathelp='bat -l help -p'
 alias bhelp=bathelp
-alias logstream='log stream --color=always'
-alias lstream=logstream
+alias lstream='log stream --color=always'
+alias lshow='log show --color=always'
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
@@ -2403,6 +2403,9 @@ alias ensuretrashes='ensuretrashesfor $(id -u)'
 alias trt=tart
 alias trr='tart run --no-audio --net-bridged=en0 --root-disk-opts="sync=fsync" --capture-system-keys'
 
+# age
+alias age=rage
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
@@ -2484,7 +2487,46 @@ export PATH="$PATH"
 echo -- PATH: "$PATH"
 
 sudo() {
-	$_sudo
+    $_sudo
+}
+
+_mandoc() {
+    if [ "\${1##*.}" = ".gz" ] ; then
+        mandoc "\$1" | gunzip | less
+    else
+        mandoc "\$1"| less
+    fi
+}
+
+man() {
+    local name=\$1
+    local i=n
+
+    if [[ \$(( name )) != 0 ]]; then
+	i=\$name
+	name=\$2
+	if [ \$name = "" ] ; then
+	    echo Specify the man page to view.
+	    return 1
+	fi
+    fi
+
+    local fnbase='$system'/usr/share/man/man
+
+    local fnith=\${fnbase}\$i/\$name.\$i
+    local fn1st=\${fnbase}1/\$name.1
+
+    local fns=( \$fnith \$fnith.gz \$fn1st \$fn1st.gz )
+
+    for ((i=0;i<"\${#fns[@]}";i++)) ; do
+	if [ -e "\${fns[i]}" ] ; then
+	    _mandoc "\${fns[i]}"
+	    return \$?
+	fi
+    done
+
+    echo "No man file for: \$name."
+    return 1
 }
 
 export VIMRUNTIME="$HOME"/vim/vim90
