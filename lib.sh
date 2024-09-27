@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240926_0da2d0c
+LIBSH_VERSION=20240927_6c56750
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -736,6 +736,8 @@ _alias ea3 ea2 -F
 
 alias dustpr='dust -prR'
 
+alias statx='stat -f "%HT"'
+
 # search
 
 alias f='fd -uuu'
@@ -1450,6 +1452,23 @@ alias glfblobs='_glfhash blob'
 
 # print commits provided as list of hashes via stdin
 alias gdump='x | git -P show'
+
+alias gresign1='gc --amend --no-edit -n -S'
+
+gresign() {
+    if [ $# != 1 ]; then
+        cat <<EOF
+resigns commits till specified one
+
+usage:
+    gresign <commit>
+EOF
+        return 1
+    fi
+
+    git rebase --exec 'git commit --amend --no-edit -n -S' -i "$1"
+
+}
 
 # pull / fetch / merge / rebase
 alias gf='g fetch -vp'
@@ -2405,6 +2424,20 @@ alias trr='tart run --no-audio --net-bridged=en0 --root-disk-opts="sync=fsync" -
 
 # age
 alias age=rage
+
+fln() {
+    local src="$1"
+    local dst="$2"
+
+    local info=$(statx "$src" 2>&1) || {
+        echo "$output" >&2
+        return 1
+    }
+
+    osascript -e 'tell application "Finder" to make alias file to POSIX file "$src" at POSIX file "$dst"' || return 1
+
+    echo "Created Finder alias: $src [$info] -> $dst"
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
