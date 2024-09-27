@@ -2423,7 +2423,7 @@ alias trt=tart
 alias trr='tart run --no-audio --net-bridged=en0 --root-disk-opts="sync=fsync" --capture-system-keys'
 
 # age
-alias age=rage
+#alias age=rage
 
 fln() {
     local src="$1"
