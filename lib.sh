@@ -584,7 +584,7 @@ alias bhelp=bathelp
 alias lstream='log stream --color=always'
 alias lshow='log show --color=always'
 
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+#export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 _help() {
     "$@" -h | bhelp
@@ -713,9 +713,9 @@ alias lsreg=lsregister
 
 # ls / eza
 #
-_alias ll ls -l
+_alias ll /bin/ls -l
 _alias la ll -a
-_alias laa la -O@e
+_alias laa la
 _alias l1 ls -1
 _alias l1a l1 -a
 
@@ -1179,7 +1179,7 @@ alias tosnap='snap -r'
 # diskutil general
 
 alias d='diskutil'
-alias l='diskutil list'
+alias l=lsblk
 alias di='d info'
 alias dm='d mount'
 dmm() {
