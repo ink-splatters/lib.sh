@@ -584,7 +584,7 @@ alias bhelp=bathelp
 alias lstream='log stream --color=always'
 alias lshow='log show --color=always'
 
-#export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 _help() {
     "$@" -h | bhelp
