@@ -1,4 +1,4 @@
-LIBSH_VERSION=20240927_6c56750
+LIBSH_VERSION=20241004_5870847
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1971,8 +1971,8 @@ EOF
 }
 
 alias f2a=flac2alac
-alias metaf=metaflac
-alias metafall='metaflac --show-all-tags'
+alias fmeta=metaflac
+alias fmetal='fmeta --show-all-tags'
 
 # cue split
 
@@ -2056,7 +2056,7 @@ EOF
         echo EXT: "$3"
     fi
 
-    for f in ./**/*."$src"; do
+    for f in ./**/*.$src; do
         echo converting "$f" to "${f%.*}.${dst_ext} (codec: ${dst_codec})"...
         ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "${f%.*}.${dst_ext}"
     done
@@ -2438,6 +2438,9 @@ fln() {
 
     echo "Created Finder alias: $src [$info] -> $dst"
 }
+
+alias cv=cert-viewer
+alias cg=certgraph
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
