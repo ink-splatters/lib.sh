@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241004_5870847
+LIBSH_VERSION=20241004_8f47703
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2442,6 +2442,39 @@ fln() {
 alias cv=cert-viewer
 alias cg=certgraph
 
+# sqldump
+
+sqldump() {
+    if [ $# = 0 ]; then
+        cat <<EOF
+Usage: $0 <sqlite db filename> [mode]
+
+default mode is "line"
+EOF
+        return 1
+    fi
+
+    local mode="${2:-line}"
+    local cmd=(sqlite3 "$1")
+    local cmddump=(sqlite3 -"$mode" "$1")
+
+    local tables=($("${cmd[@]}" .tables))
+
+    printf "%s\n\n" "BEGIN DUMP"
+
+    for t in "${tables[@]}"; do
+        printf "TABLE: %s\n" "$t"
+        local count=$("${cmd[@]}" "select count(*) from $t")
+        if [ "$count" = 0 ]; then
+            echo "<EMPTY>"
+        else
+            "${cmddump[@]}" "select * from $t"
+        fi
+        echo
+    done
+
+    printf "%s\n" "END DUMP"
+}
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
