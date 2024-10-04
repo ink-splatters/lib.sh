@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241004_dcdb92e
+LIBSH_VERSION=20241004_21944b3
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2476,6 +2476,16 @@ EOF
 
     printf "%s\n" "END DUMP"
 }
+
+# tpaste.us
+
+tpaste() {
+    curl -F 'tpaste=<-' https://tpaste.us/
+
+}
+
+alias tc=tpaste # reads: "copy to tpaste"
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
