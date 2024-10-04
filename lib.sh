@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241004_42291a6
+LIBSH_VERSION=20241004_dcdb92e
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -227,7 +227,7 @@ EOF
 }
 
 function randpass() {
-    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    if [[ $1 == "--help" || $1 == "-h" ]]; then
         cat <<EOF
 generates random password
 usage: randpass [length]
@@ -569,7 +569,7 @@ alias pxl='pxg list'
 
 alias _vi=/usr/bin/vi
 
-if [[ "$EDITOR" == "" ]]; then
+if [[ $EDITOR == "" ]]; then
     export EDITOR=vim
 fi
 alias vi="$EDITOR"
@@ -855,7 +855,7 @@ xdrecs() {
     local flags="$(ls -laO | head -2 | grep -Eo 'uchg|schg' | xargs | sed 's/ /,/g')"
     local noflags="$(echo $flags | sed -E 's/([a-z]+)/no\1/g')"
 
-    if [[ "$noflags" != "" ]]; then
+    if [[ $noflags != "" ]]; then
         set -x
         sudo chflags "$noflags" "$path"
         set +x
@@ -865,7 +865,7 @@ xdrecs() {
     sudo xattr -d $pdf "$path"
     set +x
 
-    if [[ "$flags" != "" ]]; then
+    if [[ $flags != "" ]]; then
         set -x
         sudo chflags "$flags" "$path"
         set +x
@@ -1195,7 +1195,7 @@ _salias eo diskutil enableOwnership
 # apfs
 _salias apfs.util /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util
 msnap() {
-    if [[ $# < 3 || "$1" == "-h" || "$1" == "--help" ]]; then
+    if [[ $# < 3 || $1 == "-h" || $1 == "--help" ]]; then
         cat <<EOF
 mount apfs snapshot
 
@@ -1255,7 +1255,7 @@ function aav() {
 restore() {
     local _sudo=
 
-    if (($EUID != 0)); then
+    if ((EUID != 0)); then
         _sudo=sudo
     fi
 
@@ -1292,7 +1292,7 @@ alias ghrf='ghr fork'
 alias ghrsd='ghr set-default'
 
 ghs() {
-    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    if [[ $1 == "-h" || $1 == "--help" ]]; then
         cat <<'EOF'
 
 performs GitHub fork synchronization with the source repo,
@@ -1338,7 +1338,7 @@ ghallrepos() {
 }
 
 refresharchive() {
-    if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    if [[ $1 == "-h" || $1 == "--help" ]]; then
         cat <<'EOF'
 
 - searches for .tz (tar zstd) archives in the current directory
@@ -1363,7 +1363,7 @@ EOF
 
     local git=git
 
-    if [[ "$1" != "--no-gix" ]] && command -v gix >/dev/null 2>&1; then
+    if [[ $1 != "--no-gix" ]] && command -v gix >/dev/null 2>&1; then
         git=gix
     fi
 
@@ -1872,7 +1872,7 @@ _in() {
     shift
     local haystack="$@"
     for x in ${haystack[@]}; do
-        if [[ "$x" == "$needle" ]]; then
+        if [[ $x == "$needle" ]]; then
             return 0
         fi
     done
@@ -1995,7 +1995,7 @@ EOF
     local flac="$2"
 
     if [ "$3" != "" ]; then
-        if [[ "$3" =~ (--no-|-no)meta ]]; then
+        if [[ $3 =~ (--no-|-no)meta ]]; then
             local nometa=1
         else
             echo ERROR: unknown flag: "$3"
@@ -2027,7 +2027,7 @@ EOF
 alias f2m=flac2many
 
 function any2any() {
-    if [[ "$#" -lt 2 || "$1" == "-h" || "$1" == "--help" ]]; then
+    if [[ $# -lt 2 || $1 == "-h" || $1 == "--help" ]]; then
         cat <<'EOF'
 any2any <src files extensions> <dst codec> [ dst files extension ]
 
@@ -2254,7 +2254,7 @@ EOF
 function ye() {
     local url="${YT_DLP_URL:-$1}"
 
-    if [[ $# = 1 && "$url" = "" ]]; then
+    if [[ $# == 1 && $url == "" ]]; then
         cat <<'EOF'
 yt-dlp based downloader
 Usage:
@@ -2269,7 +2269,7 @@ EOF
     elif [ "$YT_DLP_TS" != "" ]; then
         local ts="$(date "+%s")"
 
-        local duration="$(($ts - $YT_DLP_TS))"
+        local duration="$((ts - YT_DLP_TS))"
 
         if [ ! $duration -le 60 ]; then
 
@@ -2486,7 +2486,7 @@ _init() {
     alias fsl="source '$self'"
     alias flel="vi '$self'"
 
-    if [[ "$__OSINSTALL_ENVIRONMENT" != 1 ]]; then
+    if [[ $__OSINSTALL_ENVIRONMENT != 1 ]]; then
         system=/
 
     else

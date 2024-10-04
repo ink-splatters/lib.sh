@@ -1,0 +1,11 @@
+---
+yaml-files:
+- '*.yaml'
+- '*.yml'
+- '.yamllint'
+- '.yamlfmt'
+
+rules:
+    document-start:
+        level: warning
+    indentation: disable
