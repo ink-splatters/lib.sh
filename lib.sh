@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241004_21944b3
+LIBSH_VERSION=20241006_e7f53d4
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2364,7 +2364,7 @@ alias dt='date  "+%Y-%m-%d %H:%M:%S"'
 alias rgnc='rg --color=never'
 
 # tor
-torsucksnot() {
+mytorsocks() {
     _exec netsocks localhost 9050
     tor
     _exec netsocks "" ""
