@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241006_e7f53d4
+LIBSH_VERSION=20241008_4324417
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -69,6 +69,14 @@ _foreach() {
         fi
     done
 
+}
+
+_curl_get() {
+    if command -v xh >/dev/null 2>&1; then
+        xh "$@"
+    else
+        curl "$@"
+    fi
 }
 
 # self
@@ -1904,7 +1912,7 @@ alias apars=atomicparsley
 wttr() {
     local url="wttr.in"
 
-    curl "$url"/"$1"
+    _curl_get "$url"/"$1"
 }
 
 # FLAC to ALAC
@@ -2461,20 +2469,35 @@ EOF
 
     local tables=($("${cmd[@]}" .tables))
 
-    printf "%s\n\n" "BEGIN DUMP"
+    if [ "$mode" != "json" ]; then
+        printf "%s\n\n" "BEGIN DUMP"
+    fi
 
     for t in "${tables[@]}"; do
-        printf "TABLE: %s\n" "$t"
         local count=$("${cmd[@]}" "select count(*) from $t")
+
         if [ "$count" = 0 ]; then
-            echo "<EMPTY>"
-        else
-            "${cmddump[@]}" "select * from $t"
+            if [ "$mode" != "json" ]; then
+                echo "<EMPTY>"
+                echo
+            fi
+            continue
         fi
-        echo
+
+        if [ "$mode" != "json" ]; then
+            printf "TABLE: %s\n" "$t"
+        fi
+
+        "${cmddump[@]}" "select * from $t"
+
+        if [ "$mode" != "json" ]; then
+            echo
+        fi
     done
 
-    printf "%s\n" "END DUMP"
+    if [ "$mode" != "json" ]; then
+        printf "%s\n\n" "END DUMP"
+    fi
 }
 
 # tpaste.us
@@ -2485,6 +2508,35 @@ tpaste() {
 }
 
 alias tc=tpaste # reads: "copy to tpaste"
+
+# ip-api.com
+
+whatip() {
+    _curl_get http://ip-api.com/json/"$1" | jq
+}
+
+# list zombie processes
+#
+function zombies() {
+
+    ps aux | grep Z
+
+    >&2 cat <<'EOF'
+
+In your head, in your head
+Zombie, zombie, zombie-ie-ie...
+		in memory of D. O'Riordan
+EOF
+
+}
+
+alias zs=zombies
+
+# parent pid
+
+ppidof() {
+    ps -o ppid= -p "$1"
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
