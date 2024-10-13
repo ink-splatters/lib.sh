@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241008_4324417
+LIBSH_VERSION=20241013_4c0bc56
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1113,6 +1113,9 @@ alias i=_i
 alias ncg='nix-collect-garbage'
 alias ncgd='ncg -d'
 alias nso='nix store optimise'
+
+alias rev-nixpkgs-unstable='nix flake metadata nixpkgs/nixpkgs-unstable --json | jq -r ".locked.rev"'
+
 alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
 
 # creates upggradeable list of packages as --attr parameters to nix-env --upgrade
@@ -1161,29 +1164,6 @@ tu() {
 # https://github.com/ahl/apfs
 alias snap=snapUtil
 
-# list APFS snapshots
-alias snapl='snap -l'
-
-# create APFS snapshot
-alias snapc='snap -c'
-
-# rename APFS snapshot
-alias snapr='snap -n'
-
-# Delete APFS snapshot, alternative to adels
-alias snapd='snap -d'
-alias adels2=snapd
-
-# mount APFS snapshot (alternative to mount_apfs -s )
-alias snapm='snap -s'
-alias msnap2='snap -s'
-
-# APFS snapshot info
-alias snapi='snap -o'
-
-# Revert to APFS snapshot
-alias tosnap='snap -r'
-
 # diskutil general
 
 alias d='diskutil'
@@ -1228,6 +1208,20 @@ EOF
     mount_apfs ${mopt[*]} "$@" $d "$m"
 }
 
+msnaps() {
+    local vol="${1:-disk3s1}"
+    local mp="${2:-/tmp/s}"
+
+    if [[ ! $vol =~ ^/dev ]]; then
+        vol="/dev/$vol"
+    fi
+
+    local snap="$(als "$vol" | grep -Eo 'com.+')"
+
+    msnap "$snap" "$vol" "$mp"
+
+}
+
 alias a='d apfs'
 alias au='a unlock'
 function aunom() {
@@ -1243,10 +1237,20 @@ alias alvg='a listVolumeGroups'
 alias adelvg='a deleteVolumeGroup'
 alias als='a listSnapshots'
 alias adels='a deleteSnapshot'
+
 xadels() {
     adels "$1" -xid "$2"
 }
+
 alias aav='a addVolume'
+
+aavv() {
+    local disk="$1"
+    local name="$2"
+
+    aav "$disk" APFS "$name"
+}
+
 alias adel='a deleteVolume'
 
 aev() { a encryptVolume "$1" -user disk; }
@@ -1275,13 +1279,20 @@ restore() {
 }
 
 srestore() {
-    local snap="$1"
-    local src="$2"
-    local tgt="$3"
+    local src="$1"
+    local tgt="$2"
 
-    shift 3
+    local snap="$3"
 
-    clone "$src" "$tgt" --toSnapshot "$snap" "$@"
+    shift 2
+
+    if [ "$snap" = "" ]; then
+        snap="$(als "$src" | grep -Eo 'com.+')"
+    else
+        shift
+    fi
+
+    restore "$src" "$tgt" --toSnapshot "$snap" "$@"
 }
 
 function duuid() {
@@ -1980,7 +1991,8 @@ EOF
 
 alias f2a=flac2alac
 alias fmeta=metaflac
-alias fmetal='fmeta --show-all-tags'
+alias fmetatags='fmeta --show-all-tags'
+alias fmetalist='fmeta --list'
 
 # cue split
 
@@ -2081,8 +2093,10 @@ alias tt='tt -theme nord'
 
 # img viewer
 alias img=chafa
-alias cf=chafa
-alias pic=chafa
+cimg() {
+    curl "$1" | chafa
+
+}
 
 ramdisk() {
     if [ $# != 1 ]; then
@@ -2537,6 +2551,10 @@ alias zs=zombies
 ppidof() {
     ps -o ppid= -p "$1"
 }
+
+# base64
+alias b64=base64
+alias b64d='base64 -d'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
