@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241013_4c0bc56
+LIBSH_VERSION=20241014_a33d9ca
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2516,9 +2516,29 @@ EOF
 
 # tpaste.us
 
-tpaste() {
-    curl -F 'tpaste=<-' https://tpaste.us/
+tcopy() {
+    curl -F 'tpaste=<-' https://tpaste.us/ | tee /dev/tty | c
+}
 
+tpaste() {
+    local input="$1"
+    if [ "$input" = "" ]; then
+        input="$(pbpaste)"
+    fi
+
+    if [[ $input =~ ^https?:// ]]; then
+        local url="$input"
+    elif [[ $input =~ [\w]{4} ]]; then
+        local url="https://tpaste.us/$input"
+    else
+        echo Unknown paste format
+        return 1
+    fi
+
+    curl "$url" || {
+        echo Failed to retrieve paste: "$1"
+        return 1
+    }
 }
 
 alias tc=tpaste # reads: "copy to tpaste"
