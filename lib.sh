@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241014_a33d9ca
+LIBSH_VERSION=20241014_59572ac
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2540,8 +2540,6 @@ tpaste() {
         return 1
     }
 }
-
-alias tc=tpaste # reads: "copy to tpaste"
 
 # ip-api.com
 
