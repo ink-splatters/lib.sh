@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241014_59572ac
+LIBSH_VERSION=20241014_c6f8342
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2517,21 +2517,18 @@ EOF
 # tpaste.us
 
 tcopy() {
-    curl -F 'tpaste=<-' https://tpaste.us/ | tee /dev/tty | c
+    curl -F 'tpaste=<-' https://tpaste.us/
 }
 
 tpaste() {
     local input="$1"
-    if [ "$input" = "" ]; then
-        input="$(pbpaste)"
-    fi
 
     if [[ $input =~ ^https?:// ]]; then
         local url="$input"
     elif [[ $input =~ [\w]{4} ]]; then
         local url="https://tpaste.us/$input"
     else
-        echo Unknown paste format
+        echo Unknown paste format or input is empty
         return 1
     fi
 
