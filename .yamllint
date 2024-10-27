@@ -6,6 +6,6 @@ yaml-files:
 - '.yamlfmt'
 
 rules:
-    document-start:
-        level: warning
-    indentation: disable
+  document-start:
+    level: warning
+  indentation: disable
