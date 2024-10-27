@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241014_59572ac
+LIBSH_VERSION=20241027_5d917f9
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1007,7 +1007,7 @@ alias rgi='rg -iuuu'
 
 # nix
 
-alias nx=nix
+alias nx='nix --option extra-access-tokens "$GH_PAT"'
 
 # new nix cli
 
@@ -1043,18 +1043,36 @@ alias nxdvi="nxdv $_nxi"
 alias nxdvia="nxdvi $_nxafc"
 
 alias nxdrv='nx derivation'
+
+nxdrvpaths() {
+    if [ ! $# ]; then
+        cat <<EOF
+Prints nix store "requisites" paths for specified derivation(s).
+Useful when one needs to do fine-grained filtering (like for pushing to binary cache).
+
+Usage:
+    $0 <derivation...>
+EOF
+        return 1
+    fi
+
+    local outputs
+    mapfile -t outputs < <(nix derivation show $* | jq -r '.[].outputs | .. | objects | select(has("path")) | .path')
+
+    nix-store --query --requisites ${outputs[*]} | rg -v "$(echo "${outputs[@]}" | tr ' ' '|')"
+}
+
 alias nxds='nxdrv show | jq'
 alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
 alias nxfl='nxf lock'
-alias nxfm=nxfmeta
-alias nxfi=nxfm
-alias nxfmeta='nxf metadata'
+alias nxfm='nxf metadata'
 alias nxfs='nxf show'
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxrun='nx run'
+alias nxfr=nxrun
 alias nxi='nxp install'
 alias nxia='nxi --accept-flake-config'
 alias nxii='nxi --impure'
@@ -1114,7 +1132,14 @@ alias ncg='nix-collect-garbage'
 alias ncgd='ncg -d'
 alias nso='nix store optimise'
 
-alias rev-nixpkgs-unstable='nix flake metadata nixpkgs/nixpkgs-unstable --json | jq -r ".locked.rev"'
+nxrev() {
+    local repo="${1:-nixpkgs}"
+    local tag="${2:-nixpkgs-unstable}"
+
+    nxfm "$repo/$tag" --json | jq -r '.locked.rev'
+}
+alias nixpkgs-unstable=nxrev
+#alias rev-nixpkgs-unstable='nxrev nixpkgs-unstable'
 
 alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
 
@@ -1452,6 +1477,10 @@ alias gbd='gb -D'
 alias gt='g tag'
 alias gtd='gt -d'
 alias gtl=gt
+
+# remote tags
+# TODO
+#  gh api -H "Authorization: Bearer $GH_PAT" repos/NixOS/nixpkgs/tags  --paginate  | jq -r '.[] | select(.name | test("^[0-9]{2}\\.[0-9]{2}$")) | .name'
 
 # commits
 
