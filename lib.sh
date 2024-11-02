@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241027_ae3f598
+LIBSH_VERSION=20241102_bcdc183
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2347,7 +2347,14 @@ EOF
     yt-dlp $url "$@"
 }
 
-alias a2='aria2c --file-allocation=none --optimize-concurrent-downloads'
+unset -f aria2c
+unset -f a2c
+_aria2c="$(which aria2c)"
+function aria2c() {
+    "$_aria2c" --file-allocation=falloc --optimize-concurrent-downloads "$@"
+}
+alias a2c=aria2c
+
 function yea() {
     _exists aria2c || return 1
 
