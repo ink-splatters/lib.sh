@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241102_bcdc183
+LIBSH_VERSION=20241108_7303238
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1005,11 +1005,9 @@ alias rgi='rg -iuuu'
 #	uutils-coreutils "$1"
 # }
 
-# nix
+# new nix cli
 
 alias nx='nix --option extra-access-tokens "$GH_PAT"'
-
-# new nix cli
 
 _nxv='--verbose --show-trace --print-build-logs'
 _nxi='--impure'
@@ -1043,6 +1041,7 @@ alias nxdvi="nxdv $_nxi"
 alias nxdvia="nxdvi $_nxafc"
 
 alias nxdrv='nx derivation'
+alias nxdrvshow='nx derivation show'
 
 nxdrvpaths() {
     if [ ! $# ]; then
