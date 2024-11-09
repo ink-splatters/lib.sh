@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241108_7303238
+LIBSH_VERSION=20241109_fb9308b
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -589,6 +589,8 @@ alias batlog='bat --paging=never -l log'
 alias blog=batlog
 alias bathelp='bat -l help -p'
 alias bhelp=bathelp
+alias batdiff='bat -l diff'
+alias bdiff=batdiff
 alias lstream='log stream --color=always'
 alias lshow='log show --color=always'
 
@@ -1041,7 +1043,7 @@ alias nxdvi="nxdv $_nxi"
 alias nxdvia="nxdvi $_nxafc"
 
 alias nxdrv='nx derivation'
-alias nxdrvshow='nx derivation show'
+alias nxdrvshow='nx derivation show | jq'
 
 nxdrvpaths() {
     if [ ! $# ]; then
