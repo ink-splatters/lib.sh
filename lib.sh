@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241109_fb9308b
+LIBSH_VERSION=20241110_7127d26
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2096,7 +2096,12 @@ EOF
 
     local src="$1"
     local dst_codec="$2"
+    shift 2
     local dst_ext="${3:-$2}"
+
+    if [ "$3" != "" ]; then
+        shift
+    fi
 
     _exists ffmpeg || return 1
 
@@ -2108,7 +2113,7 @@ EOF
 
     for f in ./**/*.$src; do
         echo converting "$f" to "${f%.*}.${dst_ext} (codec: ${dst_codec})"...
-        ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "${f%.*}.${dst_ext}"
+        ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "${f%.*}.${dst_ext}" "$@"
     done
 
 }
