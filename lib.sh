@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241110_7127d26
+LIBSH_VERSION=20241111_4d7e178
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -41,11 +41,10 @@ _sexec() {
     sudo "$@"
 }
 
-_exists() {
+_ensure() {
     for f in "$@"; do
-
         if ! command -v "$f" 1>/dev/null; then
-            echo ERROR: "$f" does not exist or not in PATH
+            echo ERROR: "$f" is not in PATH
             return 1
         fi
     done
@@ -1043,7 +1042,7 @@ alias nxdvi="nxdv $_nxi"
 alias nxdvia="nxdvi $_nxafc"
 
 alias nxdrv='nx derivation'
-alias nxdrvshow='nx derivation show | jq'
+alias nxdrvshow='nxdrv show | jq'
 
 nxdrvpaths() {
     if [ ! $# ]; then
@@ -1354,7 +1353,7 @@ EOF
         return 1
     fi
 
-    _exists gh jq rg || return 1
+    _ensure gh jq rg || return 1
 
     local remote="${1:-origin}"
 
@@ -1404,7 +1403,7 @@ EOF
         return 1
     fi
 
-    _exists fd || return 1
+    _ensure fd || return 1
 
     local git=git
 
@@ -1983,14 +1982,14 @@ EOF
             return 1
             ;;
     esac
-    _exists ffmpeg || return 1
+    _ensure ffmpeg || return 1
 
     for f in ./**/*.flac; do
         echo converting "$f" to "${f%.*}.m4a"...
         ffmpeg -i "$f" -c:a alac -strict experimental -c:v copy "${f%.*}".m4a
     done
 
-    _exists atomicparsley && {
+    _ensure atomicparsley && {
         if [ $_noart = 1 ]; then
             echo "not embedding artwork ($_noart)"
             return
@@ -2060,7 +2059,7 @@ EOF
     fi
 
     # cuetag is part of 'cuetools'
-    _exists ${tools[*]} || return 1
+    _ensure ${tools[*]} || return 1
 
     shnsplit -t "%n. %t" -f "$cue" -o "flac flac -s -8 -o %f -" "$flac"
 
@@ -2076,7 +2075,7 @@ EOF
 }
 alias f2m=flac2many
 
-function any2any() {
+any2any() {
     if [[ $# -lt 2 || $1 == "-h" || $1 == "--help" ]]; then
         cat <<'EOF'
 any2any <src files extensions> <dst codec> [ dst files extension ]
@@ -2103,7 +2102,7 @@ EOF
         shift
     fi
 
-    _exists ffmpeg || return 1
+    _ensure ffmpeg || return 1
 
     echo FROM: "$1"
     echo TO: "$2"
@@ -2119,6 +2118,98 @@ EOF
 }
 
 alias a2a=any2any
+
+_wavpack() {
+    if [ $# -lt 3 ]; then
+        echo "ASSERT: insufficient arguments; expected at least 3, got $#." >&2
+        return 1
+    fi
+
+    local cmd="$1"
+    local src_ext="$2"
+    local dst_ext="$3"
+    shift 3
+
+    if [ "$1" == "--help" ]; then
+        cat <<'EOF'
+wavpack conversion helper
+
+Recursively converts audio files from source to destination format while
+preserving metadata with utmost precision.
+
+Usage:
+    _wavpack <command> <source_ext> <destination_ext> [extra options]
+
+Aliases:
+    wav2wavpack (or w2wv): Converts WAV to WavPack
+    wavpack2wav (or wv2w): Converts WavPack to WAV
+EOF
+        return 0
+    fi
+
+    _ensure "$cmd" || return 1
+
+    for f in ./**/*."$src_ext"; do
+        if [[ -f $f ]]; then
+            local dst="${f%.*}.$dst_ext"
+            echo "Converting $f to $dst..."
+            "$cmd" "$f" -o "$dst" "$@"
+        fi
+    done
+}
+
+# Aliases
+alias wav2wavpack='_wavpack wavpack wav wv -h -m'
+alias w2wv=wav2wavpack
+
+alias wavpack2wav='_wavpack wvunpack wv wav'
+alias wv2w=wavpack2wav
+
+wav2pcm() {
+    if [[ $1 == "-h" || $1 == "--help" ]]; then
+        cat <<'EOF'
+recursively extracts raw pcm data from WAV files
+
+WARNING: this is irreversible operation metadata-wise, meaning that
+WAV files cannot be easily constructed from raw pcm, without manually
+specifying PCM data type; also any other metadata is lost.
+
+Usage:
+    wav2pcm
+
+Aliases:
+    wav2raw
+    w2raw
+    w2p
+    w2r
+EOF
+        return 1
+    fi
+    _ensure ffmpeg ffprobe || return 1
+
+    local src_ext="wav"
+    local dst_ext="raw"
+
+    for f in ./**/*."$src_ext"; do
+        if [[ -f $f ]]; then
+            local fmt="$(ffprobe -v error \
+                -print_format json \
+                -show_streams \
+                -select_streams a "$f" \
+                | jq -r '.[].[0].codec_name' \
+                | rg '^pcm_([\w]+)' --replace '$1')"
+
+            local dst="${f%.*}.$dst_ext"
+            echo "Converting $f to $dst [$fmt]..."
+            echo ffmpeg -i "$f" -f "$fmt" -acodec copy "$dst"
+        fi
+    done
+}
+
+alias wav2raw=wav2pcm
+alias w2raw=wav2raw
+alias w2p=wav2pcm
+alias w2r=w2raw
 
 # tldr
 alias tl='tldr --platform macos'
@@ -2362,7 +2453,7 @@ function aria2c() {
 alias a2c=aria2c
 
 function yea() {
-    _exists aria2c || return 1
+    _ensure aria2c || return 1
 
     ye "$@" --downloader=aria2c
 }
@@ -2403,7 +2494,7 @@ EOF
         return 1
     fi
 
-    _exists chardetect iconv || return 1
+    _ensure chardetect iconv || return 1
 
     iconv -f $(chardetect "$1" --minimal) -t utf-8 "$1"
 }
