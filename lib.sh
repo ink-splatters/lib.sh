@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241111_4d7e178
+LIBSH_VERSION=20241117_9046865
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1768,18 +1768,57 @@ alias simctl='xcrun simctl'
 alias gcl=gcloud
 
 # cachix
-cpush() {
-    local cache="$1"
-    shift
-    cachix push "$cache" -j$(sysctl hw.ncpu | grep -o '\d') "$@"
-}
+alias cpush='cachix push'
 
 cpushinputs() {
     nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush "$@"
 }
 
-cpushrt() {
-    nix build --json | jq -r '.[].outputs | to_entries[].value' | cpush "$@"
+alias cpushi=cpushinputs
+alias cpushidarwin='cpushi aarch64-darwin'
+
+cpushruntime() {
+    if [ $# -lt 1 ]; then
+        cat <<EOF
+Pushing runtime closure to cachix.
+
+Usage:
+    $0 <cache_name>
+    $0 <package_name [package_name...] -- <cache_name> [cachix opts]
+EOF
+        return 1
+    fi
+
+    local grp1=()
+    local grp2=()
+
+    if [ $# = 1 ]; then
+        grp2+=("$1")
+    else
+        local cur=()
+        while [[ $# -gt 0 ]]; do
+            if [[ $1 == "--" ]]; then
+                grp1=("${cur[@]}")
+                cur=()
+                shift
+            else
+                cur+=("$1")
+                shift
+            fi
+        done
+        grp2=("${cur[@]}")
+    fi
+
+    nix build ${grp1[*]} --json \
+        | jq -r '.[].outputs | to_entries[].value' \
+        | cachix push ${grp2[*]}
+}
+
+alias cpushrt=cpushruntime
+
+cpushrtdarwin() {
+
+    cpushrt "$@" -- aarch64-darwin -m zstd -l 16
 }
 
 # nomino - superfast renamer - is dangerous to use because of --dry-run (--test)
@@ -1864,6 +1903,34 @@ xzsta() {
     xzst "$name" && rm -rf "$name" && echo && echo Done || echo Error: $?
 }
 
+del_working_tree() {
+    local dest="$1"
+
+    if [ ! -d "$dest"/.git ]; then
+        echo "ERROR: $dest is not a git tree"
+        return 1
+    fi
+    echo '1.5 sec to DESTRUCTIVE action'
+    sleep 1.5
+    echo 'BANG!'
+
+    pushd "$dest" 1>/dev/null \
+        && mv .git .. \
+        && cld . \
+        && mv ../.git . \
+        && { popd 1>/dev/null || true; }
+
+}
+
+gitzsta() {
+    del_working_tree "$1"
+
+    if [ $? != 0 ]; then
+        return $?
+    fi
+
+    zsta "$1"
+}
 alias unzst=xzst
 alias uzst=unzst
 alias unz=xzst
