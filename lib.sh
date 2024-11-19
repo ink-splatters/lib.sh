@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241117_9046865
+LIBSH_VERSION=20241119_42e8cfc
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1814,11 +1814,11 @@ EOF
         | cachix push ${grp2[*]}
 }
 
-alias cpushrt=cpushruntime
+alias cpushr=cpushruntime
 
-cpushrtdarwin() {
+cpushrdarwin() {
 
-    cpushrt "$@" -- aarch64-darwin -m zstd -l 16
+    cpushr "$@" -- aarch64-darwin -m zstd -l 16
 }
 
 # nomino - superfast renamer - is dangerous to use because of --dry-run (--test)
