@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241119_42e8cfc
+LIBSH_VERSION=20241125_a0f5ecd
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1042,7 +1042,9 @@ alias nxdvi="nxdv $_nxi"
 alias nxdvia="nxdvi $_nxafc"
 
 alias nxdrv='nx derivation'
-alias nxdrvshow='nxdrv show | jq'
+nxdrvshow() {
+    nxdrv show "$1" | jq
+}
 
 nxdrvpaths() {
     if [ ! $# ]; then
@@ -1140,6 +1142,8 @@ nxrev() {
 }
 alias nixpkgs-unstable=nxrev
 #alias rev-nixpkgs-unstable='nxrev nixpkgs-unstable'
+
+alias nxtree='nix-tree'
 
 alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
 
@@ -1821,6 +1825,9 @@ cpushrdarwin() {
     cpushr "$@" -- aarch64-darwin -m zstd -l 16
 }
 
+alias cpin='cachix pin'
+alias cpindarwin='cpin aarch64-darwin'
+
 # nomino - superfast renamer - is dangerous to use because of --dry-run (--test)
 # is switched OFF by default which results in potentially dangerous mass renames.
 # the wrapper, besides being a safequard, shows rename map, nicely highlighted with `jq`
@@ -2459,7 +2466,7 @@ EOF
     shift
 
     export YT_DLP_URL="$url"
-    export YT_DLP_TS="$(date "+%s")"
+    export YT_DLP_URL_EXPORT_TS="$(date "+%s")"
 
     yt-dlp -F "$url" "$@"
     echo 'lib.sh: the url has been exported as YT_DLP_URL': "$YT_DLP_URL"
@@ -2467,24 +2474,33 @@ EOF
 }
 
 function ye() {
-    local url="${YT_DLP_URL:-$1}"
 
-    if [[ $# == 1 && $url == "" ]]; then
+    if [ "${YT_DLP_URL}" = "" ]; then
         cat <<'EOF'
-yt-dlp based downloader
-Usage:
+YouTube downloads
 
-ye <yt-dlp config> [URL]
+Usage:
+    y <url>
+	Shows available formats and exports url to YT_DLP_URL env variable
+	for later usage with `ye` and `yeah`
+    ye|yeah [yt-dlp opts]
+	runs `yt-dlp` with url saved in YT_DLP_URL env variable by `y` command
+	and forwards passed arguments to `yt-dlp`.
+
+	the difference between `ye` and `yeah`: the second command will
+	use `aria2c` as downloader.
+
+	Options passed to `aria2c` are hardcoded:
+	    --file-allocation=falloc --optimize-concurrent-download
+
+	Note: `yeah` will fail if there is no `aria2c` in PATH
 EOF
         return 1
     fi
 
-    if [ $# = 2 ]; then
-        shift
-    elif [ "$YT_DLP_TS" != "" ]; then
+    if [ "${YT_DLP_URL_EXPORT_TS}" != "" ]; then
         local ts="$(date "+%s")"
-
-        local duration="$((ts - YT_DLP_TS))"
+        local duration="$((ts - YT_DLP_URL_EXPORT_TS))"
 
         if [ ! $duration -le 60 ]; then
 
@@ -2494,21 +2510,21 @@ EOF
 
 I found non-empty YT_DLP_URL, prefetched $(howmuch duration) ago:
 
-$url
+${YT_DLP_URL}
 
 Do you still want to use it for your download? [Yy]|[Nn]
 EOF
                 )" yn
                 case $yn in
                     [Yy]*) break ;;
-                    [Nn]*) return ;;
+                    [Nn]*) return 1 ;;
                     *) echo "Please answer yes or no." ;;
                 esac
             done
         fi
     fi
 
-    yt-dlp $url "$@"
+    yt-dlp "${YT_DLP_URL}" "$@"
 }
 
 unset -f aria2c
@@ -2522,8 +2538,11 @@ alias a2c=aria2c
 function yea() {
     _ensure aria2c || return 1
 
-    ye "$@" --downloader=aria2c
+    ye "$@" \
+        --external-downloader aria2c \
+        --downloader-args "aria2c:--file-allocation=falloc --optimize-concurrent-downloads"
 }
+alias yeah=yea
 
 function dlogin() {
     local pat=${*:-$(cat)}
