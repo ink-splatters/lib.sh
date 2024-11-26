@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241125_a0f5ecd
+LIBSH_VERSION=20241126_4550822
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1118,6 +1118,8 @@ EOF
     )
 
 }
+
+alias nxreflake='nxrepl --expr "builtins.getFlake \"$PWD\""'
 
 alias nxrel='nxre list'
 alias nxreu='nxrel --refresh'
