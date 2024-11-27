@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241126_4550822
+LIBSH_VERSION=20241127_e35de89
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -496,7 +496,70 @@ alias upkg=pkgf
 
 # python
 
+# pixi
 alias px=pixi
+
+alias pxlocenvcacheon='pixi config set experimental.use-environment-activation-cache true --local'
+alias pxh='px help'
+
+alias pxn='px init'
+alias pxa='px a'
+alias pxr='px rm'
+alias pxi='px i'
+alias pxx='px r'  # Run
+alias pxxt='px x' # Run a command in a temporary environment
+alias pxsh='px s' # Shell
+alias pxl='px ls'
+alias pxcgd='px clean cache -y' # a-la nix alias
+alias pxtree='px t'             # tree
+
+alias pxc='px config'
+alias pxce='pxc edit'
+alias pxcl='pxc list'
+alias pxca='pxc append'
+alias pxcp='pxc prepend'
+alias pxcs='pxc set'
+alias pxcu='pxc unset'
+
+alias pxp='px project'
+alias pxch='pxp channel'
+alias pxcha='pxpch a'
+alias pxcha='pxpch a'
+alias pxchr='pxpch rm'
+alias pxchl='pxpch ls'
+
+alias pxd='pxp description'
+alias pxdg='pxd get'
+alias pxds='pxd set'
+
+alias pxv='pxp version'
+alias pxvg='pxv get'
+alias pxver=pxvg
+alias pxvs='pxv set'
+
+alias pxe='pxp environment'
+alias pxea='pxe a'
+alias pxer='pxe rm'
+alias pxel='pxe ls'
+
+alias pxt='px task'
+alias pxta='pxt a'
+alias pxtr='pxt rm'
+alias pxtl='pxt ls'
+alias pxth='pxt help'
+
+alias pxg='px g' # global
+alias pxged='pxg edit'
+alias pxga='pxg a'
+alias pxgi='pxg i'
+alias pxgun='pxg uninstall'
+alias pxgr='pxg rm'
+alias pxgl='pxg ls'
+alias pxgs='pxg s'  # sync
+alias pxgex='pxg e' # expose
+alias pxgu='pxg update'
+alias pxgh='pxg help'
+
 alias hch=hatch
 alias ach=hch
 alias tch=hch
@@ -564,13 +627,6 @@ function va() {
 }
 
 alias vd='deactivate'
-
-alias pxg='px global'
-alias pxi='pxg install'
-alias pxr='pxg remove'
-alias pxu='pxg upgrade'
-alias pxua='px upgrade-all'
-alias pxl='pxg list'
 
 # editing / viewing
 
