@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241127_e35de89
+LIBSH_VERSION=20241128_925f43c
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1876,11 +1876,11 @@ EOF
         | cachix push ${grp2[*]}
 }
 
-alias cpushr=cpushruntime
+alias cpushrt=cpushruntime
 
-cpushrdarwin() {
+cpushrtdarwin() {
 
-    cpushr "$@" -- aarch64-darwin -m zstd -l 16
+    cpushrt "$@" -- aarch64-darwin -m zstd -l 16
 }
 
 alias cpin='cachix pin'
