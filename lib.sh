@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241128_925f43c
+LIBSH_VERSION=20241201_5266ce8
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1894,7 +1894,7 @@ alias cpindarwin='cpin aarch64-darwin'
 # hence this nasty wrapping
 unset -f nomino
 _nomino="$(which nomino)"
-nomino() {
+function nomino() {
     /usr/bin/env bash -c "jq < <('$_nomino' --test $@ -g /dev/fd/1)"
 }
 
@@ -2850,6 +2850,38 @@ ppidof() {
 # base64
 alias b64=base64
 alias b64d='base64 -d'
+
+# bun
+
+unset -f bun
+_bun="$(which bun)"
+
+function bun() {
+    local args=()
+    if [ $# -gt 0 ]; then
+        if [ ! -f "$PWD/package.json" ]; then
+            echo "running in global context"
+            args+=(-g)
+        fi
+
+        args+=("$@")
+    fi
+    ${_bun[*]} "${args[@]}"
+}
+
+alias bn=bun
+alias bpm='bn pm'
+alias bpmc='bpm cache'
+alias bcgd='bpmc rm' # a-la `ncgd`
+alias bnl='bpm ls'
+alias bni='bn i'
+alias bnr='bn rm'
+alias bnu='bn update'
+alias bnxn='bunx'      # bunx "run with node"
+alias bnx='bunx --bun' # force run with bun
+alias bnre="${_bun[*]} repl"
+alias bnn="${_bun[*]} init"
+alias bnc="${bun[*]} c"
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
