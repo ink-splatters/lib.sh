@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241201_5266ce8
+LIBSH_VERSION=20241207_cec8134
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1182,6 +1182,15 @@ alias nxreu='nxrel --refresh'
 alias nxrelu=nxreu
 alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
+
+alias nxh='nx hash'
+
+alias _nxhc='nxh convert'
+alias nxhc256='_nxhc --hash-algo sha256'
+alias nxhc=nxhc256
+
+alias _nxhf='nxh file'
+alias nxhf='_nxhf --base16'
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
