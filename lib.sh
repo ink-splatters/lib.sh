@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241207_cec8134
+LIBSH_VERSION=20241216_c77515b
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -131,6 +131,7 @@ _salias si -i
 _salias efs vi /etc/fstab # efs - edit fstab
 _salias enx vi /etc/nix/nix.conf
 alias xx='exit'
+alias q=xx
 
 # tr & clipboard
 
@@ -1199,7 +1200,10 @@ alias i=_i
 
 alias ncg='nix-collect-garbage'
 alias ncgd='ncg -d'
+
 alias nso='nix store optimise'
+alias nsmka='nix store make-content-addressed'
+alias nsls='nix store ls'
 
 nxrev() {
     local repo="${1:-nixpkgs}"
@@ -1212,31 +1216,33 @@ alias nixpkgs-unstable=nxrev
 
 alias nxtree='nix-tree'
 
-alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
-
-# creates upggradeable list of packages as --attr parameters to nix-env --upgrade
-_nuattrs() {
-
-    nix-shell -p ripgrep --run sh < <(
-        cat <<'EOF'
-nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-(wrapped|unstable)//g'
-EOF
-    )
-    return 0
-}
-
-_nu() {
-    _nuattrs $@ | xargs nix-env --upgrade
-
-}
-
-alias nu-attrs=_nuattrs
-alias nu='nix-env --upgrade'
-
-alias ncu='nix-channel --update'
-
-alias u='nix-env -e'
-alias q='nix-env -q'
+# deprecated
+# TODO: remove
+#alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
+#
+## creates upggradeable list of packages as --attr parameters to nix-env --upgrade
+#_nuattrs() {
+#
+#    nix-shell -p ripgrep --run sh < <(
+#        cat <<'EOF'
+#nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-(wrapped|unstable)//g'
+#EOF
+#    )
+#    return 0
+#}
+#
+#_nu() {
+#    _nuattrs $@ | xargs nix-env --upgrade
+#
+#}
+#
+#alias nu-attrs=_nuattrs
+#alias nu='nix-env --upgrade'
+#
+#alias ncu='nix-channel --update'
+#
+#alias u='nix-env -e'
+#alias q='nix-env -q'
 
 # direnv / nix-direnv
 alias renv=nix-direnv-reload
@@ -2005,13 +2011,13 @@ gitzsta() {
 
     zsta "$1"
 }
-alias unzst=xzst
-alias uzst=unzst
 alias unz=xzst
-
-alias unzsta=xzsta
-alias uzsta=unzsta
 alias unza=xzsta
+
+unzalong() {
+    local long="${2:-31}"
+    cat "$1" | zstd -d --long="$long" | tar xf -
+}
 
 # ipatool
 alias ipa=ipatool
@@ -2360,6 +2366,7 @@ alias tt='tt -theme nord'
 
 # img viewer
 alias img=chafa
+alias im=img
 cimg() {
     curl "$1" | chafa
 
@@ -3015,7 +3022,7 @@ man() {
     return 1
 }
 
-export VIMRUNTIME="$HOME"/vim/vim90
+export VIMRUNTIME="$HOME"/vim/vim91
 
 # on Sonoma we must create rsync alias
 # pointing to unusual location
