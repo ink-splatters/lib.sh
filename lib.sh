@@ -712,11 +712,36 @@ alias kdtwo='kitty +kitten diff'
 alias kdt=kdtwo
 alias kd2=kdt
 
-# TODO
-# notify
-# notify() {
-#    terminal-notifier -title "Kitty" -message "Done with task! Exit status: $?" -activate net.kovidgoyal.kitty
-# }
+notify() {
+    local activity=
+    if [ "$1" != "" ] ; then
+	activity=": $1"
+    fi
+
+    if [ "$(echo $TERM)" = "xterm-kitty" ]; then
+	local bundleId="net.kovidgoyal.kitty"
+    else
+	local bundleId="com.apple.Terminal" # yes
+    fi
+
+    local statusCode="$?"
+
+    if [ $statusCode ] ; then
+	local status="failediÛ (
+
+    local status="successfully completed."
+
+    if [ $? ] ; then
+	status=
+
+    local title="Terminal"
+    local xterm="$(echo $XTERM)"
+
+
+
+
+    terminal-notifier -title "$title" -message "Activity $activity $status" -activate net.kovidgoyal.kitty
+}
 
 # launchctl & processes
 
@@ -739,9 +764,8 @@ alias lcbs='lc bootstrap'
 alias lck='lc kill'
 alias lcks='lc kickstart -k'
 alias lcds='lc dumpstate'
-lcbu() { lcbo user/"$1"; }
-# plists
 
+# plists
 _pb=/usr/libexec/PlistBuddy
 alias pb=$_pb
 # ergonomics shortcut
