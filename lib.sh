@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241216_c77515b
+LIBSH_VERSION=20241231_db3e3bc
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -736,12 +736,21 @@ alias lcbo='lc bootout'
 alias lcd='lc disable'
 alias lce='lc enable'
 alias lcbs='lc bootstrap'
+alias lcbss='lcbs system'
+alias lcbsu='lcbs user/501'
+alias lcbsg='lcbs gui/501'
 alias lck='lc kill'
 alias lcks='lc kickstart -k'
 alias lcds='lc dumpstate'
-lcbu() { lcbo user/"$1"; }
-# plists
 
+lcpd() {
+    lc print-disabled "$1" | grep disabled | grep -Eo 'com.apple.[^"]+' | sort -u
+}
+
+alias lcpds='lcpd system'
+alias lcpdu='lcpd user/501'
+
+# plists
 _pb=/usr/libexec/PlistBuddy
 alias pb=$_pb
 # ergonomics shortcut
