@@ -1,4 +1,4 @@
-LIBSH_VERSION=20241231_db3e3bc
+LIBSH_VERSION=20250102_8353dca
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -291,8 +291,7 @@ alias kcont='k -SIGCONT'
 
 pk() { pg "$1" | x kill -9; }
 
-alias bt=btop
-alias t=bt
+alias t=btop
 
 _salias bw bandwhich --show-dns
 
@@ -640,13 +639,14 @@ alias vi="$EDITOR"
 alias v=vi
 alias virc='vi ~/.vimrc'
 alias vrc=virc
-alias b=bat
+alias ba=bat
 alias batlog='bat --paging=never -l log'
 alias blog=batlog
 alias bathelp='bat -l help -p'
 alias bhelp=bathelp
 alias batdiff='bat -l diff'
 alias bdiff=batdiff
+alias ca=cat
 alias lstream='log stream --color=always'
 alias lshow='log show --color=always'
 
