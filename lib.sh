@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250102_8353dca
+LIBSH_VERSION=20250110_f522ab4
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1118,8 +1118,7 @@ nxdrvpaths() {
 Prints nix store "requisites" paths for specified derivation(s).
 Useful when one needs to do fine-grained filtering (like for pushing to binary cache).
 
-Usage:
-    $0 <derivation...>
+Usage: $0 <derivation...>
 EOF
         return 1
     fi
@@ -1153,7 +1152,12 @@ alias nxpl=nxl
 alias nxpi=nxi
 alias nxr='nxp remove'
 alias nxpr=nxr
-alias nxrepl='nx repl'
+
+# setting NIX_PATH this way allows to refer to `nixpkgs` inside
+# as it would be channel (without actual `nixpkgs` channel set up)
+# details: https://github.com/NixOS/nix/issues/7026#issue-1369924326
+alias nxrepl='NIX_PATH=nixpkgs=flake:nixpkgs nx repl'
+
 alias nxre='nx registry'
 alias nxrea='nxre add'
 alias nxrep='nxre pin'
@@ -1161,7 +1165,7 @@ alias nxrerm='nxre remove'
 
 nxrepkgs() {
 
-    nix repl --file <(
+    nxrepl --file <(
         cat <<'EOF'
 import <nixpkgs> {
   overlays = [
@@ -1193,14 +1197,8 @@ alias nxrelu=nxreu
 alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
 
-alias nxh='nx hash'
-
-alias _nxhc='nxh convert'
-alias nxhc256='_nxhc --hash-algo sha256'
-alias nxhc=nxhc256
-
-alias _nxhf='nxh file'
-alias nxhf='_nxhf --base16'
+alias nxhash='nx hash'
+alias nxh='nxhash'
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
@@ -2251,24 +2249,23 @@ EOF
 
     local src="$1"
     local dst_codec="$2"
-    shift 2
     local dst_ext="${3:-$2}"
-
-    if [ "$3" != "" ]; then
-        shift
-    fi
 
     _ensure ffmpeg || return 1
 
-    echo FROM: "$1"
-    echo TO: "$2"
-    if [ "$2" != "$3" ]; then
-        echo EXT: "$3"
-    fi
-
     for f in ./**/*.$src; do
-        echo converting "$f" to "${f%.*}.${dst_ext} (codec: ${dst_codec})"...
-        ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "${f%.*}.${dst_ext}" "$@"
+        local title="${f%.*}"
+        local dst="$title.$dst_ext"
+        cat <<EOF
+
+------------------------------------------------------------------------------------------
+TITLE:	$title
+FROM:	$src
+TO:	$dst_ext$(if [ "$dst_codec" != "$dst_ext" ]; then echo " ($dst_codec)"; fi)
+------------------------------------------------------------------------------------------
+
+EOF
+        ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "$dst"
     done
 
 }
