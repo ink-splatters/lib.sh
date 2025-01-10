@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250110_f522ab4
+LIBSH_VERSION=20250110_73bc73a
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2904,6 +2904,20 @@ alias bnx='bunx --bun' # force run with bun
 alias bnre="${_bun[*]} repl"
 alias bnn="${_bun[*]} init"
 alias bnc="${bun[*]} c"
+
+# sdkman
+alias sdkl='sdk current'
+alias sdkll='sdk list'
+alias sdkr='sdk uninstall'
+alias sdku='sdk update'
+alias sdki='sdk install'
+alias sdksu='sdk selfupdate'
+alias sdkuse='sdk use'
+alias sdkset='sdk default'
+alias sdkdef=sdkset
+sdkclean() {
+    echo tmp metadata version | x -n1 sdk flush
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
