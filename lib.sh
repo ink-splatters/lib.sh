@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250110_73bc73a
+LIBSH_VERSION=20250111_1a5f380
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -41,7 +41,7 @@ _sexec() {
     sudo "$@"
 }
 
-_ensure() {
+_require() {
     for f in "$@"; do
         if ! command -v "$f" 1>/dev/null; then
             echo ERROR: "$f" is not in PATH
@@ -128,7 +128,6 @@ EOF
 
 _salias s
 _salias si -i
-_salias efs vi /etc/fstab # efs - edit fstab
 _salias enx vi /etc/nix/nix.conf
 alias xx='exit'
 alias q=xx
@@ -1074,6 +1073,11 @@ alias rgi='rg -iuuu'
 
 # new nix cli
 
+# setting NIX_PATH this way allows to refer to `nixpkgs` inside
+# as it would be channel (without actual `nixpkgs` channel set up)
+# details: https://github.com/NixOS/nix/issues/7026#issue-1369924326
+export NIX_PATH=nixpkgs=flake:nixpkgs
+
 alias nx='nix --option extra-access-tokens "$GH_PAT"'
 
 _nxv='--verbose --show-trace --print-build-logs'
@@ -1153,10 +1157,7 @@ alias nxpi=nxi
 alias nxr='nxp remove'
 alias nxpr=nxr
 
-# setting NIX_PATH this way allows to refer to `nixpkgs` inside
-# as it would be channel (without actual `nixpkgs` channel set up)
-# details: https://github.com/NixOS/nix/issues/7026#issue-1369924326
-alias nxrepl='NIX_PATH=nixpkgs=flake:nixpkgs nx repl'
+alias nxrepl='nx repl'
 
 alias nxre='nx registry'
 alias nxrea='nxre add'
@@ -1199,6 +1200,17 @@ alias nxw='nxp wipe-history'
 
 alias nxhash='nx hash'
 alias nxh='nxhash'
+
+nxhrand() {
+    _require nix
+    # branching to support Lix
+    if [[ "$(nix --version)" =~ Lix ]]; then
+        nxh to-sri --type sha256 $(rand 32) | tn
+    else
+        nxh convert --hash-algo sha256 $(rand 32)
+    fi
+}
+alias nxhr=nxhrand
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
@@ -1437,7 +1449,7 @@ EOF
         return 1
     fi
 
-    _ensure gh jq rg || return 1
+    _require gh jq rg || return 1
 
     local remote="${1:-origin}"
 
@@ -1487,7 +1499,7 @@ EOF
         return 1
     fi
 
-    _ensure fd || return 1
+    _require fd || return 1
 
     local git=git
 
@@ -1915,9 +1927,8 @@ alias cpindarwin='cpin aarch64-darwin'
 # jq call is POSIX - incompliant
 # hence this nasty wrapping
 unset -f nomino
-_nomino="$(which nomino)"
 function nomino() {
-    /usr/bin/env bash -c "jq < <('$_nomino' --test $@ -g /dev/fd/1)"
+    /usr/bin/env bash -c "jq < <('$(which nomino)' --test $@ -g /dev/fd/1)"
 }
 
 alias nom=nomino
@@ -2136,14 +2147,14 @@ EOF
             return 1
             ;;
     esac
-    _ensure ffmpeg || return 1
+    _require ffmpeg || return 1
 
     for f in ./**/*.flac; do
         echo converting "$f" to "${f%.*}.m4a"...
         ffmpeg -i "$f" -c:a alac -strict experimental -c:v copy "${f%.*}".m4a
     done
 
-    _ensure atomicparsley && {
+    _require atomicparsley && {
         if [ $_noart = 1 ]; then
             echo "not embedding artwork ($_noart)"
             return
@@ -2213,7 +2224,7 @@ EOF
     fi
 
     # cuetag is part of 'cuetools'
-    _ensure ${tools[*]} || return 1
+    _require ${tools[*]} || return 1
 
     shnsplit -t "%n. %t" -f "$cue" -o "flac flac -s -8 -o %f -" "$flac"
 
@@ -2251,7 +2262,7 @@ EOF
     local dst_codec="$2"
     local dst_ext="${3:-$2}"
 
-    _ensure ffmpeg || return 1
+    _require ffmpeg || return 1
 
     for f in ./**/*.$src; do
         local title="${f%.*}"
@@ -2300,7 +2311,7 @@ EOF
         return 0
     fi
 
-    _ensure "$cmd" || return 1
+    _require "$cmd" || return 1
 
     for f in ./**/*."$src_ext"; do
         if [[ -f $f ]]; then
@@ -2338,7 +2349,7 @@ Aliases:
 EOF
         return 1
     fi
-    _ensure ffmpeg ffprobe || return 1
+    _require ffmpeg ffprobe || return 1
 
     local src_ext="wav"
     local dst_ext="raw"
@@ -2616,7 +2627,7 @@ function aria2c() {
 alias a2c=aria2c
 
 function yea() {
-    _ensure aria2c || return 1
+    _require aria2c || return 1
 
     ye "$@" \
         --external-downloader aria2c \
@@ -2660,7 +2671,7 @@ EOF
         return 1
     fi
 
-    _ensure chardetect iconv || return 1
+    _require chardetect iconv || return 1
 
     iconv -f $(chardetect "$1" --minimal) -t utf-8 "$1"
 }
