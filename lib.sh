@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250111_1a5f380
+LIBSH_VERSION=20250114_38e9d39
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2887,7 +2887,7 @@ alias b64d='base64 -d'
 # bun
 
 unset -f bun
-_bun="$(which bun)"
+alias _bun="$(which bun)"
 
 function bun() {
     local args=()
@@ -2899,7 +2899,7 @@ function bun() {
 
         args+=("$@")
     fi
-    ${_bun[*]} "${args[@]}"
+    _bun "${args[@]}"
 }
 
 alias bn=bun
@@ -2907,7 +2907,17 @@ alias bpm='bn pm'
 alias bpmc='bpm cache'
 alias bcgd='bpmc rm' # a-la `ncgd`
 alias bnl='bpm ls'
-alias bni='bn i'
+function bni() {
+    _require bunx fd
+    bn i "$@"
+
+    local exes=
+    mapfile -t exes < <(fd -t l . ~/.bun/bin -x readlink)
+
+    for e in "${exes[@]}"; do sed -i '' -E 's/(#\!\/usr\/bin\/env) (node)/\1 bunx \2/g' "$HOME/.bun/bin/$e"; done
+
+    echo 'Fixed up shebangs'
+}
 alias bnr='bn rm'
 alias bnu='bn update'
 alias bnxn='bunx'      # bunx "run with node"
@@ -2928,6 +2938,12 @@ alias sdkset='sdk default'
 alias sdkdef=sdkset
 sdkclean() {
     echo tmp metadata version | x -n1 sdk flush
+}
+
+# tectonic
+alias tec=tectonic
+teco() {
+    tec "$1" && open "${1%.*}".pdf
 }
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
