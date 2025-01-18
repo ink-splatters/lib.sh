@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250114_38e9d39
+LIBSH_VERSION=20250118_0bb0021
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1991,7 +1991,7 @@ EOF
     local in="$1"
     shift
 
-    zstd -d --stdout "$in" | tar -x "$@"
+    zstd -d --memory=2048MB --stdout "$in" | tar -x "$@"
 }
 
 xzsta() {
