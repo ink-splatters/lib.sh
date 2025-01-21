@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250118_0bb0021
+LIBSH_VERSION=20250121_d5d1fc6
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1207,7 +1207,7 @@ nxhrand() {
     if [[ "$(nix --version)" =~ Lix ]]; then
         nxh to-sri --type sha256 $(rand 32) | tn
     else
-        nxh convert --hash-algo sha256 $(rand 32)
+        nxh convert --hash-algo sha256 $(rand 32) | tn
     fi
 }
 alias nxhr=nxhrand
