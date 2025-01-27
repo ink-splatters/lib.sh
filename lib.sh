@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250121_d5d1fc6
+LIBSH_VERSION=20250127_c3c4bf6
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -548,11 +548,11 @@ alias pxtl='pxt ls'
 alias pxth='pxt help'
 
 alias pxg='px g' # global
-alias pxged='pxg edit'
+alias pxge='pxg edit'
 alias pxga='pxg a'
 alias pxgi='pxg i'
-alias pxgun='pxg uninstall'
-alias pxgr='pxg rm'
+alias pxgr='pxg uninstall'
+alias pxgrm='pxg rm'
 alias pxgl='pxg ls'
 alias pxgs='pxg s'  # sync
 alias pxgex='pxg e' # expose
