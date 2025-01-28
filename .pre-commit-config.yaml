@@ -11,12 +11,12 @@ repos:
   - id: yamllint
     files: \.yaml(fmt|lint)?$
 - repo: 'https://github.com/google/yamlfmt'
-  rev: v0.13.0
+  rev: v0.15.0
   hooks:
   - id: yamlfmt
     files: \.yaml(fmt|lint)?$
 - repo: 'https://github.com/executablebooks/mdformat'
-  rev: 0.7.18
+  rev: 0.7.21
   hooks:
   - id: mdformat
 - repo: 'https://github.com/scop/pre-commit-shfmt'
