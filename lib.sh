@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250127_c3c4bf6
+LIBSH_VERSION=20250128_94d3926
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2048,8 +2048,8 @@ alias isearch='ipa search'
 alias ipurchase='ipa purchase -b'
 
 # sublime text
-alias sublime=sublime_text
-alias sub='subl . &'
+alias subl='~/.nix-profile/Applications/Sublime\ Text.app/Contents/MacOS/sublime_text &'
+alias sub=subl
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
