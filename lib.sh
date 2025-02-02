@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250128_debc3ce
+LIBSH_VERSION=20250202_98e6f12
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -128,7 +128,7 @@ EOF
 
 _salias s
 _salias si -i
-_salias enx vi /etc/nix/nix.conf
+_salias vinix vi /etc/nix/nix.conf
 alias xx='exit'
 alias q=xx
 
@@ -979,9 +979,6 @@ xsv() {
 # xsp q # echo com.apple.quarantine
 # xsp q m # echo com.apple.{quarantine,macl}
 
-# as it shadows legitimate app:
-alias csv="$HOME"/.nix-profile/bin/xsv
-
 # fs lockers
 
 _salias _chflags /usr/bin/chflags
@@ -1234,6 +1231,34 @@ alias nixpkgs-unstable=nxrev
 #alias rev-nixpkgs-unstable='nxrev nixpkgs-unstable'
 
 alias nxtree='nix-tree'
+
+_nix-apps-exist() {
+    [ ! -d "$1" ] && {
+        echo "Nix $2 profile and/or Applications not found."
+        return 1
+    }
+}
+#alias profiles='open /nix/var/nix/profiles/default ~/.nix-profile'
+update-nix-apps() {
+    local nixapps=/Applications/nix
+    local userapps=~/.nix-profile/Applications
+    local systemapps=/nix/var/nix/profiles/default/Applications
+
+    _nix-apps-exist "$userapps" user
+    _nix-apps-exist "$systemapps" system
+
+    cat <<EOF
+1 sec to DESTRUCTIVE action:
+sudo rm -rf $nixapps
+EOF
+    sleep 1
+    echo 'BANG!'
+
+    s rm -rf "$nixapps"
+    s cp -R ~/.nix-profile/Applications "$nixapps"
+    find $(readlink "$systemapps") -type l -exec sudo cp -P {} "$nixapps" \;
+    echo Done.
+}
 
 # deprecated
 # TODO: remove
@@ -2048,7 +2073,6 @@ alias isearch='ipa search'
 alias ipurchase='ipa purchase -b'
 
 # sublime text
-alias subl='~/.nix-profile/Applications/Sublime\ Text.app/Contents/MacOS/sublime_text &'
 alias sub=subl
 
 # opens macOS profiles pane
