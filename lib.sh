@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250202_98e6f12
+LIBSH_VERSION=20250204_551bbee
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1833,7 +1833,7 @@ alias grs=grsu
 
 # restore
 alias gres='g restore'
-alias grest='gres --staged'
+alias grest='g restore --staged'
 
 # reset
 alias grh='g reset --hard'
@@ -2073,7 +2073,7 @@ alias isearch='ipa search'
 alias ipurchase='ipa purchase -b'
 
 # sublime text
-alias sub=subl
+alias sub='subl .'
 
 # opens macOS profiles pane
 alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.extension"'
