@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250204_551bbee
+LIBSH_VERSION=20250214_64f6195
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -386,8 +386,15 @@ wchan() {
 alias wscan='ap -s'
 alias wi='ap -I'
 alias winfo=wi
-_salias ng ngrep
-alias ng0='ng -d en0'
+
+# ngrep
+unset -f ngrep
+ngrep() {
+
+    s "$(which ngrep)" "$@"
+}
+alias ngrep0="ngrep -d en0"
+alias ng0=ngrep0
 
 if0() {
 
@@ -475,7 +482,7 @@ function nets() {
 
 }
 function dhinfo() {
-    networksetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
+    nets -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
 
 function netsocks() {
@@ -1258,6 +1265,7 @@ EOF
     s cp -R ~/.nix-profile/Applications "$nixapps"
     find $(readlink "$systemapps") -type l -exec sudo cp -P {} "$nixapps" \;
     echo Done.
+    open /Applications/nix
 }
 
 # deprecated
