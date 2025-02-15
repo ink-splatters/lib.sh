@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250214_64f6195
+LIBSH_VERSION=20250215_fafc7d1
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -594,16 +594,6 @@ alias ums='um search'
 # venv / uv
 alias _venv='python -m venv'
 alias venv='uv venv -p $(which python)'
-
-function venvwith() {
-    local py="$(fd -u python"$1"\$ -t x ~/.rye)"
-
-    if ! command -v "$py" >/dev/null 2>&1; then
-        echo "not found (internal error)"
-        return 1
-    fi
-    uv venv -p "$py"
-}
 
 alias _pip="python -m pip"
 alias pip="uv pip"
