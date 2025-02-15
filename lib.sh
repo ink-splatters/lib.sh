@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250215_fafc7d1
+LIBSH_VERSION=20250215_429885d
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1131,6 +1131,50 @@ alias nxds='nxdrv show | jq'
 alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
+
+nxfi() {
+    local templates=(default multi-module package unfree)
+
+    if [[ $1 =~ -h|--help ]]; then
+        cat <<'EOF'
+initializes nix flake in the current directory, using one of
+flake.parts template
+
+Usage:
+    nxfi [<template>| --list ]
+
+    template 	one of: multi-module/mm/multi, package/pkg, unfree/uf
+		absent argument evaluates to default flake.parts template
+
+    --list	list available templates
+EOF
+        return 1
+
+    elif [ "$1" = "--list" ]; then
+        echo ${templates[*]} | x -n1
+        return 1
+    fi
+
+    local regex=(default "mm|multi(-module)?" "package|pkg" "unfree|uf")
+    local choice=
+
+    for ((i = 0; i < ${#regex[@]}; i++)); do
+        if [[ $1 =~ ${regex[i]} ]]; then
+            choice="${templates[i]}"
+            break
+        fi
+    done
+
+    if [[ $1 != "" ]] && [[ $choice == "" ]]; then
+        echo "ERROR: unknown template: $1"
+        return 1
+    fi
+
+    local template="${choice:-default}"
+
+    nix flake init -t github:hercules-ci/flake-parts#"${template}"
+
+}
 alias nxfl='nxf lock'
 alias nxfm='nxf metadata'
 alias nxfs='nxf show'
