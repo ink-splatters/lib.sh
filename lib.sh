@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250215_429885d
+LIBSH_VERSION=20250216_df5bd49
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3011,6 +3011,26 @@ alias tec=tectonic
 teco() {
     tec "$1" && open "${1%.*}".pdf
 }
+
+# json torrent to magnet link converter
+jt2magnet() {
+    _require jq
+
+    jq -r '"magnet:?xt=urn:btih:\(.infoHash)&dn=\(.name|@uri)"' <<<"$(p)" | x open || {
+        cat <<'EOF'
+ERROR: clipboard contains invalid JSON"
+
+Converts JSON torrent (e.g. from `torrentcore.xyz`) to magnet link and opens it in associated application.
+
+Usage:
+    1. Cmd+C JSON torrent
+    2. run `tc2magnet`
+EOF
+        return 1
+    }
+}
+
+alias jt2m=jt2magnet
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
