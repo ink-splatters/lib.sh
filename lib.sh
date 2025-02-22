@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250216_df5bd49
+LIBSH_VERSION=20250222_22eb141
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -875,6 +875,10 @@ function fir() {
         _fi "$f" -exec rm -rf {} \;
     done
 }
+
+alias rmr='rm -r'
+alias rmrf='rmr -f'
+alias rf=rmrf
 
 alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
 alias ecp='_editto --acl'
@@ -3031,6 +3035,9 @@ EOF
 }
 
 alias jt2m=jt2magnet
+
+alias oxidize='oxipng -o max -a --strip all'
+alias ox=oxidize
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
