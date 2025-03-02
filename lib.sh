@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250222_22eb141
+LIBSH_VERSION=20250302_eb4d524
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2257,6 +2257,8 @@ alias f2a=flac2alac
 alias fmeta=metaflac
 alias fmetatags='fmeta --show-all-tags'
 alias fmetalist='fmeta --list'
+alias fmtags=fmetatags
+alias fmls=fmetalist
 
 # cue split
 
@@ -3039,6 +3041,18 @@ alias jt2m=jt2magnet
 alias oxidize='oxipng -o max -a --strip all'
 alias ox=oxidize
 
+# idevice
+alias idid="idevice_id | rg -o '^[A-F0-9-]+'"
+
+#snyk
+alias snk=snyk
+alias sk=snyk
+
+snkc() {
+    _require jq
+    snyk config | rg -o 'INTERNAL_OAUTH_TOKEN_STORAGE: (.+)$' --replace '$1' | jq
+}
+alias snc=snkc
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
