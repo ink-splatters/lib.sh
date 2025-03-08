@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250302_eb4d524
+LIBSH_VERSION=20250308_a621f6b
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -291,6 +291,7 @@ alias kcont='k -SIGCONT'
 pk() { pg "$1" | x kill -9; }
 
 alias t=btop
+alias b=btop
 
 _salias bw bandwhich --show-dns
 
@@ -1244,7 +1245,7 @@ alias nxhash='nx hash'
 alias nxh='nxhash'
 
 nxhrand() {
-    _require nix
+    _require nix || return 1
     # branching to support Lix
     if [[ "$(nix --version)" =~ Lix ]]; then
         nxh to-sri --type sha256 $(rand 32) | tn
@@ -2191,7 +2192,6 @@ wttr() {
 }
 
 # FLAC to ALAC
-#
 function flac2alac() {
     local _noart=0
     case $1 in
@@ -2200,23 +2200,24 @@ function flac2alac() {
             ;;
         -h | --help)
             cat <<'EOF'
+flac2alac [ <artwork file name>|--no-art|--no-cover ]
 
-flac2alac [ artwork ]
-recursively converts FLAC to ALAC, starting from the current directory (.)
+Recursively converts FLAC to ALAC, starting from the current directory.
 
-artwork:
-    jpeg or png filename containing the artwork to be embedded in the
-    resulting m4a; searched in every subdir
+    artwork file name:		jpeg or png filename containing the artwork to be embedded in the
+				resulting m4a; searched in every subdir
 
-    default names being searched:
-	cover.jpg
-	cover.jpeg
-	cover.png
+				default names being searched:
+				  - cover.jpg
+				  - cover.jpeg
+				  - cover.png
+
+    --no-art|--no-cover		don't embed any art
 
 EOF
-            return 1
             ;;
     esac
+
     _require ffmpeg || return 1
 
     for f in ./**/*.flac; do
@@ -2224,11 +2225,8 @@ EOF
         ffmpeg -i "$f" -c:a alac -strict experimental -c:v copy "${f%.*}".m4a
     done
 
-    _require atomicparsley && {
-        if [ $_noart = 1 ]; then
-            echo "not embedding artwork ($_noart)"
-            return
-        fi
+    if [ $_noart != 1 ]; then
+        _require atomicparsley || return 1
 
         local _cnames=("$1" cover.jpg cover.jpeg cover.png)
 
@@ -2250,7 +2248,7 @@ EOF
                 echo not embedding artwork: "$_cover" does not exist
             fi
         done
-    }
+    fi
 }
 
 alias f2a=flac2alac
@@ -2320,11 +2318,11 @@ any2any <src files extensions> <dst codec> [ dst files extension ]
 recursively converts source to destination.
 if destination is not specified, flac is used.
 
-e.g.:
+Usage examples:
 
-any2any ape alac m4a
-any2any m4a flac
-any2any flac alac m4a
+    any2any ape alac m4a
+    any2any m4a flac
+    any2any flac alac m4a
 
 EOF
         return 1
@@ -2351,6 +2349,27 @@ EOF
         ffmpeg -i "$f" -c:a "$dst_codec" -strict experimental -c:v copy "$dst"
     done
 
+}
+
+f22448() {
+    if [[ $1 =~ -h|--help ]]; then
+        cat <<'EOF'
+Down-samples Hi-Res audio to 24bit / 48kHz.
+Supplying audio with lower bit or sample rate is not supported.
+
+Usage:
+    f22448
+
+EOF
+        return 1
+    fi
+
+    _require ffmpeg || return 1
+
+    for f in ./**/*.flac; do
+        local dst="${f%.*}".24-48.flac
+        ffmpeg -i "$f" -c:a flac -sample_fmt s32 -ar 48000 -af "aresample=resampler=soxr" "$dst"
+    done
 }
 
 alias a2a=any2any
