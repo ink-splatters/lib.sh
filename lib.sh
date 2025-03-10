@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250308_a621f6b
+LIBSH_VERSION=20250310_1b90edd
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -789,22 +789,18 @@ _alias ll ls -l
 _alias la ll -a
 _alias laa la -O@e
 _alias l1 ls -1
-_alias l1a l1 -a
 
-_alias la1 l1a
-_alias la2 laa
-
-_alias ee eza
-_alias el ee -l
+_alias el eza -l --group-directories-first
+_alias ee el
 _alias ea el -a
-_alias eaa ea -@o
+_alias eaa ea -@OM
 
-_alias e1 ee -1
-_alias e1a e1 -a
-_alias ea1 e1a
+_alias ell el -@OM
 
-_alias ea2 eaa
-_alias ea3 ea2 -F
+_alias eaf ea -F
+_alias eaaf eaa -F
+
+#TODO: sort
 
 alias dustpr='dust -prR'
 
