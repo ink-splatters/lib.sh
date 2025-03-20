@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250310_1b90edd
+LIBSH_VERSION=20250320_597f75f
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -15,6 +15,14 @@ shopt -s globstar
 set -o pipefail
 
 # helpers
+
+function pd() {
+    if [ $# = 0 ]; then
+        popd 1>/dev/null
+    else
+        pushd "$1" 1>/dev/null
+    fi
+}
 
 _alias() {
     local name="$1"
@@ -187,15 +195,18 @@ alias sinfo=bf # small info
 rand() {
     if [[ $# == 0 ]]; then
         cat <<EOF
-the util takes <count> bytes from /dev/random and outputs lower-case hex values
+The util takes <count> bytes from /dev/random and outputs lower-case hex values
 
-usage: rand <count> [-f] [-n]
+Usage:
+    rand <count> [-f] [-n]
 
-<count>         byte count
--f, --force     if count > 64, the flag is required
--n, --newline   if specified, '\n' is added after the output
+Parameters:
+    <count>		byte count
+    -f, --force		if count > 64, the flag is required
+    -n, --newline	if specified, '\n' is added after the output
 
-example: to get 256 bit nonce use: $(rand 32)
+Example:
+    To get 256 bit nonce use: $(rand 32)
 
 EOF
         return 1
@@ -236,19 +247,19 @@ EOF
 function randpass() {
     if [[ $1 == "--help" || $1 == "-h" ]]; then
         cat <<EOF
-generates random password
-usage: randpass [length]
-default length is 16
+Generates random password
 
-<count>		symbol count
+Usage:
+    randpass [length]
+
+Parameters:
+    length	length in characters, default is 16
+
 EOF
         exit 1
     fi
 
-    if ! command -v python >/dev/null 2>&1; then
-        echo ERROR: python not found
-        exit 1
-    fi
+    _require python3 || return 1
 
     local length="${1:-16}"
 
@@ -327,6 +338,8 @@ alias pig=isnet
 
 _salias ap /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport
 _salias apd /usr/libexec/airportd
+
+_salias sysinfocachegen /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/sysinfocachegen
 
 # use always native ifconfig for the purpose of lib.sh!
 _salias ifc /sbin/ifconfig
@@ -410,30 +423,34 @@ if0() {
 }
 
 randmac() {
+    echo "🪦 you've just stumbled upon a tumbstone with the text on it: 🪦"
+    echo
 
-    if (($# > 1)); then
-        cat <<'EOF'
+    cat <<'EOF'
 Temporary changes network interface mac address. This does not survice a reboot.
 
-usage: randmac [<interface>]
+Usage:
+    randmac [<interface>]
 
-[<interface>]   optionally specified interace for the mac address to be set on
+Parameters:
+
+    [<interface>]	optionally specified interace for the mac address to be set on
 EOF
-        return 1
-    fi
+    return 1
 
-    local interface=en0
+    #  local interface=en0
+    #
+    #  if [ "$1" != "" ]; then
+    #    interface="$1"
+    #  fi
+    #
+    #  ap -z
+    #  local mac=$(rand 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g')
+    #
+    #  echo -- "generated value: $mac; attempting to set..."
+    #  ifc $interface ether "$mac"
+    #  (($? == 0)) && mac && echo done.
 
-    if [ "$1" != "" ]; then
-        interface="$1"
-    fi
-
-    ap -z
-    local mac=$(rand 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g')
-
-    echo -- "generated value: $mac; attempting to set..."
-    ifc $interface ether "$mac"
-    (($? == 0)) && mac && echo done.
 }
 
 alias ms='m status'
@@ -478,16 +495,53 @@ msss() {
     printf "\tRelay info:\n\t\t%s\n" "$(m relay get | sed -E 's/^[^:]+: //g')"
 }
 
-function nets() {
+function netsetup() {
     _exec networksetup "$@"
 
 }
-function dhinfo() {
-    nets -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
+alias nsetup=netsetup
+
+alias _netservices='networksetup -listnetworkserviceorder'
+
+function netservices() {
+
+    for ((i = 1; i <= $#; i++)); do
+        case "${!i}" in
+            -h | --help)
+                cat <<'EOF'
+
+Lists macos network services, in their order (priority)
+
+Usage:
+    netservices [-h|--help] [--json]
+
+Parameters:
+    --json		output JSON
+
+EOF
+                return 1
+                ;;
+
+            --json)
+                local json=1
+                _require rg || return 1
+                ;;
+        esac
+    done
+
+    if [[ $json == 1 ]]; then
+        _netservices | rg --color never -o 'Hardware Port: ([^,]+), Device: (en[\d]+)' --replace '{"name":"$1","port":"$2"}'
+    else
+        _netservices
+    fi
 }
 
-function netsocks() {
-    nets -setsocksfirewallproxy "Wi-Fi" "$1" "$2"
+alias nservices=netservices
+alias nsvc=nservices
+alias nsvcj='nsvc --json'
+
+function dhinfo() {
+    netsetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
 
 alias dhi=dhinfo
@@ -570,27 +624,6 @@ alias pxgh='pxg help'
 alias hch=hatch
 alias ach=hch
 alias tch=hch
-alias pd=pdm
-
-alias mm=mamba
-alias um=micromamba
-alias uma='um activate'
-alias umd='um deactivate'
-alias umc='um env create -n'
-alias uml='um env list'
-alias umll='um list'
-alias umu='um update'
-alias umua='umu -a'
-
-umca() {
-    umc "$1"
-    uma "$1"
-}
-
-alias umi='um install'
-alias umr='um remove'
-alias umrm='um env remove -n'
-alias ums='um search'
 
 # venv / uv
 alias _venv='python -m venv'
@@ -1085,6 +1118,7 @@ alias nxconf='nx show-config'
 alias nxc=nxconf
 alias nxsh='nx shell'
 alias nxs='nix-search'
+alias nxsd='nxs -d'
 
 alias nxb='nx build'
 alias nxbi="nxb $_nxi"
@@ -1117,7 +1151,8 @@ nxdrvpaths() {
 Prints nix store "requisites" paths for specified derivation(s).
 Useful when one needs to do fine-grained filtering (like for pushing to binary cache).
 
-Usage: $0 <derivation...>
+Usage:
+    $0 <derivation...>
 EOF
         return 1
     fi
@@ -1138,7 +1173,7 @@ nxfi() {
 
     if [[ $1 =~ -h|--help ]]; then
         cat <<'EOF'
-initializes nix flake in the current directory, using one of
+Initializes nix flake in the current directory, using one of
 flake.parts template
 
 Usage:
@@ -1239,6 +1274,8 @@ alias nxw='nxp wipe-history'
 
 alias nxhash='nx hash'
 alias nxh='nxhash'
+alias nxhsri='nxh to-sri --type sha256'
+alias xsri='xargs nix hash to-sri --type sha256'
 
 nxhrand() {
     _require nix || return 1
@@ -1303,36 +1340,8 @@ EOF
     open /Applications/nix
 }
 
-# deprecated
-# TODO: remove
-#alias nu-legacy='nix-env --upgrade' # broken allegedly by nixpkgs' 8a5b9ee
-#
-## creates upggradeable list of packages as --attr parameters to nix-env --upgrade
-#_nuattrs() {
-#
-#    nix-shell -p ripgrep --run sh < <(
-#        cat <<'EOF'
-#nix-env -q | rg -o '^([a-zA-Z-]+)[.-](?:[\d.-]+)*' --replace '--attr nixpkgs.$1' | sed -e 's/-i/I/g;s/-min/Min/g;s/nss-//g;s/-(wrapped|unstable)//g'
-#EOF
-#    )
-#    return 0
-#}
-#
-#_nu() {
-#    _nuattrs $@ | xargs nix-env --upgrade
-#
-#}
-#
-#alias nu-attrs=_nuattrs
-#alias nu='nix-env --upgrade'
-#
-#alias ncu='nix-channel --update'
-#
-#alias u='nix-env -e'
-#alias q='nix-env -q'
-
 # direnv / nix-direnv
-alias renv=nix-direnv-reload
+alias dre=nix-direnv-reload
 
 # filesystem
 
@@ -2784,9 +2793,23 @@ alias rgnc='rg --color=never'
 
 # tor
 mytorsocks() {
-    _exec netsocks localhost 9050
+    # set it up on all the services available
+
+    _require jq
+
+    local svcs=
+
+    mapfile -t svcs < <(netservices --json | jq '.name' -r)
+
+    for svc in "${svcs[@]}"; do
+        netsetup -setsocksfirewallproxy "$svc" localhost 9050
+    done
+
     tor
-    _exec netsocks "" ""
+
+    for svc in "${svcs[@]}"; do
+        netsetup -setsocksfirewallproxy "$svc" "" ""
+    done
 }
 
 # gollama
@@ -3068,6 +3091,9 @@ snkc() {
     snyk config | rg -o 'INTERNAL_OAUTH_TOKEN_STORAGE: (.+)$' --replace '$1' | jq
 }
 alias snc=snkc
+
+alias verifyNotarization='spctl -a -vvv -t install'
+alias vn=verifyNotarization
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
