@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250320_597f75f
+LIBSH_VERSION=20250325_dad9037
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3094,6 +3094,40 @@ alias snc=snkc
 
 alias verifyNotarization='spctl -a -vvv -t install'
 alias vn=verifyNotarization
+
+_ffbranch() {
+    gco upstream/"$1" \
+        && gbd "$1" \
+        && gcob "$1" \
+        && gpush -f || return 1
+}
+
+ffnixpkgs() {
+
+    _require git
+
+    if [ "$(basename "$PWD")" != "nixpkgs" ]; then
+        echo 'assert "$(basename "$PWD")" == "nixpkgs"'
+        return 1
+    fi
+
+    if ! command git remote get-url upstream >/dev/null 2>&1; then
+        echo 'no remote: upstream'
+        exit 1
+    fi
+
+    local branches=(master nixpkgs-unstable)
+
+    gf -vp upstream "${branches[@]}"
+
+    for branch in "${branches[@]}"; do
+        _ffbranch "$branch" || {
+            echo "FAILED."
+            return 1
+        }
+
+    done
+}
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
