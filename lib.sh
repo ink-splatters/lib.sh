@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250325_dad9037
+LIBSH_VERSION=20250330_0e43882
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2078,16 +2078,28 @@ xzsta() {
     xzst "$name" && rm -rf "$name" && echo && echo Done || echo Error: $?
 }
 
-del_working_tree() {
+_ensure_git_tree() {
     local dest="$1"
 
     if [ ! -d "$dest"/.git ]; then
         echo "ERROR: $dest is not a git tree"
         return 1
     fi
-    echo '1.5 sec to DESTRUCTIVE action'
-    sleep 1.5
+}
+
+_destructive_warn() {
+    local time="${1:-1.5}"
+
+    echo "$time sec to DESTRUCTIVE action"
+    sleep "$time"
     echo 'BANG!'
+}
+
+del_working_tree() {
+    local dest="$1"
+
+    _ensure_git_tree "$dest" || return 1
+    _destructive_warn
 
     pushd "$dest" 1>/dev/null \
         && mv .git .. \
@@ -2113,6 +2125,18 @@ unzalong() {
     local long="${2:-31}"
     cat "$1" | zstd -d --long="$long" | tar xf -
 }
+
+gitprune() {
+    _require git
+
+    _ensure_git_tree "$PWD" || return 1
+    _destructive_warn
+
+    git reflog expire --expire=now --all
+    git gc --aggressive --prune=now
+}
+
+alias gprune=gitprune
 
 # ipatool
 alias ipa=ipatool
