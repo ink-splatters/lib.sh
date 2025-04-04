@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250330_0e43882
+LIBSH_VERSION=20250404_a265d29
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -627,7 +627,8 @@ alias tch=hch
 
 # venv / uv
 alias _venv='python -m venv'
-alias venv='uv venv -p $(which python)'
+alias venvwith='uv venv -p'
+alias venv='venvwith $(which python)'
 
 alias _pip="python -m pip"
 alias pip="uv pip"
@@ -1110,7 +1111,6 @@ alias nx='nix --option extra-access-tokens "$GH_PAT"'
 
 _nxv='--verbose --show-trace --print-build-logs'
 _nxi='--impure'
-_nxafc='--accept-flake-config'
 
 alias enxc='vi ~/.config/nix/nix.conf'
 
@@ -1121,24 +1121,14 @@ alias nxs='nix-search'
 alias nxsd='nxs -d'
 
 alias nxb='nx build'
-alias nxbi="nxb $_nxi"
-alias nxba="nxb $_nxafc"
-alias nxbia="nxbi $_nxafc"
-
 alias nxbv="nxb $_nxv"
-alias nxbvi="nxbv $_nxi"
-alias nxbva="nxbv $_nxafc"
-alias nxbvia="nxbvi $_nxafc"
+alias nxbi="nxb $_nxi"
+alias nxbiv="nxbi $_nxv"
 
 alias nxd='nx develop'
-alias nxda="nxd $_nxafc"
-alias nxdi="nxd $_nxi"
-alias nxdia="nxdi $_nxafc"
-
 alias nxdv="nxd $_nxv"
-alias nxdva="nxdv $_nxafc"
-alias nxdvi="nxdv $_nxi"
-alias nxdvia="nxdvi $_nxafc"
+alias nxdi="nxd $_nxi"
+alias nxdiv="nxdi $_nxv"
 
 alias nxdrv='nx derivation'
 nxdrvshow() {
@@ -3218,8 +3208,8 @@ _init() {
         # there is no sudo in RecoveryOS
         _sudo='"$@"'
 
-        # rsync path on Sonoma
-        _rsync="$system/usr/libexec/rsync/rsync.samba"
+        # Sequoia 15.4 breaks rsync again, this time we need to ship old rsync with us
+        _rsync="$selfdir/rsync.samba"
         cat <<EOF >$bspath
 # lib.sh footer written on $(date '+%+')
 __LIBSH_INITIALIZED=1 source "$self"
