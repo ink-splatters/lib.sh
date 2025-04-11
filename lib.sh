@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250404_a265d29
+LIBSH_VERSION=20250411_cc54337
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3142,6 +3142,46 @@ ffnixpkgs() {
 
     done
 }
+
+nix2bash() {
+    if [[ $1 =~ -h|--help ]]; then
+        cat <<'EOF'
+converts nix assignments to bash
+
+e.g.:
+
+```nix
+pname = "huly-code";
+version = "251.108";
+url = "https://dist.huly.io/code/${pname}-${version}-aarch64.dmg";
+...
+```
+
+to
+
+```bash
+pname="huly-code"
+version="251.108"
+url="https://dist.huly.io/code/${pname}-${version}-aarch64.dmg"
+...
+```
+
+(spoiler: it's very stupid. it just removes spaces and colons :)
+
+
+Usage
+    currently the util works only with clipboard, so you need to place something to clipboard first
+    and then call it
+
+EOF
+        return 1
+    fi
+
+    pbpaste | tr -d '\t ;'
+
+}
+
+alias nx2b=nix2bash
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
