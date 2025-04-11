@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250411_cc54337
+LIBSH_VERSION=20250411_1348a74
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2120,7 +2120,8 @@ gitprune() {
     _require git
 
     _ensure_git_tree "$PWD" || return 1
-    _destructive_warn
+
+    [ "$1" != "--no-warn" ] && _destructive_warn
 
     git reflog expire --expire=now --all
     git gc --aggressive --prune=now
