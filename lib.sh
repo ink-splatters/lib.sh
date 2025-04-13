@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250411_1348a74
+LIBSH_VERSION=20250413_be970a9
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2124,7 +2124,7 @@ gitprune() {
     [ "$1" != "--no-warn" ] && _destructive_warn
 
     git reflog expire --expire=now --all
-    git gc --aggressive --prune=now
+    git gc --prune=now --aggressive
 }
 
 alias gprune=gitprune
