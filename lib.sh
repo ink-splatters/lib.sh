@@ -2088,8 +2088,10 @@ _destructive_warn() {
 del_working_tree() {
     local dest="$1"
 
+    _require git
+
     _ensure_git_tree "$dest" || return 1
-    _destructive_warn
+    [ "$2" != "--no-warn" ] && _destructive_warn
 
     pushd "$dest" 1>/dev/null \
         && mv .git .. \
@@ -2100,7 +2102,7 @@ del_working_tree() {
 }
 
 gitzsta() {
-    del_working_tree "$1"
+    del_working_tree "$@"
 
     if [ $? != 0 ]; then
         return $?
