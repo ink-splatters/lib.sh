@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250413_be970a9
+LIBSH_VERSION=20250423_cb67cc4
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -87,7 +87,7 @@ _curl_get() {
 }
 
 # self
-getself() {
+_getself() {
     local exp='local self="${BASH_SOURCE[0]:-${(%):-%x}}"'
     eval "$(echo $exp)"
 
@@ -99,13 +99,13 @@ getself() {
     echo "$self"
 }
 
-getselfdir() {
-    local selfdir="$(dirname "$(getself)")"
+_getselfdir() {
+    local selfdir="$(dirname "$(_getself)")"
     echo "$selfdir"
 }
 
-getdatadir() {
-    local data="$(echo "$(getself)" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
+_getdatadir() {
+    local data="$(echo "$(_getself)" | sed -E 's/(^\/Volumes\/[^/]+)\/.+$/\1/g')"
     echo "$data"
 }
 
@@ -118,7 +118,7 @@ EOF
     fi
 
     if [ "$__OSINSTALL_ENVIRONMENT" == 1 ]; then
-        local _dscl=(dscl -plist -f "$(getdatadir)"/private/var/db/dslocal/nodes/Default localonly)
+        local _dscl=(dscl -plist -f "$(_getdatadir)"/private/var/db/dslocal/nodes/Default localonly)
         local users=/Local/Target/Users
     else
         local _dscl=(dscl -plist .)
@@ -2840,7 +2840,7 @@ ensuretrashfor() {
     local h=$(gethome $u)
 
     if [ "$__OSINSTALL_ENVIRONMENT" == 1 ]; then
-        local h="$(getdatadir)$h"
+        local h="$(_getdatadir)$h"
     fi
 
     local t="$h/.Trash"
@@ -3189,7 +3189,7 @@ alias nx2b=nix2bash
 
 _init() {
 
-    local self="$(getself)"
+    local self="$(_getself)"
     echo -- self: "$self"
 
     alias fsl="source '$self'"
@@ -3199,10 +3199,10 @@ _init() {
         system=/
 
     else
-        local selfdir="$(getselfdir)"
+        local selfdir="$(_getselfdir)"
         echo -- selfdir: "$selfdir"
 
-        local data="$(getdatadir)"
+        local data="$(_getdatadir)"
 
         local vg=$(d info "$data" | grep 'APFS Volume Group' | grep -Eo '[0-9A-F-]{36}')
 
