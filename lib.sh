@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250423_cb67cc4
+LIBSH_VERSION=20250505_ff28ba6
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3185,6 +3185,10 @@ EOF
 }
 
 alias nx2b=nix2bash
+
+listeners() {
+    s lsof -nP -iTCP -sTCP:LISTEN
+}
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
