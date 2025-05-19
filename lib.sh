@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250519_5efc785
+LIBSH_VERSION=20250519_daff764
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3201,6 +3201,14 @@ alias nx2b=nix2bash
 listeners() {
     s lsof -nP -iTCP -sTCP:LISTEN
 }
+
+_cleanempty=(find . -type d -empty -exec rmdir {} \;)
+cleanempty="${_cleanempty[@]}"
+alias ce=cleanempty
+celoop() {
+    while [ 1 = 1 ]; do "${_cleanempty[@]}"; done
+}
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
