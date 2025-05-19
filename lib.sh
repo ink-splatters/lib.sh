@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250505_ff28ba6
+LIBSH_VERSION=20250519_5efc785
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1157,8 +1157,11 @@ alias nxds='nxdrv show | jq'
 alias nxfmt='nx fmt'
 alias nxf='nx flake'
 alias nxfc='nxf check'
+alias nxfi='nxf info'
 
-nxfi() {
+alias nxinit='nx run nixpkgs#nix-init'
+
+nxfinit() {
     local templates=(default multi-module package unfree)
 
     if [[ $1 =~ -h|--help ]]; then
@@ -2152,8 +2155,17 @@ alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.exte
 _lts=littlesnitch
 
 _salias lts $_lts
-_salias ltse $_lts export-model $_lts.json
-_salias ltsr $_lts restore-model $_lts.json
+_salias snitch $_lts
+
+ltse() {
+    s lts export-model $_lts.json
+    echo "Exported littlesnitch model to: $_lts.json"
+}
+
+ltsr() {
+    s lts restore-model $_lts.json
+    echo "Exported littlesnitch model to: $_lts.json"
+}
 
 #alias diff='diff --colors=always'
 
