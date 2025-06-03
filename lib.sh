@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250519_daff764
+LIBSH_VERSION=20250603_cfce491
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -312,7 +312,7 @@ alias sw='sc -w'
 _salias santa santactl
 
 # opendirectory
-_salias ds dsconfigad
+_salias dsconf dsconfigad
 _salias dsc dscacheutil
 _salias sctl sysadminctl
 
@@ -1090,6 +1090,12 @@ if [ -n "${commands[fzf - share]}" ]; then
 fi
 
 alias mkd=mkdir
+
+mknix() {
+    mkdir -p "$1"
+    touch "$1"/default.nix
+}
+
 alias mkp='mk -p'
 alias rgu='rg -uuu'
 alias rgi='rg -iuuu'
@@ -1109,7 +1115,7 @@ export NIX_PATH=nixpkgs=flake:nixpkgs
 
 alias nx='nix --option extra-access-tokens "$GH_PAT"'
 
-_nxv='--verbose --show-trace --print-build-logs'
+_nxv='--verbose --show-trace -L'
 _nxi='--impure'
 
 alias enxc='vi ~/.config/nix/nix.conf'
@@ -1129,6 +1135,11 @@ alias nxd='nx develop'
 alias nxdv="nxd $_nxv"
 alias nxdi="nxd $_nxi"
 alias nxdiv="nxdi $_nxv"
+
+alias nxu='nxp upgrade'
+alias nxuv="nxu $_nxv"
+alias nxui="nxu $_nxi"
+alias nxuiv="nxui $_nxv"
 
 alias nxdrv='nx derivation'
 nxdrvshow() {
@@ -1262,7 +1273,6 @@ alias nxreflake='nxrepl --expr "builtins.getFlake \"$PWD\""'
 alias nxrel='nxre list'
 alias nxreu='nxrel --refresh'
 alias nxrelu=nxreu
-alias nxu='nxp upgrade'
 alias nxw='nxp wipe-history'
 
 alias nxhash='nx hash'
@@ -3121,8 +3131,7 @@ snkc() {
 }
 alias snc=snkc
 
-alias verifyNotarization='spctl -a -vvv -t install'
-alias vn=verifyNotarization
+alias vvv='/usr/sbin/spctl -a -vvv -t install'
 
 _ffbranch() {
     gco upstream/"$1" \
