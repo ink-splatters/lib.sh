@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250603_cfce491
+LIBSH_VERSION=20250626_b438c54
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -183,6 +183,23 @@ alias up=upper
 
 alias lower='tr "[[:upper:]]" "[[:lower:]]"'
 alias low=lower
+alias lo=low
+
+# title() {
+#     _require python
+#
+#     python <<EOF
+# import string as S
+#
+# def to_title(line):
+#     print(' '.join(map(lambda w: w if len(w) < 4 else S.ascii_uppercase[ord(w[0]) - ord('a')] + w[1:], s.lower().split())))
+#
+# s="$@"
+#
+# print(to_title(s))
+# EOF
+#
+# }
 
 # status / system info
 alias mf=macchina
@@ -560,72 +577,72 @@ alias upkg=pkgf
 # pixi
 alias px=pixi
 
-alias pxlocenvcacheon='pixi config set experimental.use-environment-activation-cache true --local'
-alias pxh='px help'
+# alias pxlocenvcacheon='pixi config set experimental.use-environment-activation-cache true --local'
+# alias pxh='px help'
 
-alias pxn='px init'
-alias pxa='px a'
-alias pxr='px rm'
-alias pxi='px i'
-alias pxx='px r'  # Run
-alias pxxt='px x' # Run a command in a temporary environment
-alias pxsh='px s' # Shell
-alias pxl='px ls'
-alias pxcgd='px clean cache -y' # a-la nix alias
-alias pxtree='px t'             # tree
+# alias pxn='px init'
+# alias pxa='px a'
+# alias pxr='px rm'
+# alias pxi='px i'
+# alias pxx='px r'  # Run
+# alias pxxt='px x' # Run a command in a temporary environment
+# alias pxsh='px s' # Shell
+# alias pxl='px ls'
+# alias pxcgd='px clean cache -y' # a-la nix # alias
+# alias pxtree='px t'             # tree
 
-alias pxc='px config'
-alias pxce='pxc edit'
-alias pxcl='pxc list'
-alias pxca='pxc append'
-alias pxcp='pxc prepend'
-alias pxcs='pxc set'
-alias pxcu='pxc unset'
+# alias pxc='px config'
+# alias pxce='pxc edit'
+# alias pxcl='pxc list'
+# alias pxca='pxc append'
+# alias pxcp='pxc prepend'
+# alias pxcs='pxc set'
+# alias pxcu='pxc unset'
 
-alias pxp='px project'
-alias pxch='pxp channel'
-alias pxcha='pxpch a'
-alias pxcha='pxpch a'
-alias pxchr='pxpch rm'
-alias pxchl='pxpch ls'
+# alias pxp='px project'
+# alias pxch='pxp channel'
+# alias pxcha='pxpch a'
+# alias pxcha='pxpch a'
+# alias pxchr='pxpch rm'
+# alias pxchl='pxpch ls'
 
-alias pxd='pxp description'
-alias pxdg='pxd get'
-alias pxds='pxd set'
+# alias pxd='pxp description'
+# alias pxdg='pxd get'
+# alias pxds='pxd set'
 
-alias pxv='pxp version'
-alias pxvg='pxv get'
-alias pxver=pxvg
-alias pxvs='pxv set'
+# alias pxv='pxp version'
+# alias pxvg='pxv get'
+# alias pxver=pxvg
+# alias pxvs='pxv set'
 
-alias pxe='pxp environment'
-alias pxea='pxe a'
-alias pxer='pxe rm'
-alias pxel='pxe ls'
+# alias pxe='pxp environment'
+# alias pxea='pxe a'
+# alias pxer='pxe rm'
+# alias pxel='pxe ls'
 
-alias pxt='px task'
-alias pxta='pxt a'
-alias pxtr='pxt rm'
-alias pxtl='pxt ls'
-alias pxth='pxt help'
+# alias pxt='px task'
+# alias pxta='pxt a'
+# alias pxtr='pxt rm'
+# alias pxtl='pxt ls'
+# alias pxth='pxt help'
 
-alias pxg='px g' # global
-alias pxge='pxg edit'
-alias pxga='pxg a'
-alias pxgi='pxg i'
-alias pxgr='pxg uninstall'
-alias pxgrm='pxg rm'
-alias pxgl='pxg ls'
-alias pxgs='pxg s'  # sync
-alias pxgex='pxg e' # expose
-alias pxgu='pxg update'
-alias pxgh='pxg help'
+# alias pxg='px g' # global
+# alias pxge='pxg edit'
+# alias pxga='pxg a'
+# alias pxgi='pxg i'
+# alias pxgr='pxg uninstall'
+# alias pxgrm='pxg rm'
+# alias pxgl='pxg ls'
+# alias pxgs='pxg s'  # sync
+# alias pxgex='pxg e' # expose
+# alias pxgu='pxg update'
+# alias pxgh='pxg help'
 
 alias hch=hatch
 alias ach=hch
 alias tch=hch
 
-# venv / uv
+# venv
 alias _venv='python -m venv'
 alias venvwith='uv venv -p'
 alias venv='venvwith $(which python)'
@@ -633,17 +650,25 @@ alias venv='venvwith $(which python)'
 alias _pip="python -m pip"
 alias pip="uv pip"
 
-# pip
-#
+# uv pip
+
 alias pipi='pip install'
-alias pipu='pipi -U'
+alias pipu='pipi -U pip wheel setuptools'
+alias pipureq='pipu -r requirements.txt'
 alias pipe='pipi -e'
 alias pipl='pip list'
 alias pipr='pip uninstall'
 alias piped='pipe .' #pipe + dot
 alias pipuall="uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -U"
-#alias pi=pip
-#alias px=pipx
+
+# uv
+alias ux=uvx
+
+alias ut='uv tool'
+alias uvi='ut install'
+alias uvu='ut upgrade'
+alias uvr='ut uninstall'
+alias uvl='ut list'
 
 function vc() {
     local name="${1:-.venv}"
@@ -662,7 +687,7 @@ alias vd='deactivate'
 # editing / viewing
 
 alias _vi=/usr/bin/vi
-
+u
 if [[ $EDITOR == "" ]]; then
     export EDITOR=vim
 fi
@@ -836,7 +861,8 @@ _alias eaaf eaa -F
 
 #TODO: sort
 
-alias dustpr='dust -prR'
+alias dsr='dust -r'
+alias dspr='dust -prR'
 
 alias statx='stat -f "%HT"'
 
@@ -1704,8 +1730,7 @@ alias gr='g rebase'
 alias gm='g merge'
 alias gms='gm --squash'
 alias gsq=gms
-alias gchp='g cherry-pick'
-alias gch=gchp
+alias gcp='g cherry-pick'
 
 # interactive rebase
 
@@ -2162,19 +2187,19 @@ alias profpane='open "x-apple.systempreferences:com.apple.Profiles-Settings.exte
 
 # littlesnitch
 
-_lts=littlesnitch
-
-_salias lts $_lts
-_salias snitch $_lts
+_salias lts littlesnitch
+_salias snitch littlesnitch
 
 ltse() {
-    s lts export-model $_lts.json
-    echo "Exported littlesnitch model to: $_lts.json"
+    local model="${1:-littlesnitch.json}"
+    lts export-model "$model"
+    echo "Exported littlesnitch model to: $model"
 }
 
 ltsr() {
-    s lts restore-model $_lts.json
-    echo "Exported littlesnitch model to: $_lts.json"
+    local model="${1:-littlesnitch.json}"
+    lts restore-model "$model"
+    echo "Restored littlesnitch model from: $model"
 }
 
 #alias diff='diff --colors=always'
@@ -2398,7 +2423,7 @@ EOF
 f22448() {
     if [[ $1 =~ -h|--help ]]; then
         cat <<'EOF'
-Down-samples Hi-Res audio to 24bit / 48kHz.
+Down-samples Hi-Res FLAC audio to 24bit / 48kHz.
 Supplying audio with lower bit or sample rate is not supported.
 
 Usage:
@@ -2411,8 +2436,9 @@ EOF
     _require ffmpeg || return 1
 
     for f in ./**/*.flac; do
-        local dst="${f%.*}".24-48.flac
-        ffmpeg -i "$f" -c:a flac -sample_fmt s32 -ar 48000 -af "aresample=resampler=soxr" "$dst"
+        local src="$f".bak
+        mv "$f" "$src"
+        ffmpeg -i "$src" -c:a flac -sample_fmt s32 -ar 48000 -af "aresample=resampler=soxr" "$f"
     done
 }
 
@@ -2509,6 +2535,29 @@ alias wav2raw=wav2pcm
 alias w2raw=wav2raw
 alias w2p=wav2pcm
 alias w2r=w2raw
+
+a2whisper() {
+    if [ ! $# ]; then
+        cat <<EOF
+Converts any audio input to pcm_s16le wav - whisper model-friendly format.
+
+Usage:
+    a2whisper <input> [<output>] [<ar, default is 16000]
+EOF
+        return 1
+    fi
+    local input="$1"
+    local base="${input#.*}"
+    local output="${2:-"$base".pcm_s16le.wav}"
+    local ar="${3:-16000}"
+
+    _require ffmpeg
+
+    ffmpeg -i "$input" -ac 1 -ar $ar -f wav -c:a pcm_s16le "$output"
+
+}
+
+alias a2w=a2whisper
 
 # tldr
 alias tl='tldr --platform macos'
@@ -2778,6 +2827,24 @@ function dlogin() {
 
     echo $pat | docker login "$url" -u $user --password-stdin
 }
+alias dk=docker
+alias dkr='dk run -it'
+alias dkrrm='dkr --rm'
+alias dklogs='dk logs'
+alias dki='dk images'
+alias dkc='dk ps -a'
+alias dkps='dkc'
+alias dkrma='dk rm -f $(dkc -q)'
+alias dkirma='dk rmi -f $(dki -q)'
+
+alias _dkb='dk build'
+alias dkb='_dkb .'
+alias dkbt='dkb -t'
+alias dkbf='_dkb -f'
+
+dkfbt() {
+    _dkb -f "$1" -t "$2"
+}
 
 function qlean() { # quick cleanup
     sudo rm -rf /{,/var}/tmp/.* /{,/var}/tmp/*
@@ -2907,9 +2974,89 @@ alias trr='tart run --no-audio --net-bridged=en0 --root-disk-opts="sync=fsync" -
 alias age=rage
 alias age-keygen='rage-keygen'
 
+_agemany_err() {
+    echo "ERROR: $1 is missing."
+}
+agemany() {
+    if [ $# -lt 2 ]; then
+        cat <<EOF
+creates encrypted tar.zstd.age (or tz.age) archive of input files
+encypts both with .age-plugin-se/id_key.pub and ~/.ssh/id_age.pub
+
+should any of the keys go missing, it results in an error.
+
+Usage:
+    agemany <archive.tz.age> <file1> [... file2 ... fileN ]
+
+EOF
+        return 1
+    fi
+
+    local pubkey="$HOME/.ssh/id_age.pub"
+    local sepubkey="$PWD/.age-plugin-se/id_age.pub"
+    local sekey="$PWD/.age-plugin-se/id_age"
+
+    [ -f "$pubkey" ] || {
+        _agemany_err "$pubkey"
+        return 1
+    }
+    [ -f "$sepubkey" ] || {
+        _agemany_err "$sepubkey"
+        return 1
+    }
+
+    if [ ! -f "$sekey" ]; then
+        echo "WARNING: $sekey missing. I won't be able to check if the ephemeral SE keys are still valid!"
+    else
+        echo "Verifying ephemeral key... Be ready to provide your fingerprint!"
+        local tmp="$(mktemp)"
+        dd if=/dev/random count=1 2>/dev/null | age -e -R "$sepubkey" -o "$tmp"
+        if ! command cat "$tmp" | age -d -i "$sekey" 1>/dev/null; then
+            echo "ERROR: could not decrypt test data."
+            return 1
+        fi
+    fi
+
+    local result="$1"
+    shift
+
+    if command tar cf - "$@" | zstd --ultra -22 | age -e -R "$sepubkey" -R "$pubkey" -o "$result"; then
+        echo "Wrore result to: $result"
+    fi
+
+}
+
+unage() {
+    if [ ! $# ]; then
+        cat <<EOF
+decrypts tar.zstd.age (tz.age) archive using ephemeral age SE key located at .age-plugin-se/id_age
+if they key cannot be used, falls back to using ~/.ssh/id_age
+
+Usage:
+    unage <archive.tz.age> [<output dir>]
+
+EOF
+        return 1
+    fi
+
+    local sekey="$PWD/.age-plugin-se/id_age"
+
+    local input="$1"
+    local outdir="${2:-$PWD}"
+
+    local tmp="$(mktemp)"
+
+    if ! command cat "$input" | age -d -i "$PWD/.age-plugin-se/id_age" -o "$tmp"; then
+        echo "Falling back to using $HOME/.ssh/id_age"
+
+        cat "$input" | age -d -i "$HOME/.ssh/id_age" -o "$tmp" || return 1
+    fi
+
+    tar xf "$tmp" -C "$outdir" && echo Done.
+}
+
 fln() {
     local src="$1"
-    local dst="$2"
 
     local info=$(statx "$src" 2>&1) || {
         echo "$output" >&2
@@ -3085,6 +3232,7 @@ alias sdksu='sdk selfupdate'
 alias sdkuse='sdk use'
 alias sdkset='sdk default'
 alias sdkdef=sdkset
+alias pc=pdfcpu
 sdkclean() {
     echo tmp metadata version | x -n1 sdk flush
 }
