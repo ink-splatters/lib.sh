@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250626_b438c54
+hIBSH_VERSION=20250805_7420364
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -15,6 +15,8 @@ shopt -s globstar
 set -o pipefail
 
 # helpers
+
+alias cpa='cp -a'
 
 function pd() {
     if [ $# = 0 ]; then
@@ -137,6 +139,7 @@ EOF
 _salias s
 _salias si -i
 _salias vinix vi /etc/nix/nix.conf
+alias vinx=vinix
 alias xx='exit'
 alias q=xx
 
@@ -186,7 +189,7 @@ alias low=lower
 alias lo=low
 
 # title() {
-#     _require python
+#     _require python || return 1
 #
 #     python <<EOF
 # import string as S
@@ -439,7 +442,7 @@ if0() {
 
 }
 
-randmac() {
+_randmac() {
     echo "🪦 you've just stumbled upon a tumbstone with the text on it: 🪦"
     echo
 
@@ -468,6 +471,10 @@ EOF
     #  ifc $interface ether "$mac"
     #  (($? == 0)) && mac && echo done.
 
+}
+
+randmac() {
+    rand 6 | sed -E 's/([0-9a-f]{2})/:\1/g' | sed 's/^://g'
 }
 
 alias ms='m status'
@@ -517,6 +524,7 @@ function netsetup() {
 
 }
 alias nsetup=netsetup
+alias nets=nsetup
 
 alias _netservices='networksetup -listnetworkserviceorder'
 
@@ -558,7 +566,8 @@ alias nsvc=nservices
 alias nsvcj='nsvc --json'
 
 function dhinfo() {
-    netsetup -getinfo "Wi-Fi" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
+    local iface="${1:-Wi-Fi}"
+    netsetup -getinfo "$iface" | rg --color=never '(^[^:]+$)|(^[^:]+:.+$)' --replace '$1    $2'
 }
 
 alias dhi=dhinfo
@@ -654,7 +663,7 @@ alias pip="uv pip"
 
 alias pipi='pip install'
 alias pipu='pipi -U pip wheel setuptools'
-alias pipureq='pipu -r requirements.txt'
+alias pipur='pipu -r requirements.txt'
 alias pipe='pipi -e'
 alias pipl='pip list'
 alias pipr='pip uninstall'
@@ -664,11 +673,12 @@ alias pipuall="uv pip list --format=freeze | rg -o '^[^=]+' | x uv pip install -
 # uv
 alias ux=uvx
 
-alias ut='uv tool'
-alias uvi='ut install'
-alias uvu='ut upgrade'
-alias uvr='ut uninstall'
-alias uvl='ut list'
+alias uvt='uv tool'
+alias uva='uv add'
+alias uvi='uvt install'
+alias uvu='uvt upgrade'
+alias uvr='uvt uninstall'
+alias uvl='uvt list'
 
 function vc() {
     local name="${1:-.venv}"
@@ -687,7 +697,7 @@ alias vd='deactivate'
 # editing / viewing
 
 alias _vi=/usr/bin/vi
-u
+
 if [[ $EDITOR == "" ]]; then
     export EDITOR=vim
 fi
@@ -1316,6 +1326,8 @@ nxhrand() {
     fi
 }
 alias nxhr=nxhrand
+alias nxhrc='nxhr | c'
+alias nxhsric='nxhsri | c'
 
 alias xpkgs="xargs -n1 | sed -E 's/^/nixpkgs\./g'"
 
@@ -1340,7 +1352,7 @@ alias nixpkgs-unstable=nxrev
 
 alias nxtree='nix-tree'
 
-_nix-apps-exist() {
+function _nix-apps-exist() {
     [ ! -d "$1" ] && {
         echo "Nix $2 profile and/or Applications not found."
         return 1
@@ -1980,39 +1992,73 @@ alias cpushidarwin='cpushi aarch64-darwin'
 
 cpushruntime() {
     if [ $# -lt 1 ]; then
-        cat <<EOF
-Pushing runtime closure to cachix.
+        cat <<'EOF'
+Pushing runtime closure (without buildEnv symlinks) to cachix.
 
 Usage:
-    $0 <cache_name>
-    $0 <package_name [package_name...] -- <cache_name> [cachix opts]
+    cpushruntime <flake_output> <cache>
+    cpushruntime <flake_output...> -- <cache> [cachix opts]
+
+Notes:
+    - Each <flake_output> is mapped to `<flake_output>.pkgs` and evaluated via `nix eval --raw --impure`
+    - All evaluations are fanned-in to a single jq stream, then queued to cachix via xargs -P16
 EOF
         return 1
     fi
 
-    local grp1=()
-    local grp2=()
+    _require nix jq cachix || return 1
 
-    if [ $# = 1 ]; then
-        grp2+=("$1")
-    else
-        local cur=()
-        while [[ $# -gt 0 ]]; do
-            if [[ $1 == "--" ]]; then
-                grp1=("${cur[@]}")
-                cur=()
-                shift
-            else
-                cur+=("$1")
-                shift
-            fi
-        done
-        grp2=("${cur[@]}")
+    local flake_args=()
+    local cachix_args=()
+    local seen_sep=0
+
+    # Parse args: outputs before `--`, cachix args after `--`
+    for a in "$@"; do
+        if [ "$a" = "--" ] && [ $seen_sep -eq 0 ]; then
+            seen_sep=1
+            continue
+        fi
+        if [ $seen_sep -eq 0 ]; then
+            flake_args+=("$a")
+        else
+            cachix_args+=("$a")
+        fi
+    done
+
+    # Support two-arg form: <flake_output> <cache>
+    if [ ${#cachix_args[@]} -eq 0 ]; then
+        if [ ${#flake_args[@]} -ge 2 ]; then
+            local cache_last_idx=$((${#flake_args[@]} - 1))
+            local cache_name="${flake_args[$cache_last_idx]}"
+            unset 'flake_args[$cache_last_idx]'
+            cachix_args=("$cache_name")
+        else
+            echo "ERROR: insufficient arguments" >&2
+            echo "Usage: cpushruntime <flake_output> <cache> | cpushruntime <flake_output...> -- <cache> [opts]" >&2
+            return 1
+        fi
     fi
 
-    nix build ${grp1[*]} --json \
-        | jq -r '.[].outputs | to_entries[].value' \
-        | cachix push ${grp2[*]}
+    if [ ${#flake_args[@]} -eq 0 ]; then
+        echo "ERROR: no flake outputs specified" >&2
+        return 1
+    fi
+
+    # Fan-out nix eval per flake output and fan-in to a single jq
+    local inputs=()
+    local out
+    for out in "${flake_args[@]}"; do
+        mapfile -t paths < <(nix eval --raw --impure "${out}.pkgs")
+        inputs+="${paths[@]}"
+    done
+
+    echo "${inputs[@]}" | jq -r '.[].paths[]' | cachix push "${cachix_args[@]}"
+
+    #    # Limit cachix concurrency with xargs -P while allowing jq to stream many paths
+    #    # Each input JSON is processed independently by jq
+    #    cat "${inputs[@]}" \
+    #        | jq -r '.[].paths[]'
+    #        #| xargs -r -P16 cachix push \"${cachix_args[@]}\""
 }
 
 alias cpushrt=cpushruntime
@@ -2126,7 +2172,7 @@ _destructive_warn() {
 del_working_tree() {
     local dest="$1"
 
-    _require git
+    _require git || return 1
 
     _ensure_git_tree "$dest" || return 1
     [ "$2" != "--no-warn" ] && _destructive_warn
@@ -2157,7 +2203,7 @@ unzalong() {
 }
 
 gitprune() {
-    _require git
+    _require git || return 1
 
     _ensure_git_tree "$PWD" || return 1
 
@@ -2551,7 +2597,7 @@ EOF
     local output="${2:-"$base".pcm_s16le.wav}"
     local ar="${3:-16000}"
 
-    _require ffmpeg
+    _require ffmpeg || return 1
 
     ffmpeg -i "$input" -ac 1 -ar $ar -f wav -c:a pcm_s16le "$output"
 
@@ -2576,17 +2622,14 @@ cimg() {
 ramdisk() {
     if [ $# != 1 ]; then
         cat <<'EOF'
-Usage: ramdisk <size in MiB>
+Usage: ramdisk <size in sectors>
+*
+    sector is 512 bytes
 EOF
         return 1
     fi
 
-    if (($1 < 16384 || $1 > (8 * 1024 * 1024))); then
-        echo "ERROR: guard ($1)"
-        return 1
-    fi
-
-    ha -nomount ram://$(($1 * 2))
+    ha -nomount ram://$1
 
 }
 
@@ -2901,7 +2944,7 @@ alias rgnc='rg --color=never'
 mytorsocks() {
     # set it up on all the services available
 
-    _require jq
+    _require jq || return 1
 
     local svcs=
 
@@ -3182,8 +3225,9 @@ alias b64d='base64 -d'
 
 # bun
 
-unset -f bun
 alias _bun="$(which bun)"
+
+unset -f bun
 
 function bun() {
     local args=()
@@ -3204,7 +3248,7 @@ alias bpmc='bpm cache'
 alias bcgd='bpmc rm' # a-la `ncgd`
 alias bnl='bpm ls'
 function bni() {
-    _require bunx fd
+    _require bunx fd || return 1
     bn i "$@"
 
     local exes=
@@ -3245,7 +3289,7 @@ teco() {
 
 # json torrent to magnet link converter
 jt2magnet() {
-    _require jq
+    _require jq || return 1
 
     jq -r '"magnet:?xt=urn:btih:\(.infoHash)&dn=\(.name|@uri)"' <<<"$(p)" | x open || {
         cat <<'EOF'
@@ -3263,8 +3307,8 @@ EOF
 
 alias jt2m=jt2magnet
 
-alias oxidize='oxipng -o max -a --strip all'
-alias ox=oxidize
+alias ox='oxipng -o max -a --strip all'
+alias oxz='ox -Z --fast'
 
 # idevice
 alias idid="idevice_id | rg -o '^[A-F0-9-]+'"
@@ -3274,7 +3318,7 @@ alias snk=snyk
 alias sk=snyk
 
 snkc() {
-    _require jq
+    _require jq || return 1
     snyk config | rg -o 'INTERNAL_OAUTH_TOKEN_STORAGE: (.+)$' --replace '$1' | jq
 }
 alias snc=snkc
@@ -3290,7 +3334,7 @@ _ffbranch() {
 
 ffnixpkgs() {
 
-    _require git
+    _require git || return 1
 
     if [ "$(basename "$PWD")" != "nixpkgs" ]; then
         echo 'assert "$(basename "$PWD")" == "nixpkgs"'
@@ -3366,6 +3410,69 @@ celoop() {
     while [ 1 = 1 ]; do "${_cleanempty[@]}"; done
 }
 
+_wg() {
+    # sudo WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun-cli WG_SUDO=1 wg-quick "$@"
+    wg-quick "$@"
+}
+
+alias wgup="_wg up ${1:-wg1}"
+alias wgu=wgup
+_setdns() {
+    local svc="$1"
+    shift
+
+    echo "[#] networksetup -setdnsservers $svc $@"
+    networksetup -setdnsservers "$svc" "$@"
+
+}
+function wgdown() {
+    _wg down ${1:-wg1} || return 1
+
+    _require rg || {
+        echo "Restore DNS yourself"
+        return 1
+    }
+
+    local svcs=()
+    local routers=()
+
+    mapfile -t svcs < <(netservices | rg '^[(][\d]+[)] (.+)$' --replace '$1')
+    mapfile -t routers < <(for svc in "${svcs[@]}"; do dhinfo "$svc" | rg -o '[\t ]*Router: ([^n].+)$' --replace '$1'; done)
+
+    if [ ${#routers[@]} -gt 1 ]; then
+        echo "assert len(${routers[*]}) == 1"
+        return 1
+    fi
+
+    for svc in "${svcs[@]}"; do _setdns "$svc" "${routers[0]}"; done
+}
+alias wgd=wgdown
+alias rewg="wgdown; wgup"
+
+function pvpnmaxcap() {
+    _require jq || return 1
+
+    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, Capacity: (100 - (.Score*20))}] | sort_by(-.Capacity)[0]'
+}
+
+appver() {
+    if [ ! $# ]; then
+        cat <<EOF
+Usage: appver <app bundle>
+EOF
+        return 1
+    fi
+
+    local info="$1/Contents/Info.plist"
+
+    if [ ! -f "$1/Contents/Info.plist" ]; then
+        echo "ERROR: cannot open: $info"
+        return 1
+    fi
+
+    pb -c 'print CFBundleShortVersionString' "$info"
+}
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
 _init() {
@@ -3375,7 +3482,6 @@ _init() {
 
     alias fsl="source '$self'"
     alias flel="vi '$self'"
-
     if [[ $__OSINSTALL_ENVIRONMENT != 1 ]]; then
         system=/
 
