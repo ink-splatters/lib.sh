@@ -3452,7 +3452,7 @@ alias rewg="wgdown; wgup"
 function pvpnmaxcap() {
     _require jq || return 1
 
-    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, Capacity: (100 - (.Score*20))}] | sort_by(-.Capacity)[0]'
+    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, ScoreBasedCapacity: (100 - (.Score*20), .Load}] | sort_by(-.Load)[0]'
 }
 
 appver() {
