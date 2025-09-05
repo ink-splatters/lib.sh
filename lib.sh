@@ -1842,6 +1842,7 @@ alias glg='g lg'
 
 alias gdiff='g diff'
 alias gd=gdiff
+alias gds='gd --staged'
 
 function gdn() {
 
@@ -2051,6 +2052,8 @@ EOF
         mapfile -t paths < <(nix eval --raw --impure "${out}.pkgs")
         inputs+="${paths[@]}"
     done
+
+    >2 echo "${inputs[@]}"
 
     echo "${inputs[@]}" | jq -r '.[].paths[]' | cachix push "${cachix_args[@]}"
 
@@ -3452,7 +3455,7 @@ alias rewg="wgdown; wgup"
 function pvpnmaxcap() {
     _require jq || return 1
 
-    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, ScoreBasedCapacity: (100 - (.Score*20), .Load}] | sort_by(-.Load)[0]'
+    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, ScoreBasedCapacity: (100 - (.Score*20)), Load}] | sort_by(.Load)[0]'
 }
 
 appver() {
@@ -3473,7 +3476,25 @@ EOF
     pb -c 'print CFBundleShortVersionString' "$info"
 }
 
+mdchat() {
+    _require jq || return 1
+
+    local base="${OPENAI_BASE_URL:-https://api.openai.com/v1}"
+    local key="${OPENAI_API_KEY}"
+    local model="${MODEL:-gpt5}"
+    local md
+    if [ -n "$1" ]; then md=$(cat -- "$1"); else md=$(cat); fi
+    curl -sS "$base/chat/completions" \
+        -H "Authorization: Bearer $key" \
+        -H "Content-Type: application/json" \
+        -d "$(jq -n --arg m "$model" --arg md "$md" \
+            '{model:$m, messages:[{role:"user", content:$md}]}')" \
+        | jq -r '.choices[0].message.content'
+}
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
+
+alias cl=claude
 
 _init() {
 
