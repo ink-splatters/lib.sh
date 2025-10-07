@@ -947,11 +947,7 @@ alias rmr='rm -r'
 alias rmrf='rmr -f'
 alias rf=rmrf
 
-alias _editto='ditto --rsrc --noqtn --extattr --preserveHFSCompression --persistRootless'
-alias ecp='_editto --acl'
-alias ecpnoacl='_editto --noacl'
-alias editto=ecp
-alias edittonoacl=ecpnoacl
+alias editto='ditto --noclone --noqtn --nopersistRootless --nocache --hfsCompression'
 
 _fdrm() {
     local nameflag="$1"
@@ -1258,7 +1254,7 @@ alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxrun='nx run'
 alias nxfr=nxrun
-alias nxi='nxp install'
+alias nxi='nxp add'
 alias nxia='nxi --accept-flake-config'
 alias nxii='nxi --impure'
 alias nxiia='nxii --accept-flake-config'
@@ -2053,9 +2049,9 @@ EOF
         inputs+="${paths[@]}"
     done
 
-    >2 echo "${inputs[@]}"
+    >&2 echo "${inputs[@]}"
 
-    echo "${inputs[@]}" | jq -r '.[].paths[]' | cachix push "${cachix_args[@]}"
+    #    echo "${inputs[@]}" | jq -r '.[].paths[]' | cachix push "${cachix_args[@]}"
 
     #    # Limit cachix concurrency with xargs -P while allowing jq to stream many paths
     #    # Each input JSON is processed independently by jq
@@ -2943,25 +2939,54 @@ alias dt='date  "+%Y-%m-%d %H:%M:%S"'
 # ripgrep
 alias rgnc='rg --color=never'
 
-# tor
-mytorsocks() {
-    # set it up on all the services available
-
+# tor /i2p
+# ~/.bashrc or ~/.zshrc fragment
+mysocks() {
     _require jq || return 1
 
-    local svcs=
+    local port=4447 # i2pd SOCKS proxy
+    local svcs pid_tor pid_i2pd
 
-    mapfile -t svcs < <(netservices --json | jq '.name' -r)
+    # --- Collect all active network services ---
+    mapfile -t svcs < <(netservices --json | jq -r '.name')
 
+    echo "-- enabling global SOCKS proxy on localhost:${port}"
     for svc in "${svcs[@]}"; do
-        netsetup -setsocksfirewallproxy "$svc" localhost 9050
+        networksetup -setsocksfirewallproxy "$svc" localhost "$port"
     done
 
-    tor
+    echo "-- starting Tor and i2pd..."
+    tor &
+    pid_tor=$!
 
-    for svc in "${svcs[@]}"; do
-        netsetup -setsocksfirewallproxy "$svc" "" ""
-    done
+    i2pd --datadir ~/.i2pd &
+    pid_i2pd=$!
+
+    echo "   Tor  PID: $pid_tor"
+    echo "   i2pd PID: $pid_i2pd"
+
+    # --- Cleanup wrapper for any exit or interrupt ---
+    cleanup() {
+        echo "-- restoring proxy settings"
+        for svc in "${svcs[@]}"; do
+            networksetup -setsocksfirewallproxy "$svc" "" ""
+        done
+
+        echo "-- stopping i2pd (SIGTERM)"
+        kill "$pid_i2pd" 2>/dev/null
+        wait "$pid_i2pd" 2>/dev/null
+
+        echo "-- stopping Tor"
+        kill "$pid_tor" 2>/dev/null
+        wait "$pid_tor" 2>/dev/null
+
+        echo "-- all cleaned up"
+    }
+
+    trap cleanup EXIT INT TERM
+
+    # Wait here until i2pd exits (Ctrl‑C once to trigger cleanup)
+    wait "$pid_i2pd"
 }
 
 # gollama
@@ -3490,6 +3515,20 @@ mdchat() {
         -d "$(jq -n --arg m "$model" --arg md "$md" \
             '{model:$m, messages:[{role:"user", content:$md}]}')" \
         | jq -r '.choices[0].message.content'
+}
+
+# aws
+
+alias sso='aws configure sso'
+alias awl='aws logs'
+awlt() {
+    local region="${AWS_REGION:-eu-central-1}"
+    local lg="$1"
+    shift
+    awl tail --region $region "$lg" "$@"
+}
+awltf() {
+    awlt "$@" --follow
 }
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
