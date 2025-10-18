@@ -2939,54 +2939,25 @@ alias dt='date  "+%Y-%m-%d %H:%M:%S"'
 # ripgrep
 alias rgnc='rg --color=never'
 
-# tor /i2p
-# ~/.bashrc or ~/.zshrc fragment
-mysocks() {
+# tor
+mytorsocks() {
+    # set it up on all the services available
+
     _require jq || return 1
 
-    local port=4447 # i2pd SOCKS proxy
-    local svcs pid_tor pid_i2pd
+    local svcs=
 
-    # --- Collect all active network services ---
-    mapfile -t svcs < <(netservices --json | jq -r '.name')
+    mapfile -t svcs < <(netservices --json | jq '.name' -r)
 
-    echo "-- enabling global SOCKS proxy on localhost:${port}"
     for svc in "${svcs[@]}"; do
-        networksetup -setsocksfirewallproxy "$svc" localhost "$port"
+        netsetup -setsocksfirewallproxy "$svc" localhost 9050
     done
 
-    echo "-- starting Tor and i2pd..."
-    tor &
-    pid_tor=$!
+    tor
 
-    i2pd --datadir ~/.i2pd &
-    pid_i2pd=$!
-
-    echo "   Tor  PID: $pid_tor"
-    echo "   i2pd PID: $pid_i2pd"
-
-    # --- Cleanup wrapper for any exit or interrupt ---
-    cleanup() {
-        echo "-- restoring proxy settings"
-        for svc in "${svcs[@]}"; do
-            networksetup -setsocksfirewallproxy "$svc" "" ""
-        done
-
-        echo "-- stopping i2pd (SIGTERM)"
-        kill "$pid_i2pd" 2>/dev/null
-        wait "$pid_i2pd" 2>/dev/null
-
-        echo "-- stopping Tor"
-        kill "$pid_tor" 2>/dev/null
-        wait "$pid_tor" 2>/dev/null
-
-        echo "-- all cleaned up"
-    }
-
-    trap cleanup EXIT INT TERM
-
-    # Wait here until i2pd exits (Ctrl‑C once to trigger cleanup)
-    wait "$pid_i2pd"
+    for svc in "${svcs[@]}"; do
+        netsetup -setsocksfirewallproxy "$svc" "" ""
+    done
 }
 
 # gollama
