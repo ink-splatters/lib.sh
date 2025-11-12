@@ -1,4 +1,4 @@
-hIBSH_VERSION=20250805_7420364
+LIBSH_VERSION=20250805_7420364
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -583,78 +583,11 @@ alias upkg=pkgf
 
 # python
 
-# pixi
-alias px=pixi
-
-# alias pxlocenvcacheon='pixi config set experimental.use-environment-activation-cache true --local'
-# alias pxh='px help'
-
-# alias pxn='px init'
-# alias pxa='px a'
-# alias pxr='px rm'
-# alias pxi='px i'
-# alias pxx='px r'  # Run
-# alias pxxt='px x' # Run a command in a temporary environment
-# alias pxsh='px s' # Shell
-# alias pxl='px ls'
-# alias pxcgd='px clean cache -y' # a-la nix # alias
-# alias pxtree='px t'             # tree
-
-# alias pxc='px config'
-# alias pxce='pxc edit'
-# alias pxcl='pxc list'
-# alias pxca='pxc append'
-# alias pxcp='pxc prepend'
-# alias pxcs='pxc set'
-# alias pxcu='pxc unset'
-
-# alias pxp='px project'
-# alias pxch='pxp channel'
-# alias pxcha='pxpch a'
-# alias pxcha='pxpch a'
-# alias pxchr='pxpch rm'
-# alias pxchl='pxpch ls'
-
-# alias pxd='pxp description'
-# alias pxdg='pxd get'
-# alias pxds='pxd set'
-
-# alias pxv='pxp version'
-# alias pxvg='pxv get'
-# alias pxver=pxvg
-# alias pxvs='pxv set'
-
-# alias pxe='pxp environment'
-# alias pxea='pxe a'
-# alias pxer='pxe rm'
-# alias pxel='pxe ls'
-
-# alias pxt='px task'
-# alias pxta='pxt a'
-# alias pxtr='pxt rm'
-# alias pxtl='pxt ls'
-# alias pxth='pxt help'
-
-# alias pxg='px g' # global
-# alias pxge='pxg edit'
-# alias pxga='pxg a'
-# alias pxgi='pxg i'
-# alias pxgr='pxg uninstall'
-# alias pxgrm='pxg rm'
-# alias pxgl='pxg ls'
-# alias pxgs='pxg s'  # sync
-# alias pxgex='pxg e' # expose
-# alias pxgu='pxg update'
-# alias pxgh='pxg help'
-
-alias hch=hatch
-alias ach=hch
-alias tch=hch
-
 # venv
 alias _venv='python -m venv'
-alias venvwith='uv venv -p'
+alias venvwith='uv v -p'
 alias venv='venvwith $(which python)'
+alias uvv=venv
 
 alias _pip="python -m pip"
 alias pip="uv pip"
@@ -679,12 +612,6 @@ alias uvi='uvt install'
 alias uvu='uvt upgrade'
 alias uvr='uvt uninstall'
 alias uvl='uvt list'
-
-function vc() {
-    local name="${1:-.venv}"
-
-    venv "$name"
-}
 
 function va() {
     local name="${1:-.venv}"
@@ -2216,13 +2143,6 @@ alias gprune=gitprune
 
 # ipatool
 alias ipa=ipatool
-idownload() {
-    ipa download -b $1 -o ~/Downloads
-}
-alias idown=idownload
-alias ilogin='ipa auth login -e'
-alias isearch='ipa search'
-alias ipurchase='ipa purchase -b'
 
 # sublime text
 alias sub='subl .'
@@ -2258,7 +2178,7 @@ alias mxc='mx compile -C build'
 
 # jc
 
-j() {
+jcp() {
     local cmd="$1"
     shift
 
@@ -2295,9 +2215,6 @@ EOF
 
     od -t x -An /dev/random | tr -d " " | fold -w ${1:-8}
 }
-
-# atomicparsley
-alias apars=atomicparsley
 
 wttr() {
     local url="wttr.in"
@@ -2631,6 +2548,9 @@ EOF
     ha -nomount ram://$1
 
 }
+# jq
+
+alias j="jq '.'"
 
 # jq cat
 jqc() {
@@ -2844,11 +2764,10 @@ EOF
     yt-dlp "${YT_DLP_URL}" "$@"
 }
 
-unset -f aria2c
-unset -f a2c
-_aria2c="$(which aria2c)"
-function aria2c() {
-    "$_aria2c" --file-allocation=falloc --optimize-concurrent-downloads "$@"
+a2c() {
+    local args=( --file-allocation=falloc --optimize-concurrent-downloads )
+    args+=( "$@")
+    aria2c "${args[@]}"
 }
 alias a2c=aria2c
 
@@ -2954,6 +2873,26 @@ mytorsocks() {
     done
 
     tor
+
+    for svc in "${svcs[@]}"; do
+        netsetup -setsocksfirewallproxy "$svc" "" ""
+    done
+}
+
+myi2psocks(){
+    # set it up on all the services available
+
+    _require jq || return 1
+
+    local svcs=
+
+    mapfile -t svcs < <(netservices --json | jq '.name' -r)
+
+    for svc in "${svcs[@]}"; do
+        netsetup -setsocksfirewallproxy "$svc" localhost 4447
+    done
+
+    i2pd --datadir ~/.i2pd
 
     for svc in "${svcs[@]}"; do
         netsetup -setsocksfirewallproxy "$svc" "" ""
@@ -3136,7 +3075,7 @@ EOF
     fi
 
     for t in "${tables[@]}"; do
-        local count=$("${cmd[@]}" "select count(*) from $t")
+        local count=$("${cmd[@]}" "select count(*) from \"$t\"")
 
         if [ "$count" = 0 ]; then
             if [ "$mode" != "json" ]; then
@@ -3415,6 +3354,7 @@ _wg() {
 }
 
 alias wgup="_wg up ${1:-wg1}"
+
 alias wgu=wgup
 _setdns() {
     local svc="$1"
@@ -3445,9 +3385,27 @@ function wgdown() {
 
     for svc in "${svcs[@]}"; do _setdns "$svc" "${routers[0]}"; done
 }
+
+function wgs() {
+    _require wg || return 1
+
+    sudo wg show | grep peer | sed 's/peer: //g' | xargs -I% sudo grep -R -B1 % /etc/wireguard |  grep -Eo '[A-Z]{2,3}[-][A-Z]+[#][0-9]+'
+    echo
+    sudo wg show
+}
+function wgls() {
+    sudo ls /etc/wireguard | grep -Eo '[0-9]+' | sort -n | tail -n+2
+}
+alias wgl=wgls
+
 alias wgd=wgdown
 alias rewg="wgdown; wgup"
 
+function pvpncaps() {
+    _require jq || return 1
+
+    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | "\.(Name)\t \.(Load)"]'
+}
 function pvpnmaxcap() {
     _require jq || return 1
 
@@ -3489,7 +3447,6 @@ mdchat() {
 }
 
 # aws
-
 alias sso='aws configure sso'
 alias awl='aws logs'
 awlt() {
@@ -3502,9 +3459,30 @@ awltf() {
     awlt "$@" --follow
 }
 
+# fclones
+alias clones=fclones
+
+# In many situations dupliate file names contain duplicate num in parentheses,
+# like this:
+# FC_20231030_0005 (1).JPG
+# 
+# the below helper prioritizes files which don't contain this notation, for preservance.
+# requires fclones json output piped to it
+
+function nicekeepers() {
+    jq '.groups[]
+     | (.files | sort | reverse) as $rev
+     | { keeper: $rev[0], dupes: $rev[1:] }'
+}
+
+alias cl='claude --permission-mode acceptEdits'
+alias clc='cl --continue'
+alias clog='cclogviewer -input'
+
+alias ts2date='date -j -f %s'
+
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
-alias cl=claude
 
 _init() {
 
