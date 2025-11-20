@@ -1,4 +1,4 @@
-LIBSH_VERSION=20250805_7420364
+LIBSH_VERSION=20251120_0dfec9f
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1635,8 +1635,10 @@ _glfhash() {
 alias glfcommits='_glfhash commit'
 alias glfblobs='_glfhash blob'
 
+alias gshow='git show'
+
 # print commits provided as list of hashes via stdin
-alias gdump='x | git -P show'
+alias gcdump='x | git -P show'
 
 alias gresign1='gc --amend --no-edit -n -S'
 
@@ -2521,6 +2523,39 @@ EOF
 
 alias a2w=a2whisper
 
+numsort() {
+    _require python3 || return 1
+
+    python3 -c "import sys, re; print(''.join(sorted(sys.stdin, key=lambda s: [int(x) if x.isdigit() else x for x in re.split(r'(\d+)', s)])))"
+}
+
+tscat() {
+    if [ "$1" == "" ]; then
+        cat <<EOF
+Usage:
+    <segment TS file list> | $0 <output.mp4>
+EOF
+        return 1
+    fi
+
+    _require ffmpeg || return 1
+
+    numsort | xargs cat | ffmpeg -i - -c copy "$1"
+}
+
+tsaudcat() {
+    if [ "$1" == "" ]; then
+        cat <<EOF
+Usage:
+    <segment TS file list> | $0 <output.m4a>
+EOF
+        return 1
+    fi
+
+    _require ffmpeg || return 1
+    numsort | xargs cat | ffmpeg -i - -vn -c:a copy "$1"
+}
+
 # tldr
 alias tl='tldr --platform macos'
 
@@ -2765,8 +2800,8 @@ EOF
 }
 
 a2c() {
-    local args=( --file-allocation=falloc --optimize-concurrent-downloads )
-    args+=( "$@")
+    local args=(--file-allocation=falloc --optimize-concurrent-downloads)
+    args+=("$@")
     aria2c "${args[@]}"
 }
 alias a2c=aria2c
@@ -2879,7 +2914,7 @@ mytorsocks() {
     done
 }
 
-myi2psocks(){
+myi2psocks() {
     # set it up on all the services available
 
     _require jq || return 1
@@ -3389,7 +3424,7 @@ function wgdown() {
 function wgs() {
     _require wg || return 1
 
-    sudo wg show | grep peer | sed 's/peer: //g' | xargs -I% sudo grep -R -B1 % /etc/wireguard |  grep -Eo '[A-Z]{2,3}[-][A-Z]+[#][0-9]+'
+    sudo wg show | grep peer | sed 's/peer: //g' | xargs -I% sudo grep -R -B1 % /etc/wireguard | grep -Eo '[A-Z]{2,3}[-][A-Z]+[#][0-9]+'
     echo
     sudo wg show
 }
@@ -3465,7 +3500,7 @@ alias clones=fclones
 # In many situations dupliate file names contain duplicate num in parentheses,
 # like this:
 # FC_20231030_0005 (1).JPG
-# 
+#
 # the below helper prioritizes files which don't contain this notation, for preservance.
 # requires fclones json output piped to it
 
@@ -3482,7 +3517,6 @@ alias clog='cclogviewer -input'
 alias ts2date='date -j -f %s'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
-
 
 _init() {
 
