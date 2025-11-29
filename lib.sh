@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251120_0dfec9f
+LIBSH_VERSION=20251129_95ced71
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -276,7 +276,7 @@ Parameters:
     length	length in characters, default is 16
 
 EOF
-        exit 1
+        return 1
     fi
 
     _require python3 || return 1
@@ -3196,6 +3196,11 @@ ppidof() {
 alias b64=base64
 alias b64d='base64 -d'
 
+# nix-base32
+alias b32=base32
+alias b32d='base32 -d'
+alias b32ds='b32d --sri'
+
 # bun
 
 alias _bun="$(which bun)"
@@ -3316,10 +3321,11 @@ ffnixpkgs() {
 
     if ! command git remote get-url upstream >/dev/null 2>&1; then
         echo 'no remote: upstream'
-        exit 1
+        return 1
     fi
 
-    local branches=(master nixpkgs-unstable)
+    #local branches=(master nixpkgs-unstable)
+    local branches=(nixpkgs-unstable)
 
     gf -vp upstream "${branches[@]}"
 
@@ -3511,7 +3517,9 @@ function nicekeepers() {
 }
 
 alias cl='claude --permission-mode acceptEdits'
+alias clskip='claude --dangerously-skip-permissions'
 alias clc='cl --continue'
+alias clcskip='clskip --continue'
 alias clog='cclogviewer -input'
 
 alias ts2date='date -j -f %s'
