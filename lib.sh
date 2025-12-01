@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251129_95ced71
+LIBSH_VERSION=20251201_bf6d6a9
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1750,7 +1750,7 @@ alias glp=gplfs
 
 # logs
 #   note: gl prefix is shared with git lfs aliases
-alias glog='g log'
+alias glog='g log --show-signature'
 alias gll=glog
 alias g1='glog -1'
 alias g2='glog -2'
