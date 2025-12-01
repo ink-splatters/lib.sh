@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251201_bf6d6a9
+LIBSH_VERSION=20251201_82e0696
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1668,6 +1668,7 @@ alias gm='g merge'
 alias gms='gm --squash'
 alias gsq=gms
 alias gcp='g cherry-pick'
+alias grc='g rebase --continue'
 
 # interactive rebase
 
