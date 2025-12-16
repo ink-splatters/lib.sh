@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251201_82e0696
+LIBSH_VERSION=20251216_4355fce
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1037,7 +1037,7 @@ alias unlockr='_chflags -R nouchg,noschg'
 
 # index
 
-alias md=mdutil
+alias mdu=mdutil
 alias mdx='mdutil -X'
 alias mdoff='mdutil -i off -d'
 alias mdoffa='md-off -a'
@@ -1653,13 +1653,15 @@ EOF
         return 1
     fi
 
-    git rebase --exec 'git commit --amend --no-edit -n -S' -i "$1"
+    git rebase --exec 'git commit --amend --no-edit -n -S && sleep 0.125' -i "$1"
 
 }
 
 # pull / fetch / merge / rebase
-alias gf='g fetch -vp'
-alias gp='g pull'
+alias gfetch='g fetch -vp'
+alias gf=gfetch
+alias gpull='g pull'
+alias gp=gpull
 alias gpr='gp --rebase'
 alias gpff='gp --ff-only'
 alias gff=gpff
@@ -1860,7 +1862,7 @@ alias grhh='grh HEAD'
 
 # submodules
 alias gsa='g submodule add'
-alias gsu='g submodule update --init --recursive'
+alias gsu='gpull --recurse-submodules'
 
 # revlist
 alias grevlist='g rev-list'
@@ -2286,11 +2288,8 @@ EOF
 }
 
 alias f2a=flac2alac
-alias fmeta=metaflac
-alias fmetatags='fmeta --show-all-tags'
-alias fmetalist='fmeta --list'
-alias fmtags=fmetatags
-alias fmls=fmetalist
+alias fmeta='metaflac --show-all-tags'
+alias fmls='metaflac --list'
 
 # cue split
 
@@ -3325,8 +3324,7 @@ ffnixpkgs() {
         return 1
     fi
 
-    #local branches=(master nixpkgs-unstable)
-    local branches=(nixpkgs-unstable)
+    local branches=(master nixpkgs-unstable)
 
     gf -vp upstream "${branches[@]}"
 
@@ -3524,6 +3522,8 @@ alias clcskip='clskip --continue'
 alias clog='cclogviewer -input'
 
 alias ts2date='date -j -f %s'
+
+alias md='glow -p'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
