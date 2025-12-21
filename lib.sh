@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251216_4355fce
+LIBSH_VERSION=20251221_e4fe171
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1862,7 +1862,8 @@ alias grhh='grh HEAD'
 
 # submodules
 alias gsa='g submodule add'
-alias gsu='gpull --recurse-submodules'
+alias gsu='g submodule update --init --recursive'
+alias gprs='gpull --recurse-submodules'
 
 # revlist
 alias grevlist='g rev-list'
@@ -2045,10 +2046,12 @@ EOF
         return 1
     fi
 
+    _require zstd || return 1
+
     local out="$1"
     shift
 
-    tar -c -f - "$@" | zstd -z -o "$out"
+    tar -c -f - "$@" | zstd --long=31 -o "$out"
 }
 
 zsta() {
@@ -2073,7 +2076,7 @@ EOF
     local in="$1"
     shift
 
-    zstd -d --memory=2048MB --stdout "$in" | tar -x "$@"
+    zstd -d --long=31 --stdout "$in" | tar -x "$@"
 }
 
 xzsta() {
