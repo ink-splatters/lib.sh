@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251221_e4fe171
+LIBSH_VERSION=20251229_ad0ec51
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -694,6 +694,62 @@ alias kcc='kcolors ~/.config/kitty/current-theme.conf'
 #  ssh
 alias kssh='kitty +kitten ssh'
 alias ks=kssh
+#alias ssh2pem='ssh-keygen -p -m PEM -f'
+alias fp='ssh-keygen -l -f'
+
+# Convert OpenSSH private key to PEM format
+function ssh2pem() {
+    local src="${1:?usage: ssh2pem <keyfile>}"
+
+    [[ -f $src ]] || {
+        echo "error: not found: $src" >&2
+        return 1
+    }
+    ssh-keygen -lf "$src" &>/dev/null || {
+        echo "error: invalid key" >&2
+        return 1
+    }
+
+    local header
+    read -r header <"$src"
+
+    case "$header" in
+        "-----BEGIN OPENSSH PRIVATE KEY-----") ;;
+        "-----BEGIN "*"PRIVATE KEY-----")
+            echo "already in PEM format" >&2
+            return 0
+            ;;
+        *)
+            echo "error: unrecognized format" >&2
+            return 1
+            ;;
+    esac
+
+    local name="${src##*/}"
+    local base="${name%.*}"
+    local ext="${name#"$base"}"
+    local default="$HOME/.ssh/${base}_pem${ext}"
+    local dest
+
+    printf 'Save to (%s): ' "$default"
+    read -r dest
+    dest="${dest:-$default}"
+    dest="${dest/#\~/$HOME}"
+
+    [[ -e $dest ]] && {
+        echo "error: already exists: $dest" >&2
+        return 1
+    }
+
+    install -m 600 "$src" "$dest" || return 1
+    ssh-keygen -p -m PEM -f "$dest" || {
+        rm -f "$dest"
+        return 1
+    }
+    chmod 400 "$dest"
+
+    echo "saved: $dest"
+}
 
 #  diff
 #    diff two files or dirs
@@ -1964,7 +2020,6 @@ EOF
             cachix_args=("$cache_name")
         else
             echo "ERROR: insufficient arguments" >&2
-            echo "Usage: cpushruntime <flake_output> <cache> | cpushruntime <flake_output...> -- <cache> [opts]" >&2
             return 1
         fi
     fi
