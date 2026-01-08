@@ -1,4 +1,4 @@
-LIBSH_VERSION=20251229_ad0ec51
+LIBSH_VERSION=20260108_24faabb
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1968,6 +1968,8 @@ alias gcl=gcloud
 
 # cachix
 alias cpush='cachix push'
+alias cpushdarwin='cpush aarch64-darwin -m zstd -l 16'
+alias cpushd=cpushdarwin
 
 cpushinputs() {
     nix flake archive --json | jq -r '.path,(.inputs|to_entries[].value.path)' | cpush "$@"
@@ -1975,6 +1977,7 @@ cpushinputs() {
 
 alias cpushi=cpushinputs
 alias cpushidarwin='cpushi aarch64-darwin'
+alias cpushid=cpushidarwin
 
 cpushruntime() {
     if [ $# -lt 1 ]; then
@@ -3613,7 +3616,7 @@ _init() {
         echo -- mounted $svdev: "$system"
 
         local previouspath="/usr/bin:/bin:/usr/sbin:/sbin"
-        export PATH="$data/usr/local/bin:$previouspath$(echo usr/bin:usr/libexec:usr/sbin:sbin:bin | sed -E 's@^|:@:'"$system\/"'@g')"
+        export PATH="$data/usr/local/bin$(echo usr/bin:usr/libexec:usr/sbin:sbin:bin | sed -E 's@^|:@:'"$system\/"'@g'):$previouspath"
 
         echo -- linking vim runtime from system volume to: $HOME/vim
 
