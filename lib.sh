@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260108_24faabb
+LIBSH_VERSION=20260111_3c6bae5
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2463,7 +2463,7 @@ EOF
     for f in ./**/*.flac; do
         local src="$f".bak
         mv "$f" "$src"
-        ffmpeg -i "$src" -c:a flac -sample_fmt s32 -ar 48000 -af "aresample=resampler=soxr" "$f"
+        ffmpeg -i "$src" -c:a flac -sample_fmt s32 -ar 48000 -af "aresample=resampler=soxr:precision=33" "$f"
     done
 }
 
@@ -3585,6 +3585,11 @@ alias clog='cclogviewer -input'
 alias ts2date='date -j -f %s'
 
 alias md='glow -p'
+
+# rip
+
+alias rqs='rip search qobuz album'
+alias rqas='rip search qobuz artist'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
