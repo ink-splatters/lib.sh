@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260111_3c6bae5
+LIBSH_VERSION=20260114_7f1806b
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1319,6 +1319,10 @@ alias ncgd='ncg -d'
 alias nso='nix store optimise'
 alias nsmka='nix store make-content-addressed'
 alias nsls='nix store ls'
+ncp() {
+    local from="${2:-https://aarch64-darwin.cachix.org}"
+    nix copy --from "$from" "$1"
+}
 
 nxrev() {
     local repo="${1:-nixpkgs}"
