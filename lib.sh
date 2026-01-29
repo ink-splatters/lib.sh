@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260114_7f1806b
+LIBSH_VERSION=20260129_e8a2e57
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3594,6 +3594,9 @@ alias md='glow -p'
 
 alias rqs='rip search qobuz album'
 alias rqas='rip search qobuz artist'
+
+# antigravity
+alias ag=agy
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
