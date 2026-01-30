@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260129_e8a2e57
+LIBSH_VERSION=20260130_e3f47d4
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3581,9 +3581,9 @@ function nicekeepers() {
 }
 
 alias cl='claude --permission-mode acceptEdits'
-alias clskip='claude --dangerously-skip-permissions'
+alias cls='claude --dangerously-skip-permissions'
 alias clc='cl --continue'
-alias clcskip='clskip --continue'
+alias clsc='cls --continue'
 alias clog='cclogviewer -input'
 
 alias ts2date='date -j -f %s'
