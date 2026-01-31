@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260130_e3f47d4
+LIBSH_VERSION=20260131_ee50b4e
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3155,49 +3155,133 @@ alias cg=certgraph
 # sqldump
 
 sqldump() {
-    if [ $# = 0 ]; then
-        cat <<EOF
-Usage: $0 <sqlite db filename> [mode]
+    local db="" mode="line" outdir="" per_file=false query="" filter_tables=""
 
-default mode is "line"
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -m | --mode)
+                mode="$2"
+                shift 2
+                ;;
+            -d | --dir)
+                outdir="$2"
+                shift 2
+                ;;
+            -q | --query)
+                query="$2"
+                shift 2
+                ;;
+            -t | --tables)
+                filter_tables="$2"
+                shift 2
+                ;;
+            -f | --files)
+                per_file=true
+                shift
+                ;;
+            -h | --help)
+                cat <<EOF
+Usage: sqldump <database> [-m|--mode MODE] [-q|--query QUERY] [-t|--tables TABLES] [-f|--files] [-d|--dir DIR]
+
+Dump SQLite database tables.
+
+Options:
+  -m, --mode MODE    Output mode (line, csv, json, etc). Default: line
+  -q, --query QUERY  Custom query template. Use %s for table name. Default: SELECT * FROM "%s"
+  -t, --tables LIST  Space-separated list of tables to dump. Default: all tables
+  -f, --files        Dump each table to a separate file
+  -d, --dir DIR      Output directory for --files. Default: current directory
+  -h, --help         Show this help
+
+Examples:
+  sqldump data.db                              Dump all tables in line mode
+  sqldump data.db -m json                      Dump all tables as JSON
+  sqldump data.db -t 'users orders'            Dump only users and orders tables
+  sqldump data.db -f -d ./out                  Dump each table to ./out/<table>.line
+  sqldump data.db -m csv -f                    Dump each table to ./<table>.csv
+  sqldump data.db -q 'SELECT * FROM "%s" LIMIT 10'
+                                               Dump first 10 rows per table
+  sqldump data.db -q 'SELECT id, name FROM "%s"' -m json -f
+                                               Dump specific columns as JSON files
 EOF
+                return 0
+                ;;
+            -*)
+                printf "Unknown option: %s\n" "$1" >&2
+                return 1
+                ;;
+            *)
+                [[ -z $db ]] && db="$1" || {
+                    printf "Unexpected argument: %s\n" "$1" >&2
+                    return 1
+                }
+                shift
+                ;;
+        esac
+    done
+
+    if [[ -z $db ]]; then
+        printf "Error: database file required\n" >&2
         return 1
     fi
 
-    local mode="${2:-line}"
-    local cmd=(sqlite3 "$1")
-    local cmddump=(sqlite3 -"$mode" "$1")
-
-    local tables=($("${cmd[@]}" .tables))
-
-    if [ "$mode" != "json" ]; then
-        printf "%s\n\n" "BEGIN DUMP"
+    if [[ ! -f $db ]]; then
+        printf "Error: database not found: %s\n" "$db" >&2
+        return 1
     fi
 
-    for t in "${tables[@]}"; do
-        local count=$("${cmd[@]}" "select count(*) from \"$t\"")
+    [[ -z $outdir ]] && outdir="$PWD"
 
-        if [ "$count" = 0 ]; then
-            if [ "$mode" != "json" ]; then
-                echo "<EMPTY>"
-                echo
+    if $per_file && [[ ! -d $outdir ]]; then
+        printf "Error: output directory does not exist: %s\n" "$outdir" >&2
+        return 1
+    fi
+
+    local -a tables
+    if [[ -n $filter_tables ]]; then
+        read -ra tables <<<"$filter_tables"
+    else
+        mapfile -t tables < <(sqlite3 "$db" .tables | tr -s ' \t' '\n' | grep -v '^$')
+    fi
+
+    if [[ ${#tables[@]} -eq 0 ]]; then
+        printf "No tables found\n" >&2
+        return 0
+    fi
+
+    local dump_table
+    dump_table() {
+        local table="$1"
+        local sql
+        if [[ -n $query ]]; then
+            # shellcheck disable=SC2059
+            printf -v sql "$query" "$table"
+        else
+            sql="SELECT * FROM \"$table\""
+        fi
+        sqlite3 -cmd ".mode $mode" "$db" "$sql"
+    }
+
+    if $per_file; then
+        for t in "${tables[@]}"; do
+            local outfile="$outdir/$t.$mode"
+            dump_table "$t" >"$outfile"
+            printf "%s\n" "$outfile"
+        done
+    else
+        [[ $mode != "json" ]] && printf "BEGIN DUMP\n\n"
+        for t in "${tables[@]}"; do
+            local count
+            count=$(sqlite3 "$db" "SELECT COUNT(*) FROM \"$t\"")
+            if [[ $count -eq 0 ]]; then
+                [[ $mode != "json" ]] && printf "<EMPTY: %s>\n\n" "$t"
+                continue
             fi
-            continue
-        fi
-
-        if [ "$mode" != "json" ]; then
-            printf "TABLE: %s\n" "$t"
-        fi
-
-        "${cmddump[@]}" "select * from $t"
-
-        if [ "$mode" != "json" ]; then
-            echo
-        fi
-    done
-
-    if [ "$mode" != "json" ]; then
-        printf "%s\n\n" "END DUMP"
+            [[ $mode != "json" ]] && printf "TABLE: %s\n" "$t"
+            dump_table "$t"
+            [[ $mode != "json" ]] && printf "\n"
+        done
+        [[ $mode != "json" ]] && printf "END DUMP\n"
     fi
 }
 
