@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260131_ee50b4e
+LIBSH_VERSION=20260209_50e3154
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3681,6 +3681,9 @@ alias rqas='rip search qobuz artist'
 
 # antigravity
 alias ag=agy
+
+# opencode
+alias oc=opencode
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
