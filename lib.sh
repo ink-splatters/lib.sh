@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260209_50e3154
+LIBSH_VERSION=20260220_6f2ebb9
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3459,7 +3459,7 @@ _ffbranch() {
         && gpush -f || return 1
 }
 
-ffnixpkgs() {
+_ffnixpkgs() {
 
     _require git || return 1
 
@@ -3473,11 +3473,9 @@ ffnixpkgs() {
         return 1
     fi
 
-    local branches=(master nixpkgs-unstable)
+    gf -vp upstream "$@"
 
-    gf -vp upstream "${branches[@]}"
-
-    for branch in "${branches[@]}"; do
+    for branch in "$@"; do
         _ffbranch "$branch" || {
             echo "FAILED."
             return 1
@@ -3485,6 +3483,8 @@ ffnixpkgs() {
 
     done
 }
+
+alias ffnixpkgs='_ffnixpkgs master nixpkgs-unstable'
 
 nix2bash() {
     if [[ $1 =~ -h|--help ]]; then
@@ -3678,12 +3678,49 @@ alias md='glow -p'
 
 alias rqs='rip search qobuz album'
 alias rqas='rip search qobuz artist'
+alias rds='rip search deezer album'
+alias rdas='rip search deezer artist'
 
 # antigravity
 alias ag=agy
 
 # opencode
 alias oc=opencode
+
+# codex
+alias cx=codex
+
+spki() {
+
+    if [[ $# == 0 ]]; then
+        cat <<'EOF'
+Usage:
+    spki <host>[:port]
+EOF
+        return 1
+    fi
+
+    local host="${1%:*}"
+    local port="${1##*:}"
+
+    if [ "$host" = "$port" ]; then
+        port=443
+    fi
+
+    cat <<EOF
+SPKI for
+
+Host: $host
+Port: $port
+
+EOF
+
+    openssl s_client -connect "$host:$port" -servername $host </dev/null 2>/dev/null \
+        | openssl x509 -pubkey -noout \
+        | openssl pkey -pubin -outform der \
+        | openssl dgst -sha256 -binary \
+        | openssl enc -base64
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
