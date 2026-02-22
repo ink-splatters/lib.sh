@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260220_6f2ebb9
+LIBSH_VERSION=20260222_4ba64ad
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3689,6 +3689,7 @@ alias oc=opencode
 
 # codex
 alias cx=codex
+alias cxx='cx --dangerously-bypass-approvals-and-sandbox'
 
 spki() {
 
