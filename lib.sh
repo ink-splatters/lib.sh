@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260222_4ba64ad
+LIBSH_VERSION=20260225_b37318b
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3689,7 +3689,11 @@ alias oc=opencode
 
 # codex
 alias cx=codex
+alias cxr='cx resume'
 alias cxx='cx --dangerously-bypass-approvals-and-sandbox'
+alias cxxr='cxx resume'
+
+alias lat='curl https://cheat.sh/latency'
 
 spki() {
 
