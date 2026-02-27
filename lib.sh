@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260225_b37318b
+LIBSH_VERSION=20260227_ed7deab
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2678,55 +2678,11 @@ alias llmp='llm pull'
 # npm/npx
 
 alias npm='npm --no-fund'
-alias npi='npm i'
-alias npu='npm update'
-alias ngi='npi -g'
-alias ngu='npu -g'
-
-alias npid='npm i -D'
-alias npr='npm run dev'
-alias ntsx='npx tsx'
 
 # font smoothing
 alias fontsmoothing='defaults -currentHost read -g AppleFontSmoothing'
 alias setfontsmoothing='defaults -currentHost write -g AppleFontSmoothing -int'
 alias delfontsmoothing='defaults -currentHost delete -g AppleFontSmoothing'
-
-# rye
-alias re=rye
-
-alias rea='re add'
-alias rer='re remove'
-
-rel() {
-    if [[ -f "$PWD/pyproject.toml" &&
-        "$(cat pyproject.toml)" =~ \[tool.rye\] ]]; then
-        re list
-    else
-        re tools list
-    fi
-
-}
-alias resync='re sync'
-alias res=resync
-alias rerun='re run'
-
-alias relint='rerun lint'
-alias reli=rlint
-alias refix='rerun fix'
-alias refi=rfix
-alias reshow='re show'
-alias resh='re show'
-alias relock='re lock'
-
-alias ret='re tools'
-
-alias retest='rerun test'
-
-function rei() { _foreach rye tools install -- "$@"; }
-function reu() { _foreach rye tools uninstall -- "$@"; }
-
-alias retl='ret list'
 
 function howmuch() {
     local seconds=$1
