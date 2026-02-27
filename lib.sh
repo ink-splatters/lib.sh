@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260227_ed7deab
+LIBSH_VERSION=20260227_142c6a7
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1363,6 +1363,8 @@ EOF
     echo Done.
     open /Applications/nix
 }
+
+alias npu=nix-prefetch-url
 
 # direnv / nix-direnv
 alias dre=nix-direnv-reload
