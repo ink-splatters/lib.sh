@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260227_142c6a7
+LIBSH_VERSION=20260311_d6d60f4
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3652,38 +3652,6 @@ alias cxx='cx --dangerously-bypass-approvals-and-sandbox'
 alias cxxr='cxx resume'
 
 alias lat='curl https://cheat.sh/latency'
-
-spki() {
-
-    if [[ $# == 0 ]]; then
-        cat <<'EOF'
-Usage:
-    spki <host>[:port]
-EOF
-        return 1
-    fi
-
-    local host="${1%:*}"
-    local port="${1##*:}"
-
-    if [ "$host" = "$port" ]; then
-        port=443
-    fi
-
-    cat <<EOF
-SPKI for
-
-Host: $host
-Port: $port
-
-EOF
-
-    openssl s_client -connect "$host:$port" -servername $host </dev/null 2>/dev/null \
-        | openssl x509 -pubkey -noout \
-        | openssl pkey -pubin -outform der \
-        | openssl dgst -sha256 -binary \
-        | openssl enc -base64
-}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
