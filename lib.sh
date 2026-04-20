@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260311_d6d60f4
+LIBSH_VERSION=20260420_4f3db4e
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3242,6 +3242,8 @@ EOF
         [[ $mode != "json" ]] && printf "END DUMP\n"
     fi
 }
+
+alias sqld=sqldump
 
 # tpaste.us
 
