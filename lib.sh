@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260420_4f3db4e
+LIBSH_VERSION=20260420_5f845d2
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -761,11 +761,169 @@ alias kdtwo='kitty +kitten diff'
 alias kdt=kdtwo
 alias kd2=kdt
 
-# TODO
-# notify
-# notify() {
-#    terminal-notifier -title "Kitty" -message "Done with task! Exit status: $?" -activate net.kovidgoyal.kitty
-# }
+notify() {
+    local status_code=$?
+    local header="Terminal"
+    local payload=
+    local subtitle=
+    local bundle_id=
+    local header_set=0
+    local payload_set=0
+    local -a args
+    local -a positionals
+
+    case "${TERM_PROGRAM:-}:${TERM:-}" in
+        Apple_Terminal:*)
+            header="Terminal"
+            bundle_id="com.apple.Terminal"
+            ;;
+        iTerm.app:*)
+            header="iTerm"
+            bundle_id="com.googlecode.iterm2"
+            ;;
+        *:xterm-kitty)
+            header="Kitty"
+            bundle_id="net.kovidgoyal.kitty"
+            ;;
+        *)
+            if [ -n "${TERM_PROGRAM:-}" ]; then
+                header="$TERM_PROGRAM"
+            fi
+            ;;
+    esac
+
+    if [ "$status_code" -eq 0 ]; then
+        payload="Completed successfully."
+    else
+        payload="Failed with exit status $status_code."
+    fi
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -H | --header)
+                if [ $# -lt 2 ]; then
+                    echo "ERROR: missing value for $1" >&2
+                    return 1
+                fi
+                header="$2"
+                header_set=1
+                shift 2
+                ;;
+            -p | --payload)
+                if [ $# -lt 2 ]; then
+                    echo "ERROR: missing value for $1" >&2
+                    return 1
+                fi
+                payload="$2"
+                payload_set=1
+                shift 2
+                ;;
+            -s | --subtitle)
+                if [ $# -lt 2 ]; then
+                    echo "ERROR: missing value for $1" >&2
+                    return 1
+                fi
+                subtitle="$2"
+                shift 2
+                ;;
+            -a | --activate)
+                if [ $# -lt 2 ]; then
+                    echo "ERROR: missing value for $1" >&2
+                    return 1
+                fi
+                bundle_id="$2"
+                shift 2
+                ;;
+            -h | --help)
+                cat <<EOF
+Usage: notify [OPTIONS]
+       notify [OPTIONS] [PAYLOAD]
+       notify [OPTIONS] <HEADER> <PAYLOAD>
+
+Send a macOS notification via terminal-notifier.
+
+Options:
+  -H, --header TEXT     Notification header/title
+  -p, --payload TEXT    Notification payload/message
+  -s, --subtitle TEXT   Notification subtitle
+  -a, --activate ID     Bundle identifier to activate on click
+  -h, --help            Show this help
+
+Defaults:
+  header                Current terminal app, when detected
+  payload               Derived from the previous command exit status
+
+Examples:
+  notify
+  notify "Build finished"
+  notify "Backup" "Completed successfully."
+  notify --header "Backup" --payload "Completed successfully."
+EOF
+                return 0
+                ;;
+            --)
+                shift
+                while [[ $# -gt 0 ]]; do
+                    positionals+=("$1")
+                    shift
+                done
+                ;;
+            -*)
+                echo "ERROR: unknown option: $1" >&2
+                return 1
+                ;;
+            *)
+                positionals+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    case "${#positionals[@]}" in
+        0) ;;
+        1)
+            if [ "$payload_set" -eq 1 ]; then
+                echo "ERROR: payload specified more than once" >&2
+                return 1
+            fi
+            payload="${positionals[0]}"
+            ;;
+        2)
+            if [ "$header_set" -eq 1 ]; then
+                echo "ERROR: header specified more than once" >&2
+                return 1
+            fi
+            if [ "$payload_set" -eq 1 ]; then
+                echo "ERROR: payload specified more than once" >&2
+                return 1
+            fi
+            header="${positionals[0]}"
+            payload="${positionals[1]}"
+            ;;
+        *)
+            echo "ERROR: too many arguments" >&2
+            return 1
+            ;;
+    esac
+
+    if ! command -v terminal-notifier >/dev/null 2>&1; then
+        echo "ERROR: terminal-notifier is not in PATH" >&2
+        return "$status_code"
+    fi
+
+    args=(-title "$header" -message "$payload")
+
+    if [ -n "$subtitle" ]; then
+        args+=(-subtitle "$subtitle")
+    fi
+
+    if [ -n "$bundle_id" ]; then
+        args+=(-activate "$bundle_id")
+    fi
+
+    terminal-notifier "${args[@]}" >/dev/null 2>&1 || echo "ERROR: failed to send notification" >&2
+    return "$status_code"
+}
 
 # launchctl & processes
 
