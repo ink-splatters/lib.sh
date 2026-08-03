@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260420_5f845d2
+LIBSH_VERSION=20260803_e5cb518
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -312,12 +312,12 @@ EOF
 
 alias pg='pgrep -i'
 
-_salias k kill
+_salias kl kill
 _salias kall killall
 
-alias k9='k -9'
-alias kstop='k -SIGSTOP'
-alias kcont='k -SIGCONT'
+alias k9='kl -9'
+alias kstop='kl -SIGSTOP'
+alias kcont='kl -SIGCONT'
 
 pk() { pg "$1" | x kill -9; }
 
@@ -526,7 +526,9 @@ function netsetup() {
 alias nsetup=netsetup
 alias nets=nsetup
 
-alias _netservices='networksetup -listnetworkserviceorder'
+_netservices() {
+    networksetup -listnetworkserviceorder "$@"
+}
 
 function netservices() {
 
@@ -1297,6 +1299,7 @@ alias nxconf='nx show-config'
 alias nxc=nxconf
 alias nxsh='nx shell'
 alias nxs='nix-search'
+alias nhs='nh search'
 alias nxsd='nxs -d'
 
 alias nxb='nx build'
@@ -1417,7 +1420,7 @@ alias nxrerm='nxre remove'
 
 nxrepkgs() {
 
-    nxrepl --file <(
+    nxrepl --expr "$(
         cat <<'EOF'
 import <nixpkgs> {
   overlays = [
@@ -1437,7 +1440,7 @@ import <nixpkgs> {
   ];
 }
 EOF
-    )
+    )"
 
 }
 
@@ -1829,6 +1832,7 @@ function gstp() { gst pop; }
 alias gb='g branch'
 alias gba='gb -a'
 alias gbd='gb -D'
+alias gbdr='gbd -r'
 
 # tags
 alias gt='g tag'
@@ -1856,6 +1860,7 @@ alias glfcommits='_glfhash commit'
 alias glfblobs='_glfhash blob'
 
 alias gshow='git show'
+alias gsno='gshow --name-only'
 
 # print commits provided as list of hashes via stdin
 alias gcdump='x | git -P show'
@@ -3571,10 +3576,9 @@ alias snc=snkc
 alias vvv='/usr/sbin/spctl -a -vvv -t install'
 
 _ffbranch() {
-    gco upstream/"$1" \
-        && gbd "$1" \
-        && gcob "$1" \
-        && gpush -f || return 1
+    gco "$1" \
+        && grh upstream/"$1" \
+        && gpush -f
 }
 
 _ffnixpkgs() {
@@ -3737,6 +3741,8 @@ EOF
     pb -c 'print CFBundleShortVersionString' "$info"
 }
 
+alias verinfo=appver
+
 mdchat() {
     _require jq || return 1
 
@@ -3812,6 +3818,25 @@ alias cxx='cx --dangerously-bypass-approvals-and-sandbox'
 alias cxxr='cxx resume'
 
 alias lat='curl https://cheat.sh/latency'
+
+iso8601() {
+    while read -r line; do
+        date -u -r "$line" +"%Y-%m-%dT%H:%M:%SZ"
+    done
+}
+
+alias sec="/usr/bin/security"
+
+prdiff() {
+    local trunk="${1:-main}"
+    git log --no-merges \
+        --reverse \
+        --oneline \
+        "$trunk"..HEAD | rg -o '^[0-9a-f]{7}( HEAD [-][>][^)]+[)] )?(.+)$' --replace '-$2'
+
+}
+
+alias k3ctl='sudo k3s kubectl'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
