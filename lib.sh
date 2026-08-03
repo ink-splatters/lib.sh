@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260803_f321f4f
+LIBSH_VERSION=20260803_fc3cea3
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3069,11 +3069,6 @@ alias mez='azf -e -m'
 alias miz='azf -i -m'
 alias miez='azf -e -i -m'
 
-# time
-alias diso='date  "+%Y-%m-%d"'
-alias dtiso='date  "+%Y-%m-%dT%H:%M:%S"'
-alias dt='date  "+%Y-%m-%d %H:%M:%S"'
-
 # ripgrep
 alias rgnc='rg --color=never'
 
@@ -3818,9 +3813,21 @@ alias cxxr='cxx resume'
 alias lat='curl https://cheat.sh/latency'
 
 iso8601() {
-    while read -r line; do
-        date -u -r "$line" +"%Y-%m-%dT%H:%M:%SZ"
-    done
+    _require python3
+
+    python3 <(
+        cat <<'EOF'
+from datetime import datetime, timezone
+import fileinput
+
+with fileinput.input() as f:
+    print(
+        datetime.fromtimestamp(int(f.readline().strip()), timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+EOF
+    )
 }
 
 alias sec="/usr/bin/security"
