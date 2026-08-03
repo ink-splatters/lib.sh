@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260803_e5cb518
+LIBSH_VERSION=20260803_f321f4f
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3660,8 +3660,61 @@ celoop() {
 }
 
 _wg() {
-    # sudo WG_QUICK_USERSPACE_IMPLEMENTATION=boringtun-cli WG_SUDO=1 wg-quick "$@"
-    wg-quick "$@"
+    local wgquick=
+    local userspace=
+    local devbin="$HOME/dev/wireguard-tools/src"
+    local env_args=()
+
+    wgquick="$(_wg_quick_bin)" || return 1
+    userspace="$(_wg_quick_userspace_impl)"
+
+    if [ -x "$devbin/wg" ]; then
+        env_args=("PATH=$devbin:$PATH")
+    else
+        env_args=("PATH=$PATH")
+    fi
+    if [ -n "$userspace" ]; then
+        env_args+=("WG_QUICK_USERSPACE_IMPLEMENTATION=$userspace")
+    fi
+    if [ -n "$WG_QUICK_CONFIG_PATH" ]; then
+        env_args+=("WG_QUICK_CONFIG_PATH=$WG_QUICK_CONFIG_PATH")
+    fi
+    if [ -n "$WG_QUICK_DNS" ]; then
+        env_args+=("WG_QUICK_DNS=$WG_QUICK_DNS")
+    fi
+
+    env "${env_args[@]}" "$wgquick" "$@"
+}
+
+_wg_quick_bin() {
+    local dev="$HOME/dev/wireguard-tools/src/wg-quick/darwin/wg-quick"
+
+    if [ -x "$dev" ]; then
+        printf '%s\n' "$dev"
+        return 0
+    fi
+
+    command -v wg-quick
+}
+
+_wg_quick_userspace_impl() {
+    local nix_wgquick=/nix/var/nix/profiles/default/bin/wg-quick
+    local dir=
+
+    if [ -n "$WG_QUICK_USERSPACE_IMPLEMENTATION" ]; then
+        printf '%s\n' "$WG_QUICK_USERSPACE_IMPLEMENTATION"
+        return 0
+    fi
+    if command -v wireguard-go >/dev/null 2>&1; then
+        command -v wireguard-go
+        return 0
+    fi
+    if [ -r "$nix_wgquick" ]; then
+        dir="$(sed -n "s|^PATH='\\(/nix/store/[^']*wireguard-go[^']*/bin\\).*|\\1|p" "$nix_wgquick" | head -n 1)"
+        if [ -n "$dir" ] && [ -x "$dir/wireguard-go" ]; then
+            printf '%s\n' "$dir/wireguard-go"
+        fi
+    fi
 }
 
 alias wgup="_wg up ${1:-wg1}"
@@ -3676,7 +3729,7 @@ _setdns() {
 
 }
 function wgdown() {
-    _wg down ${1:-wg1} || return 1
+    _wg down ${1:-wg1} || _wg_legacy down ${1:-wg1} || return 1
 
     _require rg || {
         echo "Restore DNS yourself"
@@ -3687,14 +3740,23 @@ function wgdown() {
     local routers=()
 
     mapfile -t svcs < <(netservices | rg '^[(][\d]+[)] (.+)$' --replace '$1')
-    mapfile -t routers < <(for svc in "${svcs[@]}"; do dhinfo "$svc" | rg -o '[\t ]*Router: ([^n].+)$' --replace '$1'; done)
+    mapfile -t routers < <(for svc in "${svcs[@]}"; do dhinfo "$svc" | rg -o '^[\t ]*Router: ([0-9.]+)$' --replace '$1'; done | sort -u)
 
-    if [ ${#routers[@]} -gt 1 ]; then
+    if [ ${#routers[@]} -ne 1 ]; then
         echo "assert len(${routers[*]}) == 1"
         return 1
     fi
 
     for svc in "${svcs[@]}"; do _setdns "$svc" "${routers[0]}"; done
+}
+
+_wg_legacy() {
+    local legacy=/nix/var/nix/profiles/default/bin/wg-quick
+
+    if [ ! -x "$legacy" ]; then
+        return 1
+    fi
+    "$legacy" "$@"
 }
 
 function wgs() {
