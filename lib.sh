@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260803_e5cb518
+LIBSH_VERSION=20260803_f321f4f
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1398,10 +1398,8 @@ alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxrun='nx run'
 alias nxfr=nxrun
-alias nxi='nxp add'
-alias nxia='nxi --accept-flake-config'
+alias nxi='nxp add --accept-flake-config'
 alias nxii='nxi --impure'
-alias nxiia='nxii --accept-flake-config'
 alias nxl='nxp list'
 alias nxm=nxfm
 alias nxmeta=nxfmeta
