@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260803_fc3cea3
+LIBSH_VERSION=20260818_ee82936
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2811,6 +2811,38 @@ EOF
     ha -nomount ram://$1
 
 }
+
+buildramdisk() {
+    if [[ $# != 1 || $1 -lt 1 ]]; then
+        cat <<EOF
+Usage:
+    $0 <size in GB>
+EOF
+        return 1
+    fi
+
+    local size=$((1024 * 1024 * 2 * ${1}))
+
+    local dev=$(hdiutil attach -nomount ram://$size -plist | plutil -extract system-entities.0.dev-entry raw -)
+    echo -- Allocated $size GB.
+
+    diskutil apfs createContainer $dev
+
+    dev=$(echo $dev | rg -o 'disk.+')
+
+    local cref=$(diskutil info -plist $dev | plutil -extract APFSContainerReference raw -)
+    echo -- APFS synthesized volume: $cref
+
+    diskutil apfs addVolume $cref APFS ramdisk -nomount
+
+    local mntdir=/nix/var/nix/builds
+
+    sudo rm -rf $mntdir/*
+    sudo mount_apfs /dev/${cref}s1 $mntdir
+
+    mount
+}
+
 # jq
 
 alias j="jq '.'"
