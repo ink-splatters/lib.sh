@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260803_fc3cea3
+LIBSH_VERSION=20260818_ee82936
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3708,12 +3708,18 @@ alias rewg="wgdown; wgup"
 function pvpncaps() {
     _require jq || return 1
 
-    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | "\.(Name)\t \.(Load)"]'
+    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL")]'
 }
 function pvpnmaxcap() {
     _require jq || return 1
 
     jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, ScoreBasedCapacity: (100 - (.Score*20)), Load}] | sort_by(.Load)[0]'
+}
+
+function pvpnmaxcap2() {
+    _require jq || return 1
+
+    jq '.LogicalServers | map(select(.Tier == 0 and .EntryCountry == "NL")) | sort_by(.Load,.Score)[0] | {"name": "\(.Name)", "load": "\(.Load)","score": "\(.Score)"}'
 }
 
 appver() {
