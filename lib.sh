@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260818_ee82936
+LIBSH_VERSION=20260819_9303a4a
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3566,7 +3566,7 @@ snkc() {
 }
 alias snc=snkc
 
-alias vvv='/usr/sbin/spctl -a -vvv -t install'
+alias vvv='/usr/sbin/spctl -a -vvv'
 
 _ffbranch() {
     gco "$1" \
