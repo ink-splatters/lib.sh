@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260819_9303a4a
+LIBSH_VERSION=20260829_586e1fb
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3848,6 +3848,8 @@ prdiff() {
 }
 
 alias k3ctl='sudo k3s kubectl'
+
+alias sshkey-fingerprint='ssh-keygen -lf'
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
