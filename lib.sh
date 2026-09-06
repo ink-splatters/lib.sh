@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260829_586e1fb
+LIBSH_VERSION=20260906_9f7ba41
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3850,6 +3850,44 @@ prdiff() {
 alias k3ctl='sudo k3s kubectl'
 
 alias sshkey-fingerprint='ssh-keygen -lf'
+
+zstaa() {
+    _require zstd || return 1
+
+    if [ $# != 1 ]; then
+        cat <<'EOF'
+Archives the current directory, creating aa.zst output, preserving ACLs, BSD flags and xattrs.
+
+Usage: zstaa <output.aa.zst>
+EOF
+        return 1
+    fi
+    local output="$1"
+
+    /usr/bin/aa archive \
+        -d . \
+        -include-field uid,gid,mod,flg,mtm,btm,ctm,xat,acl \
+        -a raw \
+        | zstd -10 --long=31 -o "$output"
+    echo Done.
+}
+
+unzaa() {
+    if [ $# != 1 ]; then
+        cat <<'EOF'
+Unarchives aa.zst archive to the current directory.
+
+Usage: unzaa <input.aa.zst>
+EOF
+        return 1
+    fi
+    local input="$1"
+    cat "$input" | zstd -d --long=31 | \
+	/usr/bin/aa extract \
+        -d . \
+        -include-field uid,gid,mod,flg,mtm,btm,ctm,xat,acl \
+        -no-ignore-eperm
+}
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
 
