@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260906_9f7ba41
+LIBSH_VERSION=20260917_e11bea5
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3836,6 +3836,9 @@ EOF
     )
 }
 
+alias isodate='date +%s | iso8601'
+alias bisodate="isodate | tr -d ':-'"
+
 alias sec="/usr/bin/security"
 
 prdiff() {
@@ -3882,11 +3885,11 @@ EOF
         return 1
     fi
     local input="$1"
-    cat "$input" | zstd -d --long=31 | \
-	/usr/bin/aa extract \
-        -d . \
-        -include-field uid,gid,mod,flg,mtm,btm,ctm,xat,acl \
-        -no-ignore-eperm
+    cat "$input" | zstd -d --long=31 \
+        | /usr/bin/aa extract \
+            -d . \
+            -include-field uid,gid,mod,flg,mtm,btm,ctm,xat,acl \
+            -no-ignore-eperm
 }
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
