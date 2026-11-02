@@ -1,4 +1,4 @@
-LIBSH_VERSION=20260917_e11bea5
+LIBSH_VERSION=20261102_f310b0b
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -2019,6 +2019,7 @@ alias gldiffs='glog --all -p -S'
 #  pushes
 #   best used with push.autoSetupRemote = true
 alias gpush='g push'
+alias gpushf='gpush --force-with-lease'
 alias gpusht='gpush --tags'
 
 gpushdel() {
@@ -3714,6 +3715,12 @@ function pvpnmaxcap() {
     _require jq || return 1
 
     jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, ScoreBasedCapacity: (100 - (.Score*20)), Load}] | sort_by(.Load)[0]'
+}
+
+function pvpnmaxcap10() {
+    _require jq || return 1
+
+    jq '[.LogicalServers[] | select (.Tier == 0 and .EntryCountry == "NL") | {Name, ScoreBasedCapacity: (100 - (.Score*20)), Load}] | sort_by(.Load)[0:10]'
 }
 
 function pvpnmaxcap2() {
