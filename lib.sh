@@ -1,4 +1,4 @@
-LIBSH_VERSION=20261106_abbdbe7
+LIBSH_VERSION=20261106_c365d4e
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1410,7 +1410,7 @@ alias nxpi=nxi
 alias nxr='nxp remove'
 alias nxpr=nxr
 
-alias nxrepl='nx repl'
+alias nxrepl="nx repl $_nxo"
 
 alias nxre='nx registry'
 alias nxrea='nxre add'
