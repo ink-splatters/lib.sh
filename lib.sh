@@ -1,4 +1,4 @@
-LIBSH_VERSION=20261102_f310b0b
+LIBSH_VERSION=20261106_abbdbe7
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -1292,6 +1292,7 @@ alias nx='nix --option extra-access-tokens "$GH_PAT"'
 
 _nxv='--verbose --show-trace -L'
 _nxi='--impure'
+_nxo='--override-flake nixpkgs github:NixOS/nixpkgs/nixpkgs-unstable'
 
 alias enxc='vi ~/.config/nix/nix.conf'
 
@@ -1312,7 +1313,7 @@ alias nxdv="nxd $_nxv"
 alias nxdi="nxd $_nxi"
 alias nxdiv="nxdi $_nxv"
 
-alias nxu='nxp upgrade'
+alias nxu="nxp upgrade $_nxo"
 alias nxuv="nxu $_nxv"
 alias nxui="nxu $_nxi"
 alias nxuiv="nxui $_nxv"
@@ -1398,7 +1399,7 @@ alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
 alias nxrun='nx run'
 alias nxfr=nxrun
-alias nxi='nxp add --accept-flake-config'
+alias nxi="nxp add --accept-flake-config $_nxo"
 alias nxii='nxi --impure'
 alias nxl='nxp list'
 alias nxm=nxfm
