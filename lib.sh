@@ -1,4 +1,4 @@
-LIBSH_VERSION=20261106_c365d4e
+LIBSH_VERSION=20261110_c083e3a
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -134,6 +134,21 @@ EOF
     )
 }
 
+_warn() {
+    if [ $# != 2 ]; then
+        cat <<EOF
+Usage: $0 <time in sec> <message>
+EOF
+        return 1
+    fi
+
+    local time="${1:-1.5}"
+    local msg="$2"
+
+    echo "$time sec to $msg"
+    sleep "$time"
+    echo 'BANG!'
+}
 # sudo / system
 
 _salias s
@@ -1298,7 +1313,7 @@ alias enxc='vi ~/.config/nix/nix.conf'
 
 alias nxconf='nx show-config'
 alias nxc=nxconf
-alias nxsh='nx shell'
+alias nxsh="nx shell $_nxo"
 alias nxs='nix-search'
 alias nhs='nh search'
 alias nxsd='nxs -d'
@@ -1397,8 +1412,7 @@ alias nxfm='nxf metadata'
 alias nxfs='nxf show'
 alias nxfu='nxf update'
 alias nxfuc='nxfu --commit-lock-file'
-alias nxrun='nx run'
-alias nxfr=nxrun
+alias nxrun="nx run $_nxo"
 alias nxi="nxp add --accept-flake-config $_nxo"
 alias nxii='nxi --impure'
 alias nxl='nxp list'
@@ -1791,6 +1805,30 @@ alias gx=gix
 alias gxc='gx clone'
 alias gxc1='gxc --depth=1'
 alias gxf='gx fetch'
+alias gxf1='gxf --depth=1'
+gfcfgall() {
+    if [[ ! $# || $# -gt 1 ]]; then
+        cat <<EOF
+Force the fetch configuration to match ALL tracking branches (heads/*)
+
+Usage:
+    $0 [<remote>]
+
+    remote is origin by default
+EOF
+        return 1
+    fi
+
+    _require git || return 1
+
+    local remote="${1:-origin}"
+
+    _warn "1.5" "to change fetch configuration for remote: $remote"
+
+    git config set remote."$remote".fetch "+refs/heads/*:refs/remotes/$remote/*" || return 1
+
+    echo Done.
+}
 
 #  working copy
 alias gcl='g clone'
@@ -2325,9 +2363,7 @@ _ensure_git_tree() {
 _destructive_warn() {
     local time="${1:-1.5}"
 
-    echo "$time sec to DESTRUCTIVE action"
-    sleep "$time"
-    echo 'BANG!'
+    _warn "$time" "DESTRUCTIVE action"
 }
 
 del_working_tree() {
