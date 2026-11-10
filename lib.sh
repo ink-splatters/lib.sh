@@ -1,4 +1,4 @@
-LIBSH_VERSION=20261110_c083e3a
+LIBSH_VERSION=20261110_e83fa96
 export LIBSH_VERSION
 cat <<EOF
 		       lib.sh v$LIBSH_VERSION
@@ -3934,6 +3934,23 @@ EOF
             -d . \
             -include-field uid,gid,mod,flg,mtm,btm,ctm,xat,acl \
             -no-ignore-eperm
+}
+
+mobileprovision() {
+    if [ $# != 1 ]; then
+        cat <<EOF
+Decodes ASN.1 .mobileprovision payload
+
+Usage:
+    $0 <.mobileprovision file>
+EOF
+        return 1
+    fi
+
+    /usr/bin/security cms -Di "$1" \
+        | /usr/bin/plutil -extract DER-Encoded-Profile raw -o - - | base64 -D \
+        | /usr/bin/security cms -D \
+        | /usr/bin/openssl asn1parse -inform der -i
 }
 
 # TODO: ✂ - - - - - - - - - - - - - - - - - - -
